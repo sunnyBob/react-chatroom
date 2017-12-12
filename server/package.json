@@ -1,0 +1,34 @@
+{
+  "name": "chatroom",
+  "version": "1.0.0",
+  "description": "chat app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node_modules/babel-cli/bin/babel-node.js app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.coding.net/wondeful_go_it/chatRoom.git"
+  },
+  "keywords": [
+    "socket.io",
+    "node",
+    "react"
+  ],
+  "author": "Liu Xuegang",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "nodebatis": "^2.1.3",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1"
+  }
+}
