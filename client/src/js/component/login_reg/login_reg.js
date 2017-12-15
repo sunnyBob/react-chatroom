@@ -1,6 +1,8 @@
 import React from 'react';
 import { Tab, TabItem } from '../common';
+import { browserHistory } from 'react-router';
 import request from '../../utils/request';
+
 export default class LoginReg extends React.Component {
   constructor(props) {
     super(props);
@@ -11,16 +13,18 @@ export default class LoginReg extends React.Component {
     };
   }
 
-  handleLogin = () => {
+  handleLogin = async () => {
     const { name, passwd } = this.state;
-    const ret = request({
+    const ret = await request({
       url: 'login',
       data: {
         name,
         passwd,
       },
     });
-    console.log(ret);
+    if (ret.code === '1') {
+      browserHistory.push('/chat');
+    }
   }
 
   handleChange = (e) => {
