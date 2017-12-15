@@ -22,7 +22,7 @@ export default function(options) {
     response => {
       const resp = response && response.data || {};
       if (resp.code === 2000) {
-        window.location.href = '/logout'
+        window.location.href = '/login'
       }
       return resp;
     }, Promise.reject

@@ -22,8 +22,8 @@ export default class LoginReg extends React.Component {
         passwd,
       },
     });
-    if (ret.code === '1') {
-      browserHistory.push('/chat');
+    if (ret.code === 1) {
+      browserHistory.replace('/chat');
     }
   }
 

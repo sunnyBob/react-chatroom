@@ -5,6 +5,9 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
 const routers = require('./routes/route');
+const sendData = require('./utils/sendHelp');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 io.on('connection', function(socket){
   console.log('a user connected');
@@ -12,7 +15,11 @@ io.on('connection', function(socket){
 });
 
 app.use(express.static(path.join(__dirname, '..', 'client')));
-app.use(routers(express.Router()))
+app.use(sendData);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(routers(express.Router()));
 http.listen(PORT, () => {
   console.log(`server start on port ${PORT}`);
 });
