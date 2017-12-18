@@ -16,8 +16,8 @@ io.on('connection', function(socket){
 
 app.use(express.static(path.join(__dirname, '..', 'client')));
 app.use(sendData);
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(routers(express.Router()));
 http.listen(PORT, () => {
