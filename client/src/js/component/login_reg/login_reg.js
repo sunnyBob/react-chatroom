@@ -1,6 +1,8 @@
 import React from 'react';
-import { Tab, TabItem } from '../common';
+import { Tab, TabItem, Input, RadioGroup } from '../common';
+import { browserHistory } from 'react-router';
 import request from '../../utils/request';
+
 export default class LoginReg extends React.Component {
   constructor(props) {
     super(props);
@@ -11,20 +13,28 @@ export default class LoginReg extends React.Component {
     };
   }
 
-  handleLogin = () => {
+  handleLogin = async () => {
     const { name, passwd } = this.state;
-    const ret = request({
+    const ret = await request({
       url: 'login',
       data: {
         name,
         passwd,
+        username: '',
+        password: '',
+        repassword: '',
+        age: 0,
+        sex: '',
+        email: '',
+        phone: '',
       },
     });
-    console.log(ret);
+    if (ret.code === 1) {
+      browserHistory.replace('/chat');
+    }
   }
 
-  handleChange = (e) => {
-    const { name, value } = e.target;
+  handleChange = (name, value) => {
     this.setState({
       [name]: value,
     })
@@ -39,59 +49,80 @@ export default class LoginReg extends React.Component {
           >
             <TabItem icon='sign-in' content="登录">
               <div className="content">
-                <div className="field is-horizontal">
-                  <div className="field-label is-small">
-                    <label className="label is-small">用户名</label>
-                  </div>
-                  <div className="field-body">
-                    <div className="field">
-                      <div className="control">
-                        <input className="input is-small" name="name" type="text" placeholder="username" onChange={this.handleChange}/>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="field is-horizontal">
-                  <div className="field-label is-small">
-                    <label className="label is-small">密码</label>
-                  </div>
-                  <div className="field-body">
-                    <div className="field">
-                      <div className="control">
-                        <input className="input is-small" type="password" name="passwd" placeholder="password" onChange={this.handleChange}/>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Input
+                  placeholder="username"
+                  label="Username"
+                  name="name"
+                  required={true}
+                  handleChange={this.handleChange}
+                />
+                <Input
+                  placeholder="password"
+                  label="Password"
+                  type="password"
+                  name="passwd"
+                  required={true}
+                  handleChange={this.handleChange}
+                />
                 <a className="button is-primary is-small pull-right" onClick={this.handleLogin}>登录</a>
               </div>
             </TabItem>
             <TabItem icon='registered' content="注册">
               <div className="content">
-                <div className="field is-horizontal">
-                  <div className="field-label is-small">
-                    <label className="label is-small">用户名</label>
-                  </div>
-                  <div className="field-body">
-                    <div className="field">
-                      <div className="control">
-                        <input className="input is-small" type="text" placeholder="Normal sized input"/>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="field is-horizontal">
-                  <div className="field-label is-small">
-                    <label className="label is-small">密码</label>
-                  </div>
-                  <div className="field-body">
-                    <div className="field">
-                      <div className="control">
-                        <input className="input is-small" type="password" placeholder="Normal sized input"/>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Input
+                  placeholder="username"
+                  label="Username"
+                  name="username"
+                  required={true}
+                  handleChange={this.handleChange}
+                />
+                <Input
+                  placeholder="password"
+                  label="Password"
+                  type="password"
+                  name="password"
+                  required={true}
+                  handleChange={this.handleChange}
+                />
+                <Input
+                  placeholder="password again"
+                  label="Password again"
+                  type="password"
+                  name="repassword"
+                  required={true}
+                  handleChange={this.handleChange}
+                />
+                <Input
+                  placeholder="age"
+                  label="Age"
+                  type="number"
+                  name="age"
+                  handleChange={this.handleChange}
+                />
+                <RadioGroup
+                  label="sex"
+                  name="sex"
+                  options={[{
+                    label: 'male',
+                    value: '男'
+                  }, {
+                    label: 'female',
+                    value: '女'
+                  }]}
+                  onChange={this.handleChange}
+                />
+                <Input
+                  placeholder="phone"
+                  label="Phone"
+                  name="phone"
+                  handleChange={this.handleChange}
+                />
+                <Input
+                  placeholder="email"
+                  label="Email"
+                  name="email"
+                  handleChange={this.handleChange}
+                />
                 <a className="button is-primary is-small pull-right">注册</a>
               </div>
             </TabItem>

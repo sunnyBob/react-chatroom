@@ -1,11 +1,12 @@
-import { LoginReg } from '../component';
+import { LoginReg, ChatRoom } from '../component';
 
 const routeConfig = [
   {
     path: '/',
-    // component: LoginReg,
+    indexRoute: { onEnter: (nextState, replace) => replace('/chat') },
     childRoutes: [
       { path: 'login', component: LoginReg },
+      { path: 'chat', component: ChatRoom },
     ]
   }
 ];
