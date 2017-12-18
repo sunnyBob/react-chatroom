@@ -1,6 +1,5 @@
 namespace: 'user'
 
 findUser:
-  - select id from user
+  - select id, password from user
   - where username = :name
-  - and password = :passwd

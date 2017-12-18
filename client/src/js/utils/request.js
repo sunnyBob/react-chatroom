@@ -12,17 +12,20 @@ export default function(options) {
     responseType: 'json',
   };
 
-  if (options.method && options.method.toLowerCase() === 'get') {
-    config.data = options.data;
-  } else {
+  if (config.method.toLowerCase() === 'get') {
     config.params = options.data;
+  } else {
+    config.data = options.data;
   }
 
   axios.interceptors.response.use(
     response => {
       const resp = response && response.data || {};
-      if (resp.code === 2000) {
+      if (resp.code === '2000') {
         window.location.href = '/login'
+      }
+      if (resp.code === '5000') {
+        alert(resp.message);
       }
       return resp;
     }, Promise.reject

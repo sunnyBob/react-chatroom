@@ -14,9 +14,9 @@ export default class LoginReg extends React.Component {
       password: '',
       repassword: '',
       age: 0,
-      sex: '',
-      email: '',
-      phone: '',
+      sex: null,
+      email: null,
+      phone: null,
     };
   }
 
@@ -36,8 +36,6 @@ export default class LoginReg extends React.Component {
 
   handleReg = async () => {
     const { username, password, repassword, age, phone, email, sex } = this.state;
-    console.log(repassword)
-    console.log(password);
     if (password !== repassword) {
       alert('两次输入密码不一致');
       return;

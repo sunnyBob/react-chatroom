@@ -3,14 +3,16 @@ const ctrl = require('../ctrl/renderCtrl');
 const tokenChecker = require('../utils/tokenChecker');
 
 module.exports = function(router) {
-  router.get('/api/login', ctrl.findUser)
+  router.get('/api/login', ctrl.findUser);
+  router.post('/api/register', ctrl.addUser);
 
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
-    if (!tokenChecker(token) && req.path !== '/login') {
+    if (req.path !== '/login' && !tokenChecker(token)) {
       res.send("<script>window.location.href='/login'</script>")
+    } else {
+      res.sendFile(path.resolve(__dirname, '../index.html'));
     }
-    res.sendFile(path.resolve(__dirname, '../index.html'))
   });
   return router;
 }

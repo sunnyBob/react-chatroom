@@ -58,7 +58,7 @@ class Input extends Component {
               <div className="field-body">
                 <div className="field">
                   <div className="control">
-                    <input className="input is-small" autocomplete="off" type={type} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
+                    <input className="input is-small" autoComplete="off" type={type} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
                   </div>
                   {
                     helpContent ? <p className={`help is-${helpStyle}`}>
@@ -71,7 +71,7 @@ class Input extends Component {
             (<div className="field">
               <label className="label is-small">{required ? `${label}*` : label}</label>
               <div className="control">
-                <input className="input is-small" autocomplete="off" type={type} name={name} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
+                <input className="input is-small" autoComplete="off" type={type} name={name} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
               </div>
               {
                 helpContent ? <p className={`help is-${helpStyle}`}>
