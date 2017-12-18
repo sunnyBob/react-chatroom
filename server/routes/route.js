@@ -3,7 +3,8 @@ const ctrl = require('../ctrl/renderCtrl');
 const tokenChecker = require('../utils/tokenChecker');
 
 module.exports = function(router) {
-  router.get('/api/login', ctrl.findUser)
+  router.get('/api/login', ctrl.findUser);
+  router.post('/api/register', ctrl.addUser);
 
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
