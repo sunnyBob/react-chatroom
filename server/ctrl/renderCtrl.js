@@ -6,12 +6,10 @@ const bcrypt = require('bcrypt');
 
 exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
-  const user = {
-    name,
-    passwd,
-  };
-  const ret = await userService.findUser(user);
-  if (ret[0].id && bcrypt.compareSync(passwd, ret[0].hash)) {
+  
+  const ret = await userService.findUser({name});
+  
+  if (ret[0].id && bcrypt.compareSync(passwd, ret[0].password)) {
     const firstSignIn = Date.now();
     const token = jwt.sign({
       name,
@@ -32,6 +30,12 @@ exports.findUser = async (req, res) => {
 
 exports.addUser = async (req, res) => {
   const { username, password, age, sex, phone, email } = req.body;
+  const searchRet = await userService.findUser({name: username})
+  if (searchRet[0].id) {
+    res.sendData('5000', '用户名已经被占用');
+    return;
+  }
+
   const saltRounds = 10;
   const hash = bcrypt.hashSync(password, saltRounds);
   const user = {

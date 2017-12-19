@@ -10,6 +10,13 @@ export default class LoginReg extends React.Component {
     this.state = {
       name: '',
       passwd: '',
+      username: '',
+      password: '',
+      repassword: '',
+      age: 0,
+      sex: null,
+      email: null,
+      phone: null,
     };
   }
 
@@ -20,17 +27,34 @@ export default class LoginReg extends React.Component {
       data: {
         name,
         passwd,
-        username: '',
-        password: '',
-        repassword: '',
-        age: 0,
-        sex: '',
-        email: '',
-        phone: '',
       },
     });
     if (ret.code === 1) {
       browserHistory.replace('/chat');
+    }
+  }
+
+  handleReg = async () => {
+    const { username, password, repassword, age, phone, email, sex } = this.state;
+    if (password !== repassword) {
+      alert('两次输入密码不一致');
+      return;
+    }
+    const ret = await request({
+      url: 'register',
+      method: 'post',
+      data: {
+        username,
+        password,
+        repassword,
+        age,
+        sex,
+        email,
+        phone,
+      },
+    });
+    if (ret.code === 1) {
+      // browserHistory.replace('/chat');
     }
   }
 
@@ -123,7 +147,7 @@ export default class LoginReg extends React.Component {
                   name="email"
                   handleChange={this.handleChange}
                 />
-                <a className="button is-primary is-small pull-right">注册</a>
+                <a className="button is-primary is-small pull-right" onClick={this.handleReg}>注册</a>
               </div>
             </TabItem>
           </Tab>

@@ -21,17 +21,24 @@ class Input extends Component {
   handleChange = (e) => {
     const { name, value } = e.target;
     const { reg, required } = this.props;
-    console.log(value, required);
     if (required && !value) {
       this.setState({
         helpContent: '该字段为必填字段',
         helpStyle: 'danger',
+      })
+    } else if(required && value) {
+      this.setState({
+        helpContent: '',
       })
     }
     if (reg && !reg.test(value)) {
       this.setState({
         helpContent: '数据格式不合法',
         helpStyle: 'danger',
+      })
+    } else if(reg && reg.test(value)) {
+      this.setState({
+        helpContent: '',
       })
     }
     this.props.handleChange(name, value);
@@ -51,7 +58,7 @@ class Input extends Component {
               <div className="field-body">
                 <div className="field">
                   <div className="control">
-                    <input className="input is-small" type={type} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
+                    <input className="input is-small" autoComplete="off" type={type} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
                   </div>
                   {
                     helpContent ? <p className={`help is-${helpStyle}`}>
@@ -64,7 +71,7 @@ class Input extends Component {
             (<div className="field">
               <label className="label is-small">{required ? `${label}*` : label}</label>
               <div className="control">
-                <input className="input is-small" type={type} name={name} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
+                <input className="input is-small" autoComplete="off" type={type} name={name} placeholder={placeholder} defaultValue={defaultValue} onChange={this.handleChange}/>
               </div>
               {
                 helpContent ? <p className={`help is-${helpStyle}`}>
