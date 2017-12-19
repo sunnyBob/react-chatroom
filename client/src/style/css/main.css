@@ -13,3 +13,36 @@
   right: 0;
   top: 0;
 }
+html,
+body {
+  height: 100%;
+}
+#app {
+  height: 100%;
+}
+.layout {
+  height: 100%;
+}
+.layout .mainpage {
+  height: 100%;
+}
+.menubox {
+  margin-top: 10px;
+  z-index: 99;
+  height: 100%;
+  width: 200px;
+  border: 1px solid #377599;
+}
+.room {
+  margin-top: 10px;
+  height: 100%;
+}
+.footer {
+  box-sizing: content-box;
+  padding: 10px !important;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+}

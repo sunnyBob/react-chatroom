@@ -43,7 +43,7 @@ const webpackCongig = {
 
 gulp.task('webpack', cb => {
   pump([
-    gulp.src('./src/js/index.js'),
+    gulp.src('./src/js/app.js'),
     webpackStream(webpackCongig),
     rename('bundle.js'),
     gulp.dest('./dist/js/'),
