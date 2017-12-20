@@ -27,6 +27,9 @@ const webpackCongig = {
       exclude: /node_modules/,
       use: 'babel-loader',
     }, {
+      test: /\.(png|jpg|gif)$/,
+      use: 'file-loader',
+    }, {
       test: /\.less$/,
       use: [{
           loader: "style-loader",
