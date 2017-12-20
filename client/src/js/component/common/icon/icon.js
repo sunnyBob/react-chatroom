@@ -18,9 +18,19 @@ class Icon extends React.Component {
   render() {
     const { prefix, name, size, className } = this.props;
     const classes = `${prefix} ${prefix}-${name}`;
+    let fa = '';
+    if (size === 'small') {
+      fa = '1x';
+    } else if (size === 'medium') {
+      fa = '2x';
+    } else if (size === 'large') {
+      fa = '3x';
+    }
     return (
       <span {...this.props} className={classNames('icon', { [`is-${size}`]: size }, className)}>
-        <i className={classes}></i>
+        <span className={classNames('fa', { [`fa-${fa}`]: fa})}>
+          <i className={classes}></i>
+        </span>
       </span>
     );
   }
