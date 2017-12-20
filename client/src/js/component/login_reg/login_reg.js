@@ -152,6 +152,9 @@ export default class LoginReg extends React.Component {
             </TabItem>
           </Tab>
         </div>
+        <div className="footer">
+          © Copyright 2017. jerry chatRoom, All rights reserved.
+        </div>
       </div>
     );
   }

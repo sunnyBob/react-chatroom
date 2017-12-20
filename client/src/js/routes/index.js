@@ -3,6 +3,10 @@ import Root from '../root/root';
 
 const routeConfig = [
   {
+    path: '/login',
+    component: LoginReg,
+  },
+  {
     path: '/',
     component: Root,
     indexRoute: { onEnter: (nextState, replace) => replace('/chat') },
