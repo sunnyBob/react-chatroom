@@ -2,6 +2,7 @@ import React from 'react';
 import { Tab, TabItem, Input, RadioGroup } from '../common';
 import { browserHistory } from 'react-router';
 import request from '../../utils/request';
+import './loginReg.less';
 
 export default class LoginReg extends React.Component {
   constructor(props) {
