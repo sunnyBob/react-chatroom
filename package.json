@@ -1,5 +1,11 @@
 {
   "dependencies": {
     "bcrypt": "^1.0.3"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.7",
+    "less": "^2.7.3",
+    "less-loader": "^4.0.5",
+    "style-loader": "^0.19.1"
   }
 }
