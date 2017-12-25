@@ -5,6 +5,7 @@ import routeConfig from './routes';
 import RootStore from './stores/rootStore';
 import { Provider } from 'mobx-react';
 
+window.globals = {};
 render(
   <Provider rootStore={RootStore}>
     <Router routes={routeConfig} history={browserHistory}/>
