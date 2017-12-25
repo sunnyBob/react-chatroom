@@ -6,14 +6,13 @@ const bcrypt = require('bcrypt');
 
 exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
-  
   const ret = await userService.findUser({name});
-  
-  if (ret[0].id && bcrypt.compareSync(passwd, ret[0].password)) {
+  const { id, password } = ret[0] || {};
+  if (bcrypt.compareSync(passwd, password)) {
     const firstSignIn = Date.now();
     const token = jwt.sign({
       name,
-      userId: ret[0].id,
+      userId: id,
       firstSignIn,
     }, jwtConfig.secretKey, {
       expiresIn: jwtConfig.expiresIn,
@@ -24,9 +23,9 @@ exports.findUser = async (req, res) => {
     });
     const retList = [{
       userName: name,
-      userId: ret[0].id,
+      userId: id,
     }]
-    res.sendData(1, '登录成功', { user_id: id });
+    res.sendData(1, retList, '登录成功');
   } else {
     res.sendData(0, '无效的用户名或密码');
   }
@@ -34,8 +33,8 @@ exports.findUser = async (req, res) => {
 
 exports.addUser = async (req, res) => {
   const { username, password, age, sex, phone, email } = req.body;
-  const searchRet = await userService.findUser({name: username})
-  if (searchRet[0].id) {
+  const searchRet = await userService.findUser({name: username});
+  if (searchRet.length && searchRet[0].id) {
     res.sendData('5000', '用户名已经被占用');
     return;
   }
