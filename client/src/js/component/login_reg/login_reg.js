@@ -31,6 +31,10 @@ export default class LoginReg extends React.Component {
       },
     });
     if (ret.code === 1) {
+      globals.user = {
+        user_id: ret.retList[0].userId,
+        user_name: ret.retList[0].userName,
+      };
       browserHistory.replace('/chat');
     }
   }
@@ -47,7 +51,6 @@ export default class LoginReg extends React.Component {
       data: {
         username,
         password,
-        repassword,
         age,
         sex,
         email,
