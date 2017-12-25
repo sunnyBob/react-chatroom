@@ -3,3 +3,7 @@ namespace: 'user'
 findUser:
   - select id, password from user
   - where username = :name
+
+showFriend:
+  - select friend_id, friend_name, avatar from friend
+  - where user_id = :userId

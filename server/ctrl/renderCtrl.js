@@ -22,7 +22,11 @@ exports.findUser = async (req, res) => {
       maxAge: 2592000000,//30天
       httpOnly: true
     });
-    res.sendData(1, '登录成功');
+    const retList = [{
+      userName: name,
+      userId: ret[0].id,
+    }]
+    res.sendData(1, '登录成功', { user_id: id });
   } else {
     res.sendData(0, '无效的用户名或密码');
   }
@@ -53,4 +57,10 @@ exports.addUser = async (req, res) => {
   } else {
     res.sendData('0', '注册失败');
   }
+}
+
+exports.showFriends = async (req, res) => {
+  const { userId } = req.query;
+  const ret = await userService.findFriend(userId);
+  res.sendData(ret);
 }
