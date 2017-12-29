@@ -2,18 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import Icon from '../icon';
+import { Icon } from '../';
 
 class Menus extends React.Component {
   static propTypes = {
     label: PropTypes.string,
     type: PropTypes.string,
-    floatPosition: PropTypes.string,
     isSub: PropTypes.bool,
     icon: PropTypes.string,
     selected: PropTypes.bool,
     toggled: PropTypes.bool,
-    collapse: PropTypes.bool,
     iconPrefix: PropTypes.string,
     onClick: PropTypes.func,
     activeKey: PropTypes.string,
@@ -23,75 +21,21 @@ class Menus extends React.Component {
   constructor(props) {
     super(props);
 
-    const type = props.collapse ? 'float' : props.type;
     this.state = {
       isOpen: props.selected,
       isActive: false,
-      type,
+      arrowClass: 'angle-down',
     };
-
-    this.handleToggleOpen = this.handleToggleOpen.bind(this);
-    this.handleBindEvent = this.handleBindEvent.bind(this);
-    this.handleRemoveEvent = this.handleRemoveEvent.bind(this);
-    this.handleClickOpen = this.handleClickOpen.bind(this);
   }
 
-  handleToggleOpen() {
-    this.setState({ isOpen: !this.state.isOpen });
-  }
-
-  handleClickOpen() {
+  handleClickOpen = (e) => {
     if (this.props.onClick) {
       this.props.onClick();
     }
-    if (this.state.type === 'float') return;
-    this.setState({ isOpen: !this.state.isOpen });
-  }
-
-  handleBindEvent() {
-    if (this.props.isSub && this.state.type === 'float') {
-      const node = ReactDOM.findDOMNode(this);
-      node.addEventListener('click', this.handleClick);
-      node.addEventListener('mouseenter', this.handleToggleOpen);
-      node.addEventListener('mouseleave', this.handleToggleOpen);
-    }
-  }
-
-  handleRemoveEvent() {
-    if (this.props.isSub && this.state.type === 'float') {
-      const node = ReactDOM.findDOMNode(this);
-      node.removeEventListener('click', this.handleClick);
-      node.removeEventListener('mouseenter', this.handleToggleOpen);
-      node.removeEventListener('mouseleave', this.handleToggleOpen);
-    }
-  }
-
-  componentDidMount() {
-    this.handleBindEvent();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.collapse !== this.state.collapse) {
-      if (nextProps.collapse) {
-        this.state.isOpen = false;
-        this.state.type = 'float';
-        this.handleBindEvent();
-      } else {
-        this.handleRemoveEvent();
-        this.state.type = '';
-      }
-      this.setState({
-        collapse: nextProps.collapse,
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.isSub && this.state.type === 'float') {
-      const node = ReactDOM.findDOMNode(this);
-      node.removeEventListener('mouseenter', this.handleToggleOpen);
-      node.removeEventListener('mouseleave', this.handleToggleOpen);
-    }
+    this.setState({
+      isOpen: !this.state.isOpen, 
+      arrowClass: !this.state.isOpen ? 'angle-up' : 'angle-down',
+    });
   }
 
   render() {
@@ -103,20 +47,10 @@ class Menus extends React.Component {
       iconPrefix,
       activeKey,
       selected,
-      collapse,
       className,
-      floatPosition,
     } = this.props;
     const type = this.state.type;
-    let isOpen = false;
-    if (collapse || this.props.type === 'float') {
-      isOpen = this.state.isOpen;
-    } else if (!activeKey && activeKey !== 'none') {
-      isOpen = selected;
-    } else {
-      isOpen = activeKey === label;
-    }
-    const arrowClass = type === 'float' ? 'angle-right' : 'angle-down';
+    const { isOpen, arrowClass } = this.state;
 
     if (!isSub) {
       return (
@@ -139,7 +73,7 @@ class Menus extends React.Component {
             {label}
             <span className="toggle-icon"><Icon name={arrowClass}/></span>
           </a>
-          <ul style={style} className={classNames('menu-list', type, floatPosition)}>{children}</ul>
+          <ul style={style} className={classNames('menu-list', type)}>{children}</ul>
         </li>
       );
     }

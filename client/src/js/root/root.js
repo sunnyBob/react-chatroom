@@ -14,11 +14,20 @@ class Root extends React.Component {
       <div className="container is-fluid mainpage">
         <div className="columns" style={{height: '100%'}}>
           <div className="column is-2 menubox">
-            <input/>
+            <div className="user-info"></div>
+            <input className="input"/>
             <Menus>
-              <Menu>1</Menu>
-              <Menu>2</Menu>
-              <Menu>3</Menu>
+              <Menus label="我的好友" isSub={true}>
+                <Menu to="/chat/xxx">xxx</Menu>
+                <Menu to="/chat/1">1</Menu>
+                <Menu to="/chat/2">2</Menu>
+                <Menu to="/chat/3">3</Menu>
+              </Menus>
+              <Menus label="我的群组" isSub={true}>
+                <Menus label="我加入的群" isSub={true}></Menus>
+                <Menus label="我创建的群" isSub={true}></Menus>
+                <Menus label="我管理的群" isSub={true}></Menus>
+              </Menus>
             </Menus>
           </div>
           <div className="column is-10 room">

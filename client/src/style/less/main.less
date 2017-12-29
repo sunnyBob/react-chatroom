@@ -18,6 +18,23 @@ html, body {
   z-index: 99;
   height: 100%;
   width: 200px;
+  padding: auto 0;
+  overflow: scroll;
+  background: linear-gradient(#4494d3, #D7ECF1);
+}
+.menu-list li ul {
+  padding: 0 !important;
+  border-left-width: 0 !important;
+}
+.menu-list li {
+  a:hover {
+    background: #88c2ec;
+    z-index: -1;
+  }
+}
+
+.menu-list .is-active {
+  background: #25a0f3 !important;
 }
 
 .room {

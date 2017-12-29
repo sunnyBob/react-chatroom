@@ -12,7 +12,9 @@ const routeConfig = [
     indexRoute: { onEnter: (nextState, replace) => replace('/chat') },
     childRoutes: [
       { path: 'login', component: LoginReg },
-      { path: 'chat', component: ChatRoom },
+      { path: 'chat', component: ChatRoom, childRoutes: [
+        {path: '/chat/:id', component: ChatRoom},
+      ]},
     ]
   }
 ];
