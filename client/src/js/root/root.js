@@ -27,11 +27,11 @@ class Root extends React.Component {
               {this.props.children}
             </div>
             <div className="wordarea">
-              <div className="toolbar">
+              <div className="toolbar is-clearfix">
                 <Icon name="smile-o" size="medium"/>
                 <Icon name="folder-o" size="medium"/>
               </div>
-              <textarea  rows="6"></textarea>
+              <textarea className="textarea is-primary"></textarea>
               <button className="pull-right">发送</button>
             </div>
           </div>
