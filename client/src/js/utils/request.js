@@ -30,6 +30,5 @@ export default function(options) {
       return resp;
     }, Promise.reject
   );
-  
   return axios.request(config);
 }

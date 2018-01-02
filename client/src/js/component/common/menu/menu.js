@@ -26,7 +26,6 @@ class Menu extends React.Component {
 
   render() {
     const { children, icon, to, iconPrefix } = this.props;
-    console.log(children)
     const iconEl = icon ? <Icon name={icon} prefix={iconPrefix}/> : null;
     return (
       <li>

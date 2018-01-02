@@ -15,23 +15,27 @@ html, body {
 }
 
 .user-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #dbdada;
+  padding-bottom: 10px;;
   .avatar {
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    vertical-align: middle;
+    cursor: pointer;
   }
-  span {
-    margin-left: 8px;
+  .add-user {
     font-family: 'Serif';
     font-weight: bolder;
-    color: #fafcf7;
+    color: #95f10a;
+    cursor: pointer;
   }
-  margin-bottom: 10px;
 }
 
 .menubox {
-  z-index: 99;
   height: 100%;
   width: 200px;
   padding: auto 0;
@@ -45,41 +49,9 @@ html, body {
 .menu-list li {
   a:hover {
     background: #88c2ec;
-    z-index: -1;
   }
 }
 
 .menu-list .is-active {
   background: #25a0f3 !important;
-}
-
-.room {
-  height: 100%;
-  overflow: hidden;
-  .chatInfo {
-    width: 100%;
-    height: 9%;
-  }
-  .message {
-    height: 59%;
-    margin: 0 !important;
-    overflow: scroll;
-  }
-  .wordarea {
-    width: 100%;
-    height: 19%;
-    textarea {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border-width: 0px;
-    }
-    .toolbar {
-      margin: 8px auto;
-    }
-    button {
-      height: 20%;
-      margin: 8px 0;
-    }
-  }
 }

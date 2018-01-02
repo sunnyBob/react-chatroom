@@ -20,11 +20,9 @@ class Menus extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       isOpen: props.selected,
-      isActive: false,
-      arrowClass: 'angle-down',
+      arrowClass: props.selected ? 'angle-up' : 'angle-down',
     };
   }
 
@@ -32,9 +30,10 @@ class Menus extends React.Component {
     if (this.props.onClick) {
       this.props.onClick();
     }
+    const isOpen = !this.state.isOpen;
     this.setState({
-      isOpen: !this.state.isOpen, 
-      arrowClass: !this.state.isOpen ? 'angle-up' : 'angle-down',
+      isOpen, 
+      arrowClass: isOpen ? 'angle-up' : 'angle-down',
     });
   }
 
@@ -66,7 +65,7 @@ class Menus extends React.Component {
       return (
         <li className={classNames({ 'is-selected': isOpen })}>
           <a
-            className={classNames('has-children', { 'is-active': this.state.isActive, 'is-open': isOpen })}
+            className={classNames('has-children', { 'is-open': isOpen })}
             onClick={this.handleClickOpen}
           >
             {icon ? <Icon name={icon} prefix={iconPrefix}/> : null}

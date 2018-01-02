@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
   const ret = await userService.findUser({name});
-  const { id, password } = ret[0] || {};
+  const { id, password, avatar } = ret[0] || {};
   if (bcrypt.compareSync(passwd, password)) {
     const firstSignIn = Date.now();
     const token = jwt.sign({
@@ -24,6 +24,7 @@ exports.findUser = async (req, res) => {
     const retList = [{
       userName: name,
       userId: id,
+      avatar,
     }]
     res.sendData(1, retList, '登录成功');
   } else {

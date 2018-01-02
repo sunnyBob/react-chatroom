@@ -31,9 +31,11 @@ export default class LoginReg extends React.Component {
       },
     });
     if (ret.code === 1) {
+      const { userId, userName, avatar } = ret.retList[0] || {};
       const user = {
-        user_id: ret.retList[0].userId,
-        user_name: ret.retList[0].userName,
+        user_id: userId,
+        user_name: userName,
+        avatar,
       };
       localStorage.setItem('user', JSON.stringify(user));
       browserHistory.replace('/chat');
