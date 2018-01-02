@@ -31,8 +31,18 @@ exports.findUser = async (req, res) => {
   }
 }
 
+exports.findUserById = async (req, res) => {
+  const { id } = req.query;
+  const ret = await userService.findUserById(id);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData(1, ret, 'success');
+  } else {
+    res.sendData(0, ret), 'failed';
+  }
+}
+
 exports.addUser = async (req, res) => {
-  const { username, password, age, sex, phone, email } = req.body;
+  const { username, password, age, sex, phone, email, avatar } = req.body;
   const searchRet = await userService.findUser({name: username});
   if (searchRet.length && searchRet[0].id) {
     res.sendData('5000', '用户名已经被占用');
@@ -48,7 +58,7 @@ exports.addUser = async (req, res) => {
     sex,
     email,
     phone,
-    avatar: path.join(__dirname, '../avatar/default', sex ? `${sex}.jpg` : '男.jpg')
+    avatar,
   };
   const ret = await userService.addUser(user);
   if (ret.affectedRows) {

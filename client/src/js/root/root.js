@@ -1,20 +1,19 @@
 import React from 'react';
-import { inject, observer } from 'mobx-react';
 import { Menu, Menus, Icon } from '../component/common';
+import UserInfo from './userInfo';
+import { ModalManager } from '../component/common/modal';
 
-@inject('rootStore')
-@observer
 class Root extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
+    ModalManager.open({
+      content: '222',
+      needPortal: true,
+    })
     return (
       <div className="container is-fluid mainpage">
         <div className="columns" style={{height: '100%'}}>
           <div className="column is-2 menubox">
-            <div className="user-info"></div>
+            <UserInfo/>
             <input className="input"/>
             <Menus>
               <Menus label="我的好友" isSub={true}>

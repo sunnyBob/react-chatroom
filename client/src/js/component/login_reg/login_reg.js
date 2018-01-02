@@ -24,17 +24,18 @@ export default class LoginReg extends React.Component {
   handleLogin = async () => {
     const { name, passwd } = this.state;
     const ret = await request({
-      url: 'login',
+      url: '/login',
       data: {
         name,
         passwd,
       },
     });
     if (ret.code === 1) {
-      globals.user = {
+      const user = {
         user_id: ret.retList[0].userId,
         user_name: ret.retList[0].userName,
       };
+      localStorage.setItem('user', JSON.stringify(user));
       browserHistory.replace('/chat');
     }
   }
@@ -46,7 +47,7 @@ export default class LoginReg extends React.Component {
       return;
     }
     const ret = await request({
-      url: 'register',
+      url: '/register',
       method: 'post',
       data: {
         username,
@@ -55,6 +56,7 @@ export default class LoginReg extends React.Component {
         sex,
         email,
         phone,
+        avatar: this.nameToImage(username),
       },
     });
     if (ret.code === 1) {
@@ -68,9 +70,29 @@ export default class LoginReg extends React.Component {
     })
   }
 
+  nameToImage = (name) => {
+    const Initials = name.charAt(0);
+    const fontSize = 60;
+    const fontWeight = 'bold';
+
+    const canvas = this.canvas;
+    canvas.width = 120;
+    canvas.height = 120;
+    const context = canvas.getContext('2d');
+    context.fillStyle = '#F7F7F9';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = '#605CA8';
+    context.font = fontWeight + ' ' + fontSize + 'px sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline="middle";
+    context.fillText(Initials, fontSize, fontSize);
+    return canvas.toDataURL("image/png");
+  }
+
   render() {
     return (
       <div className="login-container">
+        <canvas ref={(ref) => {this.canvas=ref}} style={{display: 'none'}}></canvas>
         <div className="card login">
           <Tab
             isCenter={true}

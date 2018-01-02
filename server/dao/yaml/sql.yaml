@@ -4,6 +4,10 @@ findUser:
   - select id, password from user
   - where username = :name
 
+findUserById:
+  - select username, avatar, email, phone, sex, age, status from user
+  - where id = :id
+
 showFriend:
   - select friend_id, friend_name, avatar from friend
   - where user_id = :userId

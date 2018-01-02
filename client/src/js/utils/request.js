@@ -4,7 +4,7 @@ require("babel-polyfill");
 
 export default function(options) {
   axios.defaults.timeout = 5000;
-  axios.defaults.baseURL = '/api/'
+  axios.defaults.baseURL = '/api'
 
   const config = {
     method: options.method || 'GET',

@@ -6,6 +6,7 @@ module.exports = function(router) {
   router.get('/api/login', ctrl.findUser);
   router.post('/api/register', ctrl.addUser);
   router.get('/api/friends', ctrl.showFriends);
+  router.get('/api/user', ctrl.findUserById);
 
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
