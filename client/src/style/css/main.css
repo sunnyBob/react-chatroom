@@ -300,6 +300,13 @@ body {
 .menu-list li a:hover {
   background: #88c2ec;
 }
+.menu-list li a img {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 5px;
+}
 .menu-list .is-active {
   background: #25a0f3 !important;
 }

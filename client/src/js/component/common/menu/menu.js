@@ -12,6 +12,7 @@ class Menu extends React.Component {
     selected: PropTypes.bool,
     onClick: PropTypes.func,
     to: PropTypes.string,
+    avatar: PropTypes.string,
   };
 
   constructor(props) {
@@ -25,11 +26,12 @@ class Menu extends React.Component {
   }
 
   render() {
-    const { children, icon, to, iconPrefix } = this.props;
+    const { children, icon, to, iconPrefix, avatar } = this.props;
     const iconEl = icon ? <Icon name={icon} prefix={iconPrefix}/> : null;
+    const avatarEl = avatar ? <img src={avatar} /> : null;
     return (
       <li>
-        <Link to={to} activeClassName="is-active" onClick={this.handleClick}>{iconEl}{children}</Link>
+        <Link to={to} activeClassName="is-active" onClick={this.handleClick}>{iconEl}{avatarEl}{children}</Link>
       </li>
     );
   }

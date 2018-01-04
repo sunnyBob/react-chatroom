@@ -2,13 +2,21 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Menu, Menus } from '../common';
 import UserInfo from './userInfo';
+import FriendList from './friendList';
 
-@inject('rootStore')
+@inject('RootStore')
 @observer
 class Root extends React.Component {
   constructor(props) {
     super(props);
-    this.user = JSON.parse(localStorage.getItem('user'));
+    const user = localStorage.getItem('user');
+    this.user = JSON.parse(user);
+    this.store = new props.RootStore();
+    this.fetchData();
+  }
+
+  fetchData = () => {
+    this.store.getFriends(this.user.user_id);
   }
 
   render() {
@@ -19,12 +27,7 @@ class Root extends React.Component {
             <UserInfo info={this.user}/>
             <input className="input"/>
             <Menus>
-              <Menus label="我的好友" isSub={true} selected={true}>
-                <Menu to="/chat/xxx">xxx</Menu>
-                <Menu to="/chat/1">1</Menu>
-                <Menu to="/chat/2">2</Menu>
-                <Menu to="/chat/3">3</Menu>
-              </Menus>
+              <FriendList friendsList={this.store.friendsInfo}/>
               <Menus label="我的群组" isSub={true}>
                 <Menus label="我加入的群" isSub={true}></Menus>
                 <Menus label="我创建的群" isSub={true}></Menus>
