@@ -3,6 +3,7 @@ import { Input, RadioGroup } from './form';
 import { Menu, Menus } from './menu';
 import { Icon } from './icon';
 import Card from './card/card';
+import { Modal, ModalManager } from './modal';
 
 export {
   Tab,
@@ -13,4 +14,6 @@ export {
   Menu,
   Menus,
   Card,
+  Modal,
+  ModalManager,
 };

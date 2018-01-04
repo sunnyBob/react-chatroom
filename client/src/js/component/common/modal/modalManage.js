@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Modal from './Modal';
+import Modal from './modal';
 
 class ModalManager extends React.Component {
   static open(props) {
