@@ -1,26 +1,35 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import Icon from '../icon/index';
+import { Icon } from '../icon';
 
 class Card extends React.Component {
-  render(） {
-    const { childern, title, icon, footer } = this.props;
+  handleClose = () => {
+    const node = ReactDOM.findDOMNode(this);
+    if (this.props.handleClose) {
+      this.props.handleClose(node);
+    } else {
+      node.parentNode.removeChild(node);
+      this.props.handleClose && this.props.handleClose();
+    }
+  }
+
+  render() {
+    const { children, title, icon, footer, className, enableClose = false } = this.props;
     return (
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">
+      <div className={classNames('card', className)}>
+        <header className="card-header">
+          <p className="card-header-title">
             {title}
           </p>
-          <a href="#" class="card-header-icon" aria-label="more options">
-            <Icon name={icon}/>
-          </a>
+          {enableClose ? <Icon name="times" className="icon-close" onClick={this.handleClose}/> : null}
         </header>
-        <div class="card-content">
-          <div class="content">
+        <div className="card-content">
+          <div className="content">
             {children}
           </div>
         </div>
-        <footer class="card-footer">
+        <footer className="card-footer">
           {footer}
         </footer>
       </div>
