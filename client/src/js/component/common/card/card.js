@@ -15,23 +15,32 @@ class Card extends React.Component {
   }
 
   render() {
-    const { children, title, icon, footer, className, enableClose = false } = this.props;
+    const { children, title, icon, footer, className,
+      enableClose = false, showHeader = true, showFooter = true
+    } = this.props;
     return (
       <div className={classNames('card', className)}>
-        <header className="card-header">
-          <p className="card-header-title">
-            {title}
-          </p>
-          {enableClose ? <Icon name="times" className="icon-close" onClick={this.handleClose}/> : null}
-        </header>
+        {
+          showHeader 
+            ? <header className="card-header">
+              <p className="card-header-title">
+                {title}
+              </p>
+              {enableClose ? <Icon name="times" className="icon-close" onClick={this.handleClose}/> : null}
+            </header> : null
+        }
         <div className="card-content">
           <div className="content">
             {children}
           </div>
         </div>
-        <footer className="card-footer">
-          {footer}
-        </footer>
+        {
+          showFooter
+            ? <footer className="card-footer">
+                {footer}
+              </footer>
+            : null
+        }
       </div>
     );
   }
