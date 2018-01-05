@@ -13,8 +13,8 @@ class UserInfo extends React.Component {
             <Menu
               to={`/chat/${friend.friend_id}`}
               avatar={friend.avatar}
+              key={friend.friend_id}
             >
-
               {friend.friend_name}
             </Menu>
           ))

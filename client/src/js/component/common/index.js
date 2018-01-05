@@ -4,6 +4,7 @@ import { Menu, Menus } from './menu';
 import { Icon } from './icon';
 import Card from './card/card';
 import { Modal, ModalManager } from './modal';
+import { Popover, PopoverManager } from './popover';
 
 export {
   Tab,
@@ -16,4 +17,6 @@ export {
   Card,
   Modal,
   ModalManager,
+  Popover,
+  PopoverManager,
 };
