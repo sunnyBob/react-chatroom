@@ -7,7 +7,7 @@ export default class Popover extends Component {
   render() {
     const { content } = this.props;
     return (
-      <Card showHeader={false}>
+      <Card showHeader={false} showFooter={false}>
         {content}
       </Card>
     );

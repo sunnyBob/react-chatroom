@@ -1,6 +1,7 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
-import { Icon } from '../common';
+import { Icon, PopoverManager } from '../common';
+import AddUserGroup from './addUserOrGroup';
 
 class UserInfo extends React.Component {
   componentWillReceiveProps(nextProps) {
@@ -11,10 +12,15 @@ class UserInfo extends React.Component {
 
   handleClick = (e) => {
     const tagName = e.target.tagName;
+    const { info } = this.props;
     if (tagName === 'IMG') {
-      browserHistory.push('/user-info');
+      browserHistory.push(`/user-info/${info.user_id}`);
     } else if (tagName === 'I') {
-      browserHistory.push('/user-add');
+      PopoverManager.open({
+        x: e.pageX,
+        y: e.pageY,
+        content: <AddUserGroup/>,
+      })
     }
   }
 

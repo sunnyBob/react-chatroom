@@ -72,5 +72,9 @@ exports.addUser = async (req, res) => {
 exports.showFriends = async (req, res) => {
   const { userId } = req.query;
   const ret = await userService.findFriend(userId);
-  res.sendData(ret);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData(1, ret, 'success');
+  } else {
+    res.sendData(0, ret), 'failed';
+  }
 }

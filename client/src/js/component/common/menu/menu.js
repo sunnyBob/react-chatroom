@@ -26,12 +26,12 @@ class Menu extends React.Component {
   }
 
   render() {
-    const { children, icon, to, iconPrefix, avatar } = this.props;
+    const { children, icon, to, iconPrefix, attachEl, isActive } = this.props;
     const iconEl = icon ? <Icon name={icon} prefix={iconPrefix}/> : null;
-    const avatarEl = avatar ? <img src={avatar} /> : null;
+    const attach = attachEl ? attachEl : null;
     return (
       <li>
-        <Link to={to} activeClassName="is-active" onClick={this.handleClick}>{iconEl}{avatarEl}{children}</Link>
+        <Link to={to} activeClassName="is-active" className={isActive ? 'is-active' : ''} onClick={this.handleClick}>{attachEl}{iconEl}{children}</Link>
       </li>
     );
   }

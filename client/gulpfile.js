@@ -30,7 +30,7 @@ const webpackCongig = {
       test: /\.(png|jpg|gif)$/,
       use: 'file-loader',
     }, {
-      test: /\.less$/,
+      test: /\.less|css$/,
       use: [{
           loader: "style-loader",
       }, {

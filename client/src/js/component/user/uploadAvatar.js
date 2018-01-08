@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router'
 import Cropper from 'cropperjs';
 import { Card } from '../common'
 
+import '../../../../node_modules/cropperjs/dist/cropper.min.css';
 import './user.less';
 
 export default class extends React.Component {
