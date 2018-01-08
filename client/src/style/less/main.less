@@ -1,3 +1,4 @@
+@import './status.less';
 html, body {
   height: 100%;
 }
@@ -25,7 +26,13 @@ html, body {
     border-radius: 50%;
     width: 40px;
     height: 40px;
+    position: relative;
     cursor: pointer;
+  }
+  .status {
+    position: absolute;
+    margin-top: 15px;
+    margin-left: 24px;
   }
   .add-user {
     font-family: 'Serif';
@@ -70,4 +77,19 @@ html, body {
 }
 .card-header-title {
   padding-left: 1.5rem !important;
+}
+.cols-3 {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  .cols-3-1 {
+    width: 30%;
+  }
+  .cols-3-2 {
+    width: 60%;
+  }
+  .cols-3-3 {
+    width: 95%;
+  }
 }

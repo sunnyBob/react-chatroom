@@ -17,6 +17,7 @@ class Root extends React.Component {
 
   fetchData = () => {
     this.store.getFriends(this.user.user_id);
+    this.store.getUser(this.user.user_id);
   }
 
   render() {
@@ -24,7 +25,7 @@ class Root extends React.Component {
       <div className="container is-fluid mainpage">
         <div className="columns" style={{height: '100%'}}>
           <div className="column is-2 menubox">
-            <UserInfo info={this.user}/>
+            <UserInfo info={this.store.userInfo}/>
             <input className="input"/>
             <Menus>
               <FriendList friendsList={this.store.friendsInfo}/>

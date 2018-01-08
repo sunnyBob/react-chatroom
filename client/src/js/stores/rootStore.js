@@ -11,9 +11,7 @@ export default class RootStore {
       url: '/user',
       data: { id },
     }).then((resp) => {
-      console.log(resp);
       if (Array.isArray(resp.retList) && resp.retList.length) {
-        console.log(resp.retList[0]);
         this.userInfo = resp.retList[0];
       }
     });

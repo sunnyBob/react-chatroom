@@ -5,7 +5,7 @@ findUser:
   - where username = :name
 
 findUserById:
-  - select username, avatar, email, phone, sex, age, status, signature from user
+  - select id, username, avatar, email, phone, sex, age, status, signature from user
   - where id = :id
 
 showFriend:
