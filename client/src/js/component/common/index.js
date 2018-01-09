@@ -5,6 +5,7 @@ import { Icon } from './icon';
 import Card from './card/card';
 import { Modal, ModalManager } from './modal';
 import { Popover, PopoverManager } from './popover';
+import AttrList from './attrList/attr';
 
 export {
   Tab,
@@ -19,4 +20,5 @@ export {
   ModalManager,
   Popover,
   PopoverManager,
+  AttrList,
 };

@@ -4,7 +4,6 @@ import { Icon, PopoverManager } from '../common';
 import AddUserGroup from './addUserOrGroup';
 
 const statusType = {
-  0: 'offline',
   1: 'online',
 };
 class UserInfo extends React.Component {
@@ -34,7 +33,7 @@ class UserInfo extends React.Component {
     return (
       <div className="user-info" onClick={this.handleClick}>
         <img src={info.avatar || ''} className="avatar"/>
-        <Icon name="circle" className={`status ${statusStyle}`}/>
+        {info.status !== 0 && <Icon name="circle" className={`status ${statusStyle}`}/>}
         <Icon name="user-plus" className="add-user"/>
       </div>
     );

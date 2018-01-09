@@ -1,8 +1,5 @@
 .online {
-  color: #1cf79c;
-}
-.offline {
-  color: #fc5252;
+  color: #11ca4c;
 }
 html,
 body {
@@ -25,12 +22,12 @@ body {
   margin-bottom: 10px;
   border-bottom: 1px solid #dbdada;
   padding-bottom: 10px;
+  position: relative;
 }
 .user-info .avatar {
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  position: relative;
   cursor: pointer;
 }
 .user-info .status {

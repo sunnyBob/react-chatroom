@@ -2,9 +2,8 @@ import React from 'react';
 import { browserHistory } from 'react-router'
 import { inject, observer } from 'mobx-react';
 import Cropper from 'cropperjs';
-import { Card, ModalManager } from '../common'
+import { Card, ModalManager, AttrList } from '../common'
 import UploadAvatar from './uploadAvatar';
-import Attr from './attr';
 
 import './user.less';
 
@@ -38,13 +37,15 @@ class UserDetail extends React.Component {
 
   render() {
     const { userInfo = {} } = this.store;
-    console.log(userInfo);
     const attrList = [{
+      label: 'ID',
+      value: userInfo.id,
+    }, {
       label: '用户名',
       value: userInfo.username,
     }, {
       label: '性别',
-      value: userInfo.username,
+      value: userInfo.sex,
     }, {
       label: '年龄',
       value: userInfo.age,
@@ -69,7 +70,7 @@ class UserDetail extends React.Component {
         <div className="info-top">
           <img src={userInfo.avatar}/>
         </div>
-        <Attr attrList={attrList}/>
+        <AttrList attrList={attrList}/>
         <button className="button" onClick={this.handleUpload}>upload</button>
       </Card>
     );

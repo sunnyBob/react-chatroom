@@ -21,6 +21,19 @@ export default class LoginReg extends React.Component {
     };
   }
 
+  updateStatus = (userId) => {
+    request({
+      url: '/user',
+      method: 'PUT',
+      data: {
+        status: 1,
+        userId,
+      }
+    }).then(resp => {
+      console.log(resp);
+    })
+  }
+
   handleLogin = async () => {
     const { name, passwd } = this.state;
     const ret = await request({
@@ -38,6 +51,7 @@ export default class LoginReg extends React.Component {
         avatar,
       };
       localStorage.setItem('user', JSON.stringify(user));
+      this.updateStatus(userId);
       browserHistory.replace('/chat');
     }
   }
@@ -49,7 +63,7 @@ export default class LoginReg extends React.Component {
       return;
     }
     const ret = await request({
-      url: '/register',
+      url: '/user',
       method: 'post',
       data: {
         username,
@@ -61,7 +75,9 @@ export default class LoginReg extends React.Component {
         avatar: this.nameToImage(username),
       },
     });
+    console.log(ret)
     if (ret.code === 1) {
+      alert('注册成功');
       // browserHistory.replace('/chat');
     }
   }
@@ -91,6 +107,20 @@ export default class LoginReg extends React.Component {
     return canvas.toDataURL("image/png");
   }
 
+  handleToggle = () => {
+    this.setState({
+      name: '',
+      passwd: '',
+      username: '',
+      password: '',
+      repassword: '',
+      age: 0,
+      sex: null,
+      email: null,
+      phone: null,
+    })
+  }
+
   render() {
     return (
       <div className="login-container">
@@ -98,6 +128,7 @@ export default class LoginReg extends React.Component {
         <div className="card login">
           <Tab
             isCenter={true}
+            handleClick={this.handleToggle}
           >
             <TabItem icon='sign-in' content="登录">
               <div className="content">
@@ -105,11 +136,13 @@ export default class LoginReg extends React.Component {
                   placeholder="username"
                   label="Username"
                   name="name"
+                  key="name"
                   required={true}
                   handleChange={this.handleChange}
                 />
                 <Input
                   placeholder="password"
+                  key="passwd"
                   label="Password"
                   type="password"
                   name="passwd"
@@ -125,6 +158,7 @@ export default class LoginReg extends React.Component {
                   placeholder="username"
                   label="Username"
                   name="username"
+                  key="username"
                   required={true}
                   handleChange={this.handleChange}
                 />
@@ -133,6 +167,7 @@ export default class LoginReg extends React.Component {
                   label="Password"
                   type="password"
                   name="password"
+                  key="password"
                   required={true}
                   handleChange={this.handleChange}
                 />

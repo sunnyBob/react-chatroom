@@ -78,3 +78,13 @@ exports.showFriends = async (req, res) => {
     res.sendData(0, ret), 'failed';
   }
 }
+
+exports.updateStatus = async (req, res) => {
+  const { userId, status } = req.body;
+  const ret = await userService.updateStatus(userId, status);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData(ret);
+  } else {
+    res.sendData(0, 'failed');
+  }
+}

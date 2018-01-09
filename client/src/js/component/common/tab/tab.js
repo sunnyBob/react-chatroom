@@ -16,6 +16,7 @@ class Tab extends Component {
       content: [data],
       index,
     });
+    this.props.handleClick && this.props.handleClick(data, index);
   }
 
   renderTab = () => {
