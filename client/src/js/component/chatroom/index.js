@@ -4,6 +4,7 @@ import './chatRoom.less';
 
 class ChatRoom extends React.Component {
   render() {
+    const socket = io("http://127.0.0.1:3000");
     return (
       <div className="room">
         <div className="chatInfo"></div>
