@@ -41,7 +41,7 @@ class Input extends Component {
         helpContent: '',
       })
     }
-    this.props.handleChange(name, value);
+    this.props.handleChange && this.props.handleChange(name, value);
   }
 
   render() {

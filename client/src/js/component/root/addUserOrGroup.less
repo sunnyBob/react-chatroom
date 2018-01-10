@@ -1,0 +1,37 @@
+.adduserorgroup {
+  overflow: hidden;
+  .search-btn {
+    margin: 5px auto 8px auto;
+    button {
+      margin-right: 5px;
+    }
+  }
+  .person {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 8px;
+    span {
+      background: #b1afaf;
+      color: white;
+      font-weight: 400;
+      margin-left: 5px;
+      width: 100%;
+      background: #5f5ca8;
+      border-radius: 6px;
+      padding: 3px 5px;
+    }
+    &+button {
+      float: right;
+    }
+  }
+  .fa-close {
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .avatar {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+}

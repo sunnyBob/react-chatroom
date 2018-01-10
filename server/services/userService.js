@@ -4,6 +4,11 @@ exports.findUser = async (user) => {
   return ret;
 }
 
+exports.findUserById = async (id) => {
+  const ret = await dao.query('user.findUserById', { id });
+  return ret;
+}
+
 exports.addUser = async (user) => {
   const ret = await dao.insert('user', user);
   return ret;
@@ -11,5 +16,10 @@ exports.addUser = async (user) => {
 
 exports.findFriend = async (userId) => {
   const ret = await dao.query('user.showFriend', { userId });
+  return ret;
+}
+
+exports.updateStatus = async (userId, type) => {
+  const ret = await dao.update('user', { status: type, id: userId },  idKey = "id");
   return ret;
 }

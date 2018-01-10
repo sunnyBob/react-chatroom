@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
-import { Icon } from '../../index';
+import { Icon } from '../';
 
 class Menu extends React.Component {
   static propTypes = {
@@ -12,6 +12,7 @@ class Menu extends React.Component {
     selected: PropTypes.bool,
     onClick: PropTypes.func,
     to: PropTypes.string,
+    avatar: PropTypes.string,
   };
 
   constructor(props) {
@@ -25,11 +26,12 @@ class Menu extends React.Component {
   }
 
   render() {
-    const { children, icon, to, iconPrefix } = this.props;
+    const { children, icon, to, iconPrefix, attachEl, isActive } = this.props;
     const iconEl = icon ? <Icon name={icon} prefix={iconPrefix}/> : null;
+    const attach = attachEl ? attachEl : null;
     return (
       <li>
-        <Link to={to} activeClassName="is-active" onClick={this.handleClick}>{iconEl}{children}</Link>
+        <Link to={to} activeClassName="is-active" className={isActive ? 'is-active' : ''} onClick={this.handleClick}>{attachEl}{iconEl}{children}</Link>
       </li>
     );
   }

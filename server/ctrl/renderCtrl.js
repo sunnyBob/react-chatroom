@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
   const ret = await userService.findUser({name});
-  const { id, password } = ret[0] || {};
+  const { id, password, avatar } = ret[0] || {};
   if (bcrypt.compareSync(passwd, password)) {
     const firstSignIn = Date.now();
     const token = jwt.sign({
@@ -24,6 +24,7 @@ exports.findUser = async (req, res) => {
     const retList = [{
       userName: name,
       userId: id,
+      avatar,
     }]
     res.sendData(1, retList, '登录成功');
   } else {
@@ -31,8 +32,18 @@ exports.findUser = async (req, res) => {
   }
 }
 
+exports.findUserById = async (req, res) => {
+  const { id } = req.query;
+  const ret = await userService.findUserById(id);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData(1, ret, 'success');
+  } else {
+    res.sendData(0, ret), 'failed';
+  }
+}
+
 exports.addUser = async (req, res) => {
-  const { username, password, age, sex, phone, email } = req.body;
+  const { username, password, age, sex, phone, email, avatar } = req.body;
   const searchRet = await userService.findUser({name: username});
   if (searchRet.length && searchRet[0].id) {
     res.sendData('5000', '用户名已经被占用');
@@ -48,7 +59,7 @@ exports.addUser = async (req, res) => {
     sex,
     email,
     phone,
-    avatar: path.join(__dirname, '../avatar/default', sex ? `${sex}.jpg` : '男.jpg')
+    avatar,
   };
   const ret = await userService.addUser(user);
   if (ret.affectedRows) {
@@ -61,5 +72,19 @@ exports.addUser = async (req, res) => {
 exports.showFriends = async (req, res) => {
   const { userId } = req.query;
   const ret = await userService.findFriend(userId);
-  res.sendData(ret);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData(1, ret, 'success');
+  } else {
+    res.sendData(0, ret), 'failed';
+  }
+}
+
+exports.updateStatus = async (req, res) => {
+  const { userId, status } = req.body;
+  const ret = await userService.updateStatus(userId, status);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData(ret);
+  } else {
+    res.sendData(0, 'failed');
+  }
 }

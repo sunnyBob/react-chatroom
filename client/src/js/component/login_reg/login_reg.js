@@ -21,20 +21,37 @@ export default class LoginReg extends React.Component {
     };
   }
 
+  updateStatus = (userId) => {
+    request({
+      url: '/user',
+      method: 'PUT',
+      data: {
+        status: 1,
+        userId,
+      }
+    }).then(resp => {
+      console.log(resp);
+    })
+  }
+
   handleLogin = async () => {
     const { name, passwd } = this.state;
     const ret = await request({
-      url: 'login',
+      url: '/login',
       data: {
         name,
         passwd,
       },
     });
     if (ret.code === 1) {
-      globals.user = {
-        user_id: ret.retList[0].userId,
-        user_name: ret.retList[0].userName,
+      const { userId, userName, avatar } = ret.retList[0] || {};
+      const user = {
+        user_id: userId,
+        user_name: userName,
+        avatar,
       };
+      localStorage.setItem('user', JSON.stringify(user));
+      this.updateStatus(userId);
       browserHistory.replace('/chat');
     }
   }
@@ -46,7 +63,7 @@ export default class LoginReg extends React.Component {
       return;
     }
     const ret = await request({
-      url: 'register',
+      url: '/user',
       method: 'post',
       data: {
         username,
@@ -55,9 +72,12 @@ export default class LoginReg extends React.Component {
         sex,
         email,
         phone,
+        avatar: this.nameToImage(username),
       },
     });
+    console.log(ret)
     if (ret.code === 1) {
+      alert('注册成功');
       // browserHistory.replace('/chat');
     }
   }
@@ -68,12 +88,47 @@ export default class LoginReg extends React.Component {
     })
   }
 
+  nameToImage = (name) => {
+    const Initials = name.charAt(0);
+    const fontSize = 60;
+    const fontWeight = 'bold';
+
+    const canvas = this.canvas;
+    canvas.width = 120;
+    canvas.height = 120;
+    const context = canvas.getContext('2d');
+    context.fillStyle = '#F7F7F9';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = '#605CA8';
+    context.font = fontWeight + ' ' + fontSize + 'px sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline="middle";
+    context.fillText(Initials, fontSize, fontSize);
+    return canvas.toDataURL("image/png");
+  }
+
+  handleToggle = () => {
+    this.setState({
+      name: '',
+      passwd: '',
+      username: '',
+      password: '',
+      repassword: '',
+      age: 0,
+      sex: null,
+      email: null,
+      phone: null,
+    })
+  }
+
   render() {
     return (
       <div className="login-container">
+        <canvas ref={(ref) => {this.canvas=ref}} style={{display: 'none'}}></canvas>
         <div className="card login">
           <Tab
             isCenter={true}
+            handleClick={this.handleToggle}
           >
             <TabItem icon='sign-in' content="登录">
               <div className="content">
@@ -81,11 +136,13 @@ export default class LoginReg extends React.Component {
                   placeholder="username"
                   label="Username"
                   name="name"
+                  key="name"
                   required={true}
                   handleChange={this.handleChange}
                 />
                 <Input
                   placeholder="password"
+                  key="passwd"
                   label="Password"
                   type="password"
                   name="passwd"
@@ -101,6 +158,7 @@ export default class LoginReg extends React.Component {
                   placeholder="username"
                   label="Username"
                   name="username"
+                  key="username"
                   required={true}
                   handleChange={this.handleChange}
                 />
@@ -109,6 +167,7 @@ export default class LoginReg extends React.Component {
                   label="Password"
                   type="password"
                   name="password"
+                  key="password"
                   required={true}
                   handleChange={this.handleChange}
                 />

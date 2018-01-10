@@ -4,7 +4,7 @@ require("babel-polyfill");
 
 export default function(options) {
   axios.defaults.timeout = 5000;
-  axios.defaults.baseURL = '/api/'
+  axios.defaults.baseURL = '/api'
 
   const config = {
     method: options.method || 'GET',
@@ -20,16 +20,17 @@ export default function(options) {
 
   axios.interceptors.response.use(
     response => {
-      const resp = response && response.data || {};
-      if (resp.code === '2000') {
-        window.location.href = '/login'
+      if (response.data) {
+        const resp = response.data;
+        if (resp.code === '2000') {
+          window.location.href = '/login'
+        }
+        if (resp.code === '5000') {
+          alert(resp.message);
+        }
       }
-      if (resp.code === '5000') {
-        alert(resp.message);
-      }
-      return resp;
-    }, Promise.reject
+      return response.data || response;
+    }, error => Promise.reject(error)
   );
-  
   return axios.request(config);
 }

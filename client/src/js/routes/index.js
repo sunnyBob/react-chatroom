@@ -1,6 +1,4 @@
-import { LoginReg, ChatRoom } from '../component';
-import Root from '../root/root';
-
+import { LoginReg, ChatRoom, Root, UserDetail } from '../component';
 const routeConfig = [
   {
     path: '/login',
@@ -12,7 +10,10 @@ const routeConfig = [
     indexRoute: { onEnter: (nextState, replace) => replace('/chat') },
     childRoutes: [
       { path: 'login', component: LoginReg },
-      { path: 'chat', component: ChatRoom },
+      { path: '/user-info/:id', component: UserDetail },
+      { path: 'chat', component: ChatRoom, childRoutes: [
+        {path: '/chat/:id', component: ChatRoom},
+      ]},
     ]
   }
 ];
