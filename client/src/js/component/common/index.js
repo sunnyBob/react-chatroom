@@ -6,6 +6,7 @@ import Card from './card/card';
 import { Modal, ModalManager } from './modal';
 import { Popover, PopoverManager } from './popover';
 import AttrList from './attrList/attr';
+import { Dropdown } from './dropdown';
 
 export {
   Tab,
@@ -21,4 +22,5 @@ export {
   Popover,
   PopoverManager,
   AttrList,
+  Dropdown,
 };

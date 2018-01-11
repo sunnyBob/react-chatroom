@@ -1,6 +1,6 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Menu, Menus, Icon } from '../common';
+import { Menu, Menus, Icon, Dropdown } from '../common';
 import { browserHistory } from 'react-router';
 import UserInfo from './userInfo';
 import FriendList from './friendList';
@@ -35,7 +35,20 @@ class Root extends React.Component {
     });
   }
 
+  handleSignOut = () => {
+  
+  }
+
   render() {
+    const items = [{
+      content: t('Change Language'),
+      icon: 'language',
+      handleClick: this.handleToggleLang,
+    }, {
+      content: t('Sign Out'),
+      icon: 'sign-out',
+      handleClick: this.handleSignOut,
+    }]
     return (
       <div className="container is-fluid mainpage">
         <div className="columns" style={{height: '100%'}}>
@@ -52,9 +65,13 @@ class Root extends React.Component {
             </Menus>
           </div>
           <div className="column is-10">
-            <div className="topbar">
-              <Icon name="language" className="icon-lang" onClick={this.handleToggleLang}/>
-            </div>
+            <Dropdown
+              className="setting"
+              align="right"
+              items={items}
+              triggerEl={<Icon name="cog"/>}
+              hasDividers={true}
+            />
             {this.props.children}
           </div>
         </div>

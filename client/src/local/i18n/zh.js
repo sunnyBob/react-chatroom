@@ -22,7 +22,9 @@ export default {
       'Male': '男',
       'Female': '女',
       'Sign In': '登录',
+      'Sign Out': '退出',
       'Register': '注册',
+      'Change Language': '切换语言',
     }
   }
 }

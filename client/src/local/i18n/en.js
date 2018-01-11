@@ -10,8 +10,12 @@ export default {
       'Find Groups': 'find groups',
       'Add': 'add',
       'QQ Emoji': 'QQ emoji',
+      'User Name': 'User name',
       '男': 'male',
       '女': 'female',
+      'Change Language': 'change language',
+      'Sign Out': 'Sign out',
+      'Sign In': 'Sign in',
     }
   }
 }
