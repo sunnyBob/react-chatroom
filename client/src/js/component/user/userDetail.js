@@ -41,22 +41,22 @@ class UserDetail extends React.Component {
       label: 'ID',
       value: userInfo.id,
     }, {
-      label: '用户名',
+      label: t('User Name'),
       value: userInfo.username,
     }, {
-      label: '性别',
-      value: userInfo.sex,
+      label: t('Sex'),
+      value: t(userInfo.sex),
     }, {
-      label: '年龄',
+      label: t('Age'),
       value: userInfo.age,
     }, {
-      label: '邮箱',
+      label: t('Email'),
       value: userInfo.email,
     }, {
-      label: '手机',
+      label: t('Phone'),
       value: userInfo.phone,
     }, {
-      label: '个性签名',
+      label: t('Signature'),
       value: userInfo.signature,
       colSpan: 3,
     }]

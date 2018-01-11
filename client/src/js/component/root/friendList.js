@@ -18,7 +18,7 @@ class UserInfo extends React.Component {
     const { friendsList } = this.props;
     const pathname = window.location.pathname
     return (
-      <Menus label="我的好友" isSub={true} selected={true}>
+      <Menus label={t('My Friends')} isSub={true} selected={true}>
         {
           toJS(friendsList).map(friend => (
             <Menu

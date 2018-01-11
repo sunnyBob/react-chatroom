@@ -49,17 +49,17 @@ class AddUsrGroup extends React.Component {
     const { avatar, username } = this.state.result;
     return (
       <div className="adduserorgroup">
-        <h5>添加好友/群</h5>
+        <h5>{t('Add User/Group')}</h5>
         <div className="field">
           <p className="control has-icons-left has-icons-right">
-            <input placeholder="请输入id" className="input is-small is-info search" name="userId" ref={ref =>{ this.input = ref }}/>
+            <input placeholder={t('Enter Id')} className="input is-small is-info search" name="userId" ref={ref =>{ this.input = ref }}/>
             <Icon name="search" className="is-left"/>
             <Icon name="close" className="is-right" onClick={this.clear}/>
           </p>
         </div>
         <div className="search-btn">
-          <button onClick={this.handleSearch} name="user" className="button is-small">查找好友</button>
-          <button onClick={this.handleSearch} name="group" className="button is-small">查找群</button>
+          <button onClick={this.handleSearch} name="user" className="button is-small">{t('Find Friends')}</button>
+          <button onClick={this.handleSearch} name="group" className="button is-small">{t('Find Groups')}</button>
         </div>
         {
           Object.keys(this.state.result).length ? <div className="result">
@@ -67,7 +67,7 @@ class AddUsrGroup extends React.Component {
               <img src={avatar} className="avatar"/>
               <span>{username}</span>
             </div>
-            <button className="button is-info is-small">添加</button>
+            <button className="button is-info is-small">{t('Add')}</button>
           </div> : null
         }
       </div>

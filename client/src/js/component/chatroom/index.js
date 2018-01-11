@@ -25,7 +25,7 @@ class ChatRoom extends React.Component {
         handleClick={this.handleToggle}
         size='small'
       >
-        <TabItem content="QQ表情">
+        <TabItem content={t('QQ Emoji')}>
           <div className="emojibox">
             <div className="qq_emoji">
               {this.genEmoji(104)}
@@ -56,7 +56,7 @@ class ChatRoom extends React.Component {
             <Icon name="folder-o" size="medium"/>
           </div>
           <textarea className="textarea is-primary"></textarea>
-          <button className="pull-right">发送</button>
+          <button className="pull-right">{t('Send')}</button>
         </div>
       </div>
     )
