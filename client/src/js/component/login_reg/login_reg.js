@@ -27,7 +27,7 @@ export default class LoginReg extends React.Component {
       method: 'PUT',
       data: {
         status: 1,
-        userId,
+        id: userId,
       }
     }).then(resp => {
       console.log(resp);
