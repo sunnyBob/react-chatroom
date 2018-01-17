@@ -19,7 +19,8 @@ exports.findFriend = async (userId) => {
   return ret;
 }
 
-exports.updateUserInfo = async (userId, user) => {
+exports.updateUserInfo = async (user) => {
+  console.log(user);
   const ret = await dao.update('user', user,  idKey = "id");
   return ret;
 }

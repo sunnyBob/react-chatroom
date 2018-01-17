@@ -80,9 +80,9 @@ exports.showFriends = async (req, res) => {
 }
 
 exports.updateUserInfo = async (req, res) => {
-  const { user } = req.body;
-  const ret = await userService.updateUserInfo(userId, user);
-  if (Array.isArray(ret) && ret.length) {
+  const user = req.body;
+  const ret = await userService.updateUserInfo(user);
+  if (ret.affectedRows) {
     res.sendData(ret);
   } else {
     res.sendData(0, 'failed');
