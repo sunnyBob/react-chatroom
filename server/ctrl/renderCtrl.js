@@ -79,9 +79,9 @@ exports.showFriends = async (req, res) => {
   }
 }
 
-exports.updateStatus = async (req, res) => {
-  const { userId, status } = req.body;
-  const ret = await userService.updateStatus(userId, status);
+exports.updateUserInfo = async (req, res) => {
+  const { user } = req.body;
+  const ret = await userService.updateUserInfo(userId, user);
   if (Array.isArray(ret) && ret.length) {
     res.sendData(ret);
   } else {
