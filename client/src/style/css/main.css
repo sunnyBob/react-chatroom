@@ -430,11 +430,11 @@ body {
   justify-content: flex-start;
 }
 .cols-3 .cols-3-1 {
-  width: 30%;
+  min-width: 30%;
 }
 .cols-3 .cols-3-2 {
-  width: 60%;
+  min-width: 60%;
 }
 .cols-3 .cols-3-3 {
-  width: 95%;
+  min-width: 95%;
 }

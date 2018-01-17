@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react';
 import Cropper from 'cropperjs';
 import { Card, ModalManager, AttrList } from '../common'
 import UploadAvatar from './uploadAvatar';
+import ModifyPasswd from './ModifyPasswd';
 
 import './user.less';
 
@@ -35,6 +36,13 @@ class UserDetail extends React.Component {
     })
   }
 
+  modPasswd = () => {
+    ModalManager.open({
+      title: <small>密码修改</small>,
+      content: <ModifyPasswd/>,
+    })
+  }
+
   render() {
     const { userInfo = {} } = this.store;
     const attrList = [{
@@ -43,21 +51,35 @@ class UserDetail extends React.Component {
     }, {
       label: t('User Name'),
       value: userInfo.username,
+      editable: true,
     }, {
       label: t('Sex'),
       value: t(userInfo.sex),
     }, {
       label: t('Age'),
       value: userInfo.age,
+      editable: true,
     }, {
       label: t('Email'),
       value: userInfo.email,
+      editable: true,
     }, {
       label: t('Phone'),
       value: userInfo.phone,
+      editable: true,
     }, {
       label: t('Signature'),
       value: userInfo.signature,
+      colSpan: 3,
+      editable: true,
+    }, {
+      label: t('More Options'),
+      value: (
+        <div className="options">
+          <span onClick={this.modPasswd}>密码修改</span>
+          <span onClick={this.handleUpload}>头像上传</span>
+        </div>
+      ),
       colSpan: 3,
     }]
     return (
