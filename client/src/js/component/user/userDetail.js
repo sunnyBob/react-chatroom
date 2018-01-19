@@ -31,17 +31,63 @@ class UserDetail extends React.Component {
   }
 
   handleUpload = () => {
-    ModalManager.open({
-      content: <UploadAvatar/>,
+    const modal = ModalManager.open({
+      content: <UploadAvatar ref={ref => { this.imagePicker = ref; }}/>,
       showHeader: false,
-    })
+      onOk: () => handleOk.call(this),
+    });
+    function handleOk() {
+      const avatar = this.imagePicker.state.previewUrl;
+      if (avatar) {
+        request({
+          url: '/user',
+          method: 'PUT',
+          data: {
+            id: this.props.params.id,
+            avatar,
+          },
+        }).then(resp => {
+          if (resp.code) {
+            this.store.getUser(this.props.params.id);
+            ModalManager.close(modal);
+          } else {
+            alert("failed");
+          }
+        });
+      }
+    }
   }
 
   modPasswd = () => {
     ModalManager.open({
       title: <small>密码修改</small>,
-      content: <ModifyPasswd/>,
-    })
+      content: <ModifyPasswd ref={(ref) => { this.passwdMpdal = ref; }}/>,
+      onOk: () => handleOk.call(this),
+    });
+    function handleOk() {
+      const { originPasswd, nowPasswd } = this.passwdMpdal.state;
+      if (originPasswd && originPasswd) {
+        const user = {
+          originPasswd,
+          name: this.store.userInfo.username,
+          id: this.props.params.id,
+          password: nowPasswd,
+        };
+        request({
+          url: '/user',
+          method: 'PUT',
+          data: user,
+        }).then(resp => {
+          if (resp.code) {
+            alert('success');
+          } else {
+            alert("failed");
+          }
+        });
+      } else {
+        alert('原始/新密码不能为空');
+      }
+    }
   }
 
   handleEdit = (user, cb) => {

@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwtConfig');
 const bcrypt = require('bcrypt');
 
+const saltRounds = 10;
+
 exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
   const ret = await userService.findUser({name});
@@ -50,7 +52,6 @@ exports.addUser = async (req, res) => {
     return;
   }
 
-  const saltRounds = 10;
   const hash = bcrypt.hashSync(password, saltRounds);
   const user = {
     username,
@@ -81,10 +82,27 @@ exports.showFriends = async (req, res) => {
 
 exports.updateUserInfo = async (req, res) => {
   const user = req.body;
-  const ret = await userService.updateUserInfo(user);
-  if (ret.affectedRows) {
-    res.sendData(ret);
+  const { password, originPasswd, name} = user;
+  if (password && originPasswd) {
+    const ret = await userService.findUser({name});
+    const { password: nowPassword, id } = ret[0] || {};
+    if (bcrypt.compareSync(originPasswd, nowPassword)) {
+      delete user.originPasswd;
+      const ret = await userService.updateUserInfo(user);
+      if (ret.affectedRows) {
+        res.sendData(ret);
+      } else {
+        res.sendData(0, 'failed');
+      }
+    } else {
+      res.sendData('5000', '原始密码不正确');
+    }
   } else {
-    res.sendData(0, 'failed');
+    const ret = await userService.updateUserInfo(user);
+    if (ret.affectedRows) {
+      res.sendData(ret);
+    } else {
+      res.sendData(0, 'failed');
+    }
   }
 }
