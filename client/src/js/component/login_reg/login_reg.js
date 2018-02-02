@@ -52,6 +52,7 @@ export default class LoginReg extends React.Component {
       };
       localStorage.setItem('user', JSON.stringify(user));
       this.updateStatus(userId);
+      socket.emit('login', { id: userId, name: userName });
       browserHistory.replace('/chat');
     }
   }

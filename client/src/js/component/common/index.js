@@ -7,6 +7,7 @@ import { Modal, ModalManager } from './modal';
 import { Popover, PopoverManager } from './popover';
 import AttrList from './attrList/attr';
 import { Dropdown } from './dropdown';
+import MyEditor from './EditPlugin/myEditor';
 
 export {
   Tab,
@@ -23,4 +24,5 @@ export {
   PopoverManager,
   AttrList,
   Dropdown,
+  MyEditor,
 };
