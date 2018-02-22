@@ -1,25 +1,75 @@
 import React from 'react';
-import { Icon, PopoverManager, Tab, TabItem, MyEditor } from '../common';
+import { Icon, PopoverManager, Tab, TabItem } from '../common';
+import Textarea from 'react-contenteditable'
 import './chatRoom.less';
 
 class ChatRoom extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      msg: '',
+    this.state = { 
+      html: '',
     };
+
+    this.msgEl = [];
   }
 
-  changeMsg = (e) => {
-    this.setState({
-      msg: e.target.value,
-    });
+  handleChange = evt => {
+    this.setState({html: evt.target.value});
+  };
+
+  genEmoji = (count, type = 'QQ') => {
+    const arr = [];
+    const class_name = type === 'QQ' ? 'qemoji' : 'symemoji';
+    for (let i = 0; i <= count; i++) {
+      arr.push(<a className={`${class_name}-${i}`} key={`${type}-${i}`}></a>);
+      if ((i+1) % 15 === 0) {
+        arr.push(<br key={`${type}_${i}`}/>);
+      }
+    }
+    return arr;
+  }
+
+  addEmoji = (e) => {
+    if (e.target.tagName === 'A') {
+      this.setState({ html: this.state.html + ':' + e.target.className + ':'});
+    }
+  }
+
+  showEmoji = (e) => {
+    const { pageX, pageY } = e;
+    const emojiArr = [];
+    
+    const content = (
+      <Tab
+        isBoxed={false}
+        handleClick={this.handleToggle}
+        size='small'
+      >
+        <TabItem content={t('QQ Emoji')}>
+          <div className="emojibox">
+            <div className="qq_emoji" onClick={this.addEmoji}>
+              {this.genEmoji(104)}
+            </div>
+          </div>
+        </TabItem>
+      </Tab>
+    )
+    PopoverManager.open({
+      x: pageX,
+      y: pageY,
+      reverse: true,
+      content,
+    })
   }
 
   sendMsg = () => {
-    const msg = this.state.msg;
-    socket.emit('msg', msg);
+    this.msgEl.push(<div className="msginfo"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: this.state.html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+    this.setState({
+      html: '',
+      msgEl: this.msgEl,
+    });
+    this.msgBox.scrollTop = this.msgBox.scrollHeight;
   }
 
   render() {
@@ -27,11 +77,15 @@ class ChatRoom extends React.Component {
     return (
       <div className="room">
         <div className="chatInfo"></div>
-        <div className="message">
-          xxx
+        <div className="message" ref={ref => { this.msgBox = ref; }}>
+          {this.state.msgEl}
         </div>
         <div className="wordarea">
-          <MyEditor/>
+          <div className="toolbar is-clearfix">
+            <Icon name="smile-o" size="medium" onClick={this.showEmoji}/>
+            <Icon name="folder-o" size="medium"/>
+          </div>
+          <Textarea className="textarea is-primary" html={this.state.html} onChange={this.handleChange}/>
           <button className="pull-right" onClick={this.sendMsg}>{t('Send')}</button>
         </div>
       </div>
