@@ -1,4 +1,5 @@
 const userService = require('../services/userService');
+const msgService = require('../services/msgService');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwtConfig');
@@ -104,5 +105,17 @@ exports.updateUserInfo = async (req, res) => {
     } else {
       res.sendData(0, 'failed');
     }
+  }
+}
+
+// message
+exports.addMsg = async (req, res) => {
+  const { from_user, to_user, content } = req.body;
+  const msgInfo = { from_user, to_user, content };
+  const ret = await msgService.addMsg(msgInfo);
+  if (ret.affectedRows) {
+    res.sendData('1', '发送成功');
+  } else {
+    res.sendData('0', '发送失败');
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon, PopoverManager, Tab, TabItem } from '../common';
-import Textarea from 'react-contenteditable'
+import Textarea from 'react-contenteditable';
+import request from '../../utils/request';
 import './chatRoom.less';
 
 class ChatRoom extends React.Component {
@@ -10,6 +11,9 @@ class ChatRoom extends React.Component {
     this.state = { 
       html: '',
     };
+
+    const user = localStorage.getItem('user');
+    this.user = JSON.parse(user);
 
     this.msgEl = [];
   }
@@ -63,13 +67,25 @@ class ChatRoom extends React.Component {
     })
   }
 
-  sendMsg = () => {
-    this.msgEl.push(<div className="msginfo"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: this.state.html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+  sendMsg = async () => {
+    const html = this.state.html;
+    const ret = await request({
+      url: '/message',
+      method: 'post',
+      data: {
+        from_user: this.user.user_id,
+        to_user: parseInt(this.props.params.id),
+        content: html,
+      },
+    });
+    console.log(ret);
+    this.msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
     this.setState({
       html: '',
       msgEl: this.msgEl,
+    }, () => {
+      this.msgBox.scrollTop = this.msgBox.scrollHeight;
     });
-    this.msgBox.scrollTop = this.msgBox.scrollHeight;
   }
 
   render() {

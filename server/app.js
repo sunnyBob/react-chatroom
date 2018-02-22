@@ -10,7 +10,6 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 io.on('connection', function(socket){
-  console.log(socket);
   console.log('a user connected');
   socket.emit('news', '1111')
 });

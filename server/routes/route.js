@@ -9,6 +9,9 @@ module.exports = function(router) {
   router.get('/api/user', ctrl.findUserById);
   router.put('/api/user', ctrl.updateUserInfo);
 
+  //message
+  router.post('/api/message', ctrl.addMsg);
+
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
     if (req.path !== '/login' && !tokenChecker(token)) {
