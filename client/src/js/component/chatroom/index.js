@@ -10,6 +10,7 @@ class ChatRoom extends React.Component {
 
     this.state = { 
       html: '',
+      currentChatUser: {},
     };
 
     const user = localStorage.getItem('user');
@@ -18,9 +19,36 @@ class ChatRoom extends React.Component {
     this.msgEl = [];
   }
 
+  componentDidMount() {
+    this.getCurrentUser(this.props.params.id);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.params.id !== nextProps.params.id) {
+      this.getCurrentUser(nextProps.params.id);
+      this.setState({
+        html: '',
+      });
+    }
+  }
+
   handleChange = evt => {
     this.setState({html: evt.target.value});
   };
+
+  getCurrentUser = async (id) => {
+    const resp =  await request({
+      url: '/user',
+      data: {
+        id,
+      }
+    });
+    if (Array.isArray(resp.retList) && resp.retList.length) {
+      this.setState({
+        currentChatUser: resp.retList[0],
+      });
+    }
+  }
 
   genEmoji = (count, type = 'QQ') => {
     const arr = [];
@@ -69,6 +97,13 @@ class ChatRoom extends React.Component {
 
   sendMsg = async () => {
     const html = this.state.html;
+    if (!this.props.params.id) {
+      alert('No chats selected!');
+      this.setState({
+        html: '',
+      });
+      return;
+    }
     const ret = await request({
       url: '/message',
       method: 'post',
@@ -78,7 +113,6 @@ class ChatRoom extends React.Component {
         content: html,
       },
     });
-    console.log(ret);
     this.msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
     this.setState({
       html: '',
@@ -90,9 +124,11 @@ class ChatRoom extends React.Component {
 
   render() {
     const socket = io("http://127.0.0.1:3000");
+    const name = this.state.currentChatUser.username;
+
     return (
       <div className="room">
-        <div className="chatInfo"></div>
+        <div className="chatInfo">{name && <div>正在与<span style={{fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'}}>{name}</span>聊天...</div>}</div>
         <div className="message" ref={ref => { this.msgBox = ref; }}>
           {this.state.msgEl}
         </div>

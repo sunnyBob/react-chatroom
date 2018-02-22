@@ -9,7 +9,7 @@ const sendData = require('./utils/sendHelp');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-io.on('connection', function(socket){
+io.on('connection', (socket) => {
   console.log('a user connected');
   socket.emit('news', '1111')
 });

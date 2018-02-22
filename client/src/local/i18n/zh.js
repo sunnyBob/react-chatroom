@@ -25,6 +25,7 @@ export default {
       'Sign Out': '退出',
       'Register': '注册',
       'Change Language': '切换语言',
+      'New Chat': '创建群组',
     }
   }
 }

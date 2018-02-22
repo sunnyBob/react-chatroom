@@ -39,16 +39,26 @@ class Root extends React.Component {
   
   }
 
+  handleAddGroup = () => {
+
+  }
+
   render() {
     const items = [{
       content: t('Change Language'),
       icon: 'language',
       handleClick: this.handleToggleLang,
     }, {
+      content: t('New Chat'),
+      icon: 'users',
+      handleClick: this.handleAddGroup,
+    }, {
       content: t('Sign Out'),
       icon: 'sign-out',
       handleClick: this.handleSignOut,
-    }]
+    }];
+    const child = React.Children.only(this.props.children);
+    const cloneChild = React.cloneElement(child, { fetchData: this.fetchData });
     return (
       <div className="container is-fluid mainpage">
         <div className="columns" style={{height: '100%'}}>
@@ -72,7 +82,7 @@ class Root extends React.Component {
               triggerEl={<Icon name="cog"/>}
               hasDividers={true}
             />
-            {this.props.children}
+            {cloneChild}
           </div>
         </div>
       </div>

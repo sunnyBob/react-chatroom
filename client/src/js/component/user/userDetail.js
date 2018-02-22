@@ -48,7 +48,8 @@ class UserDetail extends React.Component {
           },
         }).then(resp => {
           if (resp.code) {
-            window.location.reload();
+            this.props.fetchData && this.props.fetchData();
+            ModalManager.close(modal);
           } else {
             alert("failed");
           }
@@ -99,13 +100,20 @@ class UserDetail extends React.Component {
       data: user,
     }).then(resp => {
       if (resp.code) {
-        this.store.getUser(this.props.params.id);
-        alert("success");
+        if (user.hasOwnProperty('username')) {
+          this.props.fetchData && this.props.fetchData();
+        } else {
+          this.store.getUser(this.props.params.id);
+        }
         cb();
       } else {
         alert("failed");
       }
     })
+  }
+
+  handleChat = () => {
+    browserHistory.push(`/chat/${this.props.params.id}`);
   }
 
   render() {
@@ -150,6 +158,7 @@ class UserDetail extends React.Component {
         <div className="options">
           <span onClick={this.modPasswd}>密码修改</span>
           <span onClick={this.handleUpload}>头像上传</span>
+          <span onClick={this.handleChat}>发消息</span>
         </div>
       ),
       colSpan: 3,
