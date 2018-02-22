@@ -37,7 +37,7 @@ class UserDetail extends React.Component {
       onOk: () => handleOk.call(this),
     });
     function handleOk() {
-      const avatar = this.imagePicker.state.previewUrl;
+      const avatar = this.imagePicker.state.previewUrl || this.imagePicker.img.src;
       if (avatar) {
         request({
           url: '/user',
@@ -48,12 +48,13 @@ class UserDetail extends React.Component {
           },
         }).then(resp => {
           if (resp.code) {
-            this.store.getUser(this.props.params.id);
-            ModalManager.close(modal);
+            window.location.reload();
           } else {
             alert("failed");
           }
         });
+      } else {
+        ModalManager.close(modal);
       }
     }
   }
@@ -98,8 +99,8 @@ class UserDetail extends React.Component {
       data: user,
     }).then(resp => {
       if (resp.code) {
-        alert("success");
         this.store.getUser(this.props.params.id);
+        alert("success");
         cb();
       } else {
         alert("failed");
@@ -164,7 +165,6 @@ class UserDetail extends React.Component {
           <img src={userInfo.avatar}/>
         </div>
         <AttrList attrList={attrList} handleEdit={this.handleEdit}/>
-        <button className="button" onClick={this.handleUpload}>upload</button>
       </Card>
     );
   }

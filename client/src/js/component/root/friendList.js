@@ -29,7 +29,7 @@ class UserInfo extends React.Component {
               isActive={parseInt(pathname.split('/').reverse()[0], 10) === friend.friend_id}
               key={friend.friend_id}
             >
-              {friend.friend_name}
+              {friend.username}
             </Menu>
           ))
         }

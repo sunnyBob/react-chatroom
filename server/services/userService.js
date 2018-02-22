@@ -17,11 +17,11 @@ exports.addUser = async (user) => {
 
 exports.findFriend = async (userId) => {
   const ret = await dao.query('user.showFriend', { userId });
+  console.log(ret);
   return ret;
 }
 
 exports.updateUserInfo = async (user) => {
-  console.log(user);
   const ret = await dao.update('user', user,  idKey = "id");
   return ret;
 }
