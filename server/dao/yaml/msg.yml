@@ -1,0 +1,5 @@
+namespace: 'msg'
+
+findMsg:
+  - select * from message
+  - where from_user = :userId or to_user = :userId

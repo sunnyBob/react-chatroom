@@ -17,7 +17,6 @@ exports.addUser = async (user) => {
 
 exports.findFriend = async (userId) => {
   const ret = await dao.query('user.showFriend', { userId });
-  console.log(ret);
   return ret;
 }
 

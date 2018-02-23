@@ -52,7 +52,6 @@ export default class LoginReg extends React.Component {
       };
       localStorage.setItem('user', JSON.stringify(user));
       this.updateStatus(userId);
-      socket.emit('login', { id: userId, name: userName });
       browserHistory.replace('/chat');
     }
   }
@@ -76,7 +75,6 @@ export default class LoginReg extends React.Component {
         avatar: this.nameToImage(username),
       },
     });
-    console.log(ret)
     if (ret.code === 1) {
       alert('注册成功');
       // browserHistory.replace('/chat');

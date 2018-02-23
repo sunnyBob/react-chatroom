@@ -1,0 +1,14 @@
+namespace: 'user'
+
+findUser:
+  - select id, password, avatar from user
+  - where username = :name
+
+findUserById:
+  - select id, username, avatar, email, phone, sex, age, status, signature from user
+  - where id = :id
+
+showFriend:
+  - select * from friend as f, user as u
+  - where (f.user_id = :userId and f.friend_id = u.id)
+  - or (f.friend_id = :userId and f.user_id = u.id)

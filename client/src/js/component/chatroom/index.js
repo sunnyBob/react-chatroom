@@ -11,24 +11,39 @@ class ChatRoom extends React.Component {
     this.state = { 
       html: '',
       currentChatUser: {},
+      msgEl: [],
     };
 
     const user = localStorage.getItem('user');
     this.user = JSON.parse(user);
 
     this.msgEl = [];
+    socket.on('chatToOne', (msg, userId) => {
+      if (userId == this.props.params.id) {
+        this.handleRecvMsg(msg);
+      }
+    });
   }
 
   componentDidMount() {
-    this.getCurrentUser(this.props.params.id);
+    const id = this.props.params.id;
+    if (id) {
+      this.getCurrentUser(id);
+      this.getCurrentUserMsg(id);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.params.id !== nextProps.params.id) {
-      this.getCurrentUser(nextProps.params.id);
-      this.setState({
-        html: '',
-      });
+    const id = this.props.params.id;
+    const nextId = nextProps.params.id;
+    if (id !== nextId) {
+      if (nextId) {
+        this.getCurrentUser(nextId);
+        this.getCurrentUserMsg(nextId);
+        this.setState({
+          html: '',
+        });
+      } 
     }
   }
 
@@ -46,6 +61,32 @@ class ChatRoom extends React.Component {
     if (Array.isArray(resp.retList) && resp.retList.length) {
       this.setState({
         currentChatUser: resp.retList[0],
+      });
+    }
+  }
+
+  getCurrentUserMsg = async (userId) => {
+    const resp =  await request({
+      url: '/message',
+      data: {
+        userId,
+      },
+    });
+    if (Array.isArray(resp.retList)) {
+      
+      const messages = resp.retList;
+      const msgEl = [];
+      messages.forEach(msg => {
+        const { from_user, to_user, content } = msg;
+        if (from_user == userId) {
+          msgEl.push(<div className="msginfo-left"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+        }
+        if (to_user == userId) {
+          msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+        }
+      });
+      this.setState({ msgEl }, () => {
+        this.msgBox.scrollTop = this.msgBox.scrollHeight;
       });
     }
   }
@@ -97,6 +138,7 @@ class ChatRoom extends React.Component {
 
   sendMsg = async () => {
     const html = this.state.html;
+    const userId = this.props.params.id;
     if (!this.props.params.id) {
       alert('No chats selected!');
       this.setState({
@@ -109,13 +151,25 @@ class ChatRoom extends React.Component {
       method: 'post',
       data: {
         from_user: this.user.user_id,
-        to_user: parseInt(this.props.params.id),
+        to_user: parseInt(userId),
         content: html,
       },
     });
-    this.msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+    if (ret.code) {
+      socket.emit('chatToOne', html, this.user.user_id, userId);
+      this.msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+      this.setState({
+        html: '',
+        msgEl: this.msgEl,
+      }, () => {
+        this.msgBox.scrollTop = this.msgBox.scrollHeight;
+      });
+    }
+  }
+
+  handleRecvMsg = (msg) => {
+    this.msgEl.push(<div className="msginfo-left"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: msg.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
     this.setState({
-      html: '',
       msgEl: this.msgEl,
     }, () => {
       this.msgBox.scrollTop = this.msgBox.scrollHeight;
@@ -123,9 +177,7 @@ class ChatRoom extends React.Component {
   }
 
   render() {
-    const socket = io("http://127.0.0.1:3000");
     const name = this.state.currentChatUser.username;
-
     return (
       <div className="room">
         <div className="chatInfo">{name && <div>正在与<span style={{fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'}}>{name}</span>聊天...</div>}</div>

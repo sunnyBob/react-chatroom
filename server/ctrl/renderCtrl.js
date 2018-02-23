@@ -28,7 +28,7 @@ exports.findUser = async (req, res) => {
       userName: name,
       userId: id,
       avatar,
-    }]
+    }];
     res.sendData(1, retList, '登录成功');
   } else {
     res.sendData(0, '无效的用户名或密码');
@@ -117,5 +117,16 @@ exports.addMsg = async (req, res) => {
     res.sendData('1', '发送成功');
   } else {
     res.sendData('0', '发送失败');
+  }
+}
+
+exports.getMsg = async (req, res) => {
+  const { userId } = req.query;
+  const ret = await msgService.getMsg(userId);
+  console.log(ret);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData('1', ret, '消息查询成功');
+  } else {
+    res.sendData('0', ret, '消息查询失败');
   }
 }
