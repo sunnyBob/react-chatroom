@@ -16,6 +16,7 @@ class UserDetail extends React.Component {
     super(props);
 
     this.store = new props.RootStore();
+    this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
   }
 
   componentWillMount() {
@@ -47,7 +48,7 @@ class UserDetail extends React.Component {
             avatar,
           },
         }).then(resp => {
-          if (resp.code) {
+          if (resp.code === 1) {
             this.props.fetchData && this.props.fetchData();
             ModalManager.close(modal);
           } else {
@@ -80,7 +81,7 @@ class UserDetail extends React.Component {
           method: 'PUT',
           data: user,
         }).then(resp => {
-          if (resp.code) {
+          if (resp.code === 1) {
             alert('success');
           } else {
             alert("failed");
@@ -99,7 +100,7 @@ class UserDetail extends React.Component {
       method: 'PUT',
       data: user,
     }).then(resp => {
-      if (resp.code) {
+      if (resp.code === 1) {
         if (user.hasOwnProperty('username')) {
           this.props.fetchData && this.props.fetchData();
         } else {
@@ -158,7 +159,7 @@ class UserDetail extends React.Component {
         <div className="options">
           <span onClick={this.modPasswd}>密码修改</span>
           <span onClick={this.handleUpload}>头像上传</span>
-          <span onClick={this.handleChat}>发消息</span>
+          {userInfo.id != this.userId && <span onClick={this.handleChat}>发消息</span>}
         </div>
       ),
       colSpan: 3,

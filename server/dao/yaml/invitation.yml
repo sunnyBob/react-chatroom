@@ -1,0 +1,8 @@
+namespace: 'invitation'
+
+findInvitation:
+  - select * from invite
+  - where (friend_id = :friendId or user_id = :friendId)
+  - if:
+      test: :userId
+      sql: and (user_id = :userId or friend_id = :userId)

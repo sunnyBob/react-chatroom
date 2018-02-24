@@ -13,6 +13,9 @@ module.exports = function(router) {
   router.get('/api/message', ctrl.getMsg);
   router.post('/api/message', ctrl.addMsg);
 
+  //invitation
+  router.post('/api/invitation', ctrl.sendInvitation)
+
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
     if (req.path !== '/login' && !tokenChecker(token)) {

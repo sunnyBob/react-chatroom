@@ -17,7 +17,6 @@ class ChatRoom extends React.Component {
     const user = localStorage.getItem('user');
     this.user = JSON.parse(user);
 
-    this.msgEl = [];
     socket.on('chatToOne', (msg, userId) => {
       if (userId == this.props.params.id) {
         this.handleRecvMsg(msg);
@@ -157,10 +156,11 @@ class ChatRoom extends React.Component {
     });
     if (ret.code) {
       socket.emit('chatToOne', html, this.user.user_id, userId);
-      this.msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+      const msgEl = [...this.state.msgEl];
+      msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
       this.setState({
         html: '',
-        msgEl: this.msgEl,
+        msgEl: msgEl,
       }, () => {
         this.msgBox.scrollTop = this.msgBox.scrollHeight;
       });
@@ -168,9 +168,10 @@ class ChatRoom extends React.Component {
   }
 
   handleRecvMsg = (msg) => {
-    this.msgEl.push(<div className="msginfo-left"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: msg.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+    const msgEl = [...this.state.msgEl];
+    msgEl.push(<div className="msginfo-left"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: msg.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
     this.setState({
-      msgEl: this.msgEl,
+      msgEl: msgEl,
     }, () => {
       this.msgBox.scrollTop = this.msgBox.scrollHeight;
     });

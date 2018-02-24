@@ -50,4 +50,10 @@ export default class PopoverManager extends Component {
     container.style.top = (reverse ? y - container.clientHeight : y) + 'px';
     return container;
   }
+  static close(popover) {
+    const unmountResult = ReactDOM.unmountComponentAtNode(popover);
+    if (unmountResult && popover.parentNode) {
+      popover.parentNode.removeChild(popover);
+    }
+  }
 }

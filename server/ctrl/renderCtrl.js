@@ -1,5 +1,4 @@
-const userService = require('../services/userService');
-const msgService = require('../services/msgService');
+const { userService, msgService, inviteService } = require('../services');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwtConfig');
@@ -31,7 +30,7 @@ exports.findUser = async (req, res) => {
     }];
     res.sendData(1, retList, '登录成功');
   } else {
-    res.sendData(0, '无效的用户名或密码');
+    res.sendData('5000', '无效的用户名或密码');
   }
 }
 
@@ -50,24 +49,23 @@ exports.addUser = async (req, res) => {
   const searchRet = await userService.findUser({name: username});
   if (searchRet.length && searchRet[0].id) {
     res.sendData('5000', '用户名已经被占用');
-    return;
-  }
-
-  const hash = bcrypt.hashSync(password, saltRounds);
-  const user = {
-    username,
-    password: hash,
-    age,
-    sex,
-    email,
-    phone,
-    avatar,
-  };
-  const ret = await userService.addUser(user);
-  if (ret.affectedRows) {
-    res.sendData('1', '注册成功');
   } else {
-    res.sendData('0', '注册失败');
+    const hash = bcrypt.hashSync(password, saltRounds);
+    const user = {
+      username,
+      password: hash,
+      age,
+      sex,
+      email,
+      phone,
+      avatar,
+    };
+    const ret = await userService.addUser(user);
+    if (ret.affectedRows) {
+      res.sendData('1', '注册成功');
+    } else {
+      res.sendData('0', '注册失败');
+    }
   }
 }
 
@@ -128,5 +126,27 @@ exports.getMsg = async (req, res) => {
     res.sendData('1', ret, '消息查询成功');
   } else {
     res.sendData('0', ret, '消息查询失败');
+  }
+}
+
+//invitation
+exports.sendInvitation = async (req, res) => {
+  const { user_id, friend_id, username, invite_type } = req.body;
+  const searchRet = await inviteService.getInvitation(friend_id, user_id);
+  if (searchRet.length && searchRet[0].id) {
+    res.sendData('5000', '已发送过好友申请');
+  } else {
+    const invitation = {
+      user_id,
+      friend_id,
+      username,
+      invite_type,
+    };
+    const ret = await inviteService.sendInvitation(invitation);
+    if (ret.affectedRows) {
+      res.sendData('1', '发送成功');
+    } else {
+      res.sendData('0', '发送失败');
+    }
   }
 }

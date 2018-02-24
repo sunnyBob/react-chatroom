@@ -1,6 +1,3 @@
-.online {
-  color: #11ca4c;
-}
 .qemoji-0 {
   background-image: url('/src/images/QQ.png');
   background-position: 0px 0px;
@@ -984,10 +981,19 @@ body {
   height: 40px;
   cursor: pointer;
 }
-.user-info .status {
+.user-info .avatar-wrap {
+  position: relative;
+}
+.user-info .avatar-wrap::after {
   position: absolute;
-  margin-top: 15px;
-  margin-left: 24px;
+  content: '';
+  background: #0ff116;
+  width: 8px;
+  height: 8px;
+  display: block;
+  border-radius: 50%;
+  bottom: 5px;
+  right: 6px;
 }
 .user-info .add-user {
   font-family: 'Serif';
@@ -1015,6 +1021,20 @@ body {
   border-radius: 50%;
   vertical-align: middle;
   margin-right: 5px;
+}
+.menu-list li .avatar-wrap {
+  position: relative;
+}
+.menu-list li .avatar-wrap[data-status="1"]::after {
+  position: absolute;
+  content: '';
+  background: #0ff116;
+  width: 8px;
+  height: 8px;
+  display: block;
+  border-radius: 50%;
+  top: 18px;
+  right: 6px;
 }
 .menu-list .is-active {
   background: #25a0f3 !important;

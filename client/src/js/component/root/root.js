@@ -75,13 +75,15 @@ class Root extends React.Component {
             </Menus>
           </div>
           <div className="column is-10">
-            <Dropdown
-              className="setting"
-              align="right"
-              items={items}
-              triggerEl={<Icon name="cog"/>}
-              hasDividers={true}
-            />
+            <div className="right-bar">
+              <Dropdown
+                align="right"
+                items={items}
+                triggerEl={<Icon name="cog"/>}
+                hasDividers={true}
+              />
+              <Icon name="bell" className="alert-bell"/>
+            </div>
             {cloneChild}
           </div>
         </div>

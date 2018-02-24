@@ -24,7 +24,7 @@ class UserInfo extends React.Component {
             <Menu
               onClick={this.handleClick.bind(this, friend)}
               attachEl={
-                <img src={friend.avatar}/>
+                <span className="avatar-wrap" data-status={friend.status}><img src={friend.avatar} className="avatar"/></span>
               }
               isActive={parseInt(pathname.split('/').reverse()[0], 10) === friend.id}
               key={friend.id}
