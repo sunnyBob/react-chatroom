@@ -20,7 +20,7 @@ html, body {
   overflow: hidden;
 }
 .column.is-10 {
-  padding-top: 0;
+  padding-top: 20px;
 }
 .user-info {
   display: flex;
@@ -122,4 +122,21 @@ html, body {
   .cols-3-3 {
     min-width: 95%;
   }
+}
+.pagination {
+  justify-content: flex-end !important;
+  ul {
+    list-style: none;
+    li {
+      display: inline-block;
+    }
+    margin-right: 10px;
+  }
+  .input {
+    width: 50px;
+    vertical-align: middle;
+  }
+}
+.data-table {
+  font-size: 14px;
 }

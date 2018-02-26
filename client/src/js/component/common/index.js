@@ -10,6 +10,8 @@ import { Dropdown } from './dropdown';
 import { Checkbox, CheckboxGroup } from './checkbox';
 import { Radio, RadioGroup } from './radio';
 import Table from './table/Table';
+import Select from './select/Select';
+import Tag from './tag'
 
 export {
   Tab,
@@ -30,4 +32,5 @@ export {
   Radio,
   RadioGroup,
   Table,
+  Select,
 };

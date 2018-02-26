@@ -4,7 +4,13 @@ const tokenChecker = require('../utils/tokenChecker');
 
 module.exports = function(router) {
   router.get('/api/login', ctrl.findUser);
+
+  //friend
   router.get('/api/friends', ctrl.showFriends);
+  router.post('/api/friends', ctrl.addFriend);
+
+
+  //user
   router.get('/api/user', ctrl.findUserById);
   router.post('/api/user', ctrl.addUser);
   router.put('/api/user', ctrl.updateUserInfo);
@@ -14,7 +20,9 @@ module.exports = function(router) {
   router.post('/api/message', ctrl.addMsg);
 
   //invitation
-  router.post('/api/invitation', ctrl.sendInvitation)
+  router.get('/api/invitation', ctrl.getInvitation);
+  router.post('/api/invitation', ctrl.sendInvitation);
+  router.delete('/api/invitation', ctrl.deleteInvitation);
 
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';

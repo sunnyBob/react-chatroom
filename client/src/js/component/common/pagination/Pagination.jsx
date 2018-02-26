@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
 import Pager from './Pager';
-import { Select } from '../../';
+import { Select } from '../';
 
 class Pagination extends React.Component {
   static propTypes = {
@@ -331,7 +331,7 @@ class Pagination extends React.Component {
       total, sizer, pager, jumper,
     };
     const components = this.props.layout.split(',');
-
+    console.log(components);
     return show ? (
       <nav className={`pagination ${sizeClass} ${alignClass}`}>
         {components.map(item => items[item.trim()])}

@@ -69,16 +69,6 @@ exports.addUser = async (req, res) => {
   }
 }
 
-exports.showFriends = async (req, res) => {
-  const { userId } = req.query;
-  const ret = await userService.findFriend(userId);
-  if (Array.isArray(ret) && ret.length) {
-    res.sendData(1, ret, 'success');
-  } else {
-    res.sendData(0, ret), 'failed';
-  }
-}
-
 exports.updateUserInfo = async (req, res) => {
   const user = req.body;
   const { password, originPasswd, name} = user;
@@ -106,6 +96,27 @@ exports.updateUserInfo = async (req, res) => {
   }
 }
 
+//friend
+exports.showFriends = async (req, res) => {
+  const { userId } = req.query;
+  const ret = await userService.findFriend(userId);
+  if (Array.isArray(ret) && ret.length) {
+    res.sendData(1, ret, 'success');
+  } else {
+    res.sendData(0, ret), 'failed';
+  }
+}
+
+exports.addFriend = async (req, res) => {
+  const { userId, friendId } = req.body;
+  const ret = await userService.addFriend(userId, friendId);
+  if (ret.affectedRows) {
+    res.sendData('1', '添加好友成功');
+  } else {
+    res.sendData('0', '添加好友失败');
+  }
+}
+
 // message
 exports.addMsg = async (req, res) => {
   const { from_user, to_user, content } = req.body;
@@ -119,9 +130,8 @@ exports.addMsg = async (req, res) => {
 }
 
 exports.getMsg = async (req, res) => {
-  const { userId } = req.query;
-  const ret = await msgService.getMsg(userId);
-  console.log(ret);
+  const { fromUser, toUser } = req.query;
+  const ret = await msgService.getMsg(fromUser, toUser);
   if (Array.isArray(ret) && ret.length) {
     res.sendData('1', ret, '消息查询成功');
   } else {
@@ -148,5 +158,27 @@ exports.sendInvitation = async (req, res) => {
     } else {
       res.sendData('0', '发送失败');
     }
+  }
+}
+
+exports.getInvitation = async (req, res) => {
+  const { user_id, friend_id, invite_type } = req.query;
+  const searchRet = await inviteService.getInvitation(friend_id, user_id, invite_type);
+  if (Array.isArray(searchRet)) {
+    res.sendData('1', searchRet, '查询成功');
+  } else {
+    res.sendData('0', searchRet, '查询失败');
+  }
+}
+
+exports.deleteInvitation = async (req, res) => {
+  const { id } = req.body;
+  console.log(req.body);
+  const ret = await inviteService.deleteInvitation(id);
+
+  if (ret.affectedRows) {
+    res.sendData('1', '删除申请成功');
+  } else {
+    res.sendData('0', '删除申请失败');
   }
 }

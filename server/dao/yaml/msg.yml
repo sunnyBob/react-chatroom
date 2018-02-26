@@ -2,4 +2,5 @@ namespace: 'msg'
 
 findMsg:
   - select * from message
-  - where from_user = :userId or to_user = :userId
+  - where (from_user = :fromUser and to_user = :toUser)
+  - or (from_user = :toUser and to_user = :fromUser)

@@ -4,10 +4,10 @@ const path = require('path');
 const nodebatis = new NodeBatis(path.resolve(__dirname, './yaml'), {
     debug: true,
     dialect: 'mysql',
-    host: '127.0.0.1',
+    host: '207.226.143.224',
     port: 3306,
     database: 'chatroom',
     user: 'root',
-    password: '123456'
+    password: 'liuxuegang'
 })
 module.exports = nodebatis;

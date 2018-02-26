@@ -69,7 +69,7 @@ class AddUsrGroup extends React.Component {
 
   render() {
     const { id, avatar, username } = this.state.result;
-    console.log(this.state.result);
+    
     return (
       <div className="adduserorgroup">
         <h5>{t('Add User/Group')}</h5>

@@ -1,7 +1,7 @@
 const dao = require('../dao');
 
-exports.getMsg = async (userId) => {
-  const ret = await dao.query('msg.findMsg', { userId });
+exports.getMsg = async (fromUser, toUser) => {
+  const ret = await dao.query('msg.findMsg', { fromUser, toUser });
   return ret;
 }
 

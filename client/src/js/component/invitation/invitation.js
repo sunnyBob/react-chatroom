@@ -1,178 +1,138 @@
 import React from 'react';
 import { browserHistory } from 'react-router'
-import { inject, observer } from 'mobx-react';
-import Cropper from 'cropperjs';
-import { Card, ModalManager } from '../common';
+import { Card, ModalManager, Table, Tab, TabItem } from '../common';
 import request from '../../utils/request';
 
-import './user.less';
+import './invitation.less';
 
-@inject('RootStore')
-@observer
 class Invitation extends React.Component {
   constructor(props) {
     super(props);
 
-    this.store = new props.RootStore();
+    this.state = {
+      inviteType: '好友申请',
+      tbData: [],
+    };
+    console.log(props);
     this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
   }
 
-  componentWillMount() {
-    this.store.getUser(this.props.params.id);
+  componentDidMount() {
+    this.fetchData();
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.store.getUser(nextProps.params.id);
+  fetchData = () => {
+    request({
+      url: '/invitation',
+      data: {
+        friend_id: this.userId,
+        invite_type: this.state.inviteType,
+      },
+    }).then(resp => {
+      if (resp.code == 1) {
+        this.setState({
+          tbData: resp.retList,
+        });
+      }
+    });
   }
 
   handleClose = () => {
-    browserHistory.push('/chat');
+    history.back();
   }
 
-  handleUpload = () => {
-    const modal = ModalManager.open({
-      content: <UploadAvatar ref={ref => { this.imagePicker = ref; }}/>,
-      showHeader: false,
-      onOk: () => handleOk.call(this),
-    });
-    function handleOk() {
-      const avatar = this.imagePicker.state.previewUrl || this.imagePicker.img.src;
-      if (avatar) {
-        request({
-          url: '/user',
-          method: 'PUT',
-          data: {
-            id: this.props.params.id,
-            avatar,
-          },
-        }).then(resp => {
-          if (resp.code === 1) {
-            this.props.fetchData && this.props.fetchData();
-            ModalManager.close(modal);
-          } else {
-            alert("failed");
-          }
-        });
-      } else {
-        ModalManager.close(modal);
-      }
-    }
+  handleToggle = (e) => {
+    const inviteType = e.target.innerHTML;
+    this.setState({
+      inviteType, 
+    }, () => { this.fetchData(); });
   }
 
-  modPasswd = () => {
-    ModalManager.open({
-      title: <small>密码修改</small>,
-      content: <ModifyPasswd ref={(ref) => { this.passwdMpdal = ref; }}/>,
-      onOk: () => handleOk.call(this),
-    });
-    function handleOk() {
-      const { originPasswd, nowPasswd } = this.passwdMpdal.state;
-      if (originPasswd && originPasswd) {
-        const user = {
-          originPasswd,
-          name: this.store.userInfo.username,
-          id: this.props.params.id,
-          password: nowPasswd,
-        };
-        request({
-          url: '/user',
-          method: 'PUT',
-          data: user,
-        }).then(resp => {
-          if (resp.code === 1) {
-            alert('success');
-          } else {
-            alert("failed");
-          }
-        });
-      } else {
-        alert('原始/新密码不能为空');
-      }
-    }
-  }
-
-  handleEdit = (user, cb) => {
-    user.id = this.props.params.id;
-    request({
-      url: '/user',
-      method: 'PUT',
-      data: user,
-    }).then(resp => {
-      if (resp.code === 1) {
-        if (user.hasOwnProperty('username')) {
+  handleAccept = (invitation) => {
+    const { id, user_id, friend_id, username, invite_type } = invitation;
+    if (invite_type === '好友申请') {
+      request({
+        url: '/friends',
+        method: 'post',
+        data: {
+          userId: user_id,
+          friendId: friend_id,
+        },
+      }).then(resp => {
+        if (resp.code == 1) {
+          alert(`成功添加${username}为好友`);
           this.props.fetchData && this.props.fetchData();
+          this.handleDeleteInvitation(id);
         } else {
-          this.store.getUser(this.props.params.id);
+          alert(`添加好友失败`);
         }
-        cb();
-      } else {
-        alert("failed");
-      }
+      });
+    }
+  }
+
+  handleReject = (invitation) => {
+    const { id, username } = invitation;
+    ModalManager.confirm({
+      content: `确定拒绝${username}的好友申请？`,
+      onOk: this.handleDeleteInvitation.bind(null, id, () => {
+        alert(`您已拒绝${username}的好友申请`);
+        this.fetchData();
+      }),
     })
   }
 
-  handleChat = () => {
-    browserHistory.push(`/chat/${this.props.params.id}`);
+  handleDeleteInvitation = (id, cb = () => {}) => {
+    request({
+      url: '/invitation',
+      method: 'delete',
+      data: {
+        id,
+      },
+    }).then(resp => {
+      if (resp.code == 1) {
+       cb();
+      }
+    });
   }
 
   render() {
-    const { userInfo = {} } = this.store;
-    const attrList = [{
-      label: 'ID',
-      field: 'ID',
-      value: userInfo.id,
-    }, {
-      label: t('User Name'),
-      field: 'username',
-      value: userInfo.username,
-      editable: true,
-    }, {
-      label: t('Sex'),
-      field: 'sex',
-      value: t(userInfo.sex),
-    }, {
-      label: t('Age'),
-      field: 'age',
-      value: userInfo.age,
-      editable: true,
-    }, {
-      label: t('Email'),
-      field: 'email',
-      value: userInfo.email,
-      editable: true,
-    }, {
-      label: t('Phone'),
-      field: 'phone',
-      value: userInfo.phone,
-      editable: true,
-    }, {
-      label: t('Signature'),
-      field: 'signature',
-      value: userInfo.signature,
-      colSpan: 3,
-      editable: true,
-    }, {
-      label: t('More Options'),
-      value: (
-        <div className="options">
-          <span onClick={this.modPasswd}>密码修改</span>
-          <span onClick={this.handleUpload}>头像上传</span>
-          {userInfo.id != this.userId && <span onClick={this.handleChat}>发消息</span>}
-        </div>
-      ),
-      colSpan: 3,
-    }]
+    const columns = [
+      { label: '申请人Id', field: 'user_id' },
+      { label: '申请人姓名', field: 'username' },
+      { label: '申请类型', field: 'invite_type' },
+      { label: '申请时间', field: 'createTime' },
+      { label: '操作', template: row => <span className="invitation-opt">
+        <a onClick={this.handleAccept.bind(null, row)}>[接受] </a>
+        <a onClick={this.handleReject.bind(null, row)}>[拒绝]</a>
+      </span> },
+    ];
+    const data = this.state.tbData;
     return (
       <Card
-        title="个人主页"
+        title="申请列表"
         enableClose={true}
         handleClose={this.handleClose}
         className="person-info"
       >
-        <div className="info-top">
-          <img src={userInfo.avatar}/>
+        <div className="invitation-btns">
+          <a onClick={this.handleToggle} className="button is-primary is-small">好友申请</a>
+          <a onClick={this.handleToggle} className="button is-info is-small">入群申请</a>
         </div>
-        <AttrList attrList={attrList} handleEdit={this.handleEdit}/>
+        <Table
+          data={data}
+          columns={columns}
+          total={data.length}
+          className="is-narrow"
+          pagination={{
+            current: 1,
+            pageSize: 4,
+            total: data.length,
+            isShow: true,
+            size: 'small',
+            align: 'right',
+            layout: 'total, pager, jumper',
+          }}
+        />
       </Card>
     );
   }

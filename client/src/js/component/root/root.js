@@ -1,7 +1,7 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Menu, Menus, Icon, Dropdown } from '../common';
-import { browserHistory } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 import UserInfo from './userInfo';
 import FriendList from './friendList';
 import '../../../local';
@@ -82,7 +82,7 @@ class Root extends React.Component {
                 triggerEl={<Icon name="cog"/>}
                 hasDividers={true}
               />
-              <Icon name="bell" className="alert-bell"/>
+              <Link to="/invitation"><Icon name="bell" className="alert-bell"/></Link>
             </div>
             {cloneChild}
           </div>

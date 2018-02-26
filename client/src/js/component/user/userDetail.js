@@ -28,7 +28,7 @@ class UserDetail extends React.Component {
   }
 
   handleClose = () => {
-    browserHistory.push('/chat');
+    history.back();
   }
 
   handleUpload = () => {
@@ -119,6 +119,7 @@ class UserDetail extends React.Component {
 
   render() {
     const { userInfo = {} } = this.store;
+    const editable = userInfo.id === this.userId;
     const attrList = [{
       label: 'ID',
       field: 'ID',
@@ -127,7 +128,7 @@ class UserDetail extends React.Component {
       label: t('User Name'),
       field: 'username',
       value: userInfo.username,
-      editable: true,
+      editable,
     }, {
       label: t('Sex'),
       field: 'sex',
@@ -136,30 +137,30 @@ class UserDetail extends React.Component {
       label: t('Age'),
       field: 'age',
       value: userInfo.age,
-      editable: true,
+      editable,
     }, {
       label: t('Email'),
       field: 'email',
       value: userInfo.email,
-      editable: true,
+      editable,
     }, {
       label: t('Phone'),
       field: 'phone',
       value: userInfo.phone,
-      editable: true,
+      editable,
     }, {
       label: t('Signature'),
       field: 'signature',
       value: userInfo.signature,
       colSpan: 3,
-      editable: true,
+      editable,
     }, {
       label: t('More Options'),
       value: (
         <div className="options">
-          <span onClick={this.modPasswd}>密码修改</span>
-          <span onClick={this.handleUpload}>头像上传</span>
-          {userInfo.id != this.userId && <span onClick={this.handleChat}>发消息</span>}
+          {userInfo.id === this.userId && <span onClick={this.modPasswd}>密码修改</span>}
+          {userInfo.id === this.userId && <span onClick={this.handleUpload}>头像上传</span>}
+          {userInfo.id !== this.userId && <span onClick={this.handleChat}>发消息</span>}
         </div>
       ),
       colSpan: 3,

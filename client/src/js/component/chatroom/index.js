@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router';
 import { Icon, PopoverManager, Tab, TabItem } from '../common';
-import Textarea from 'react-contenteditable';
 import request from '../../utils/request';
+import Textarea from 'react-contenteditable';
 import './chatRoom.less';
 
 class ChatRoom extends React.Component {
@@ -28,7 +29,6 @@ class ChatRoom extends React.Component {
     const id = this.props.params.id;
     if (id) {
       this.getCurrentUser(id);
-      this.getCurrentUserMsg(id);
     }
   }
 
@@ -38,7 +38,6 @@ class ChatRoom extends React.Component {
     if (id !== nextId) {
       if (nextId) {
         this.getCurrentUser(nextId);
-        this.getCurrentUserMsg(nextId);
         this.setState({
           html: '',
         });
@@ -60,28 +59,38 @@ class ChatRoom extends React.Component {
     if (Array.isArray(resp.retList) && resp.retList.length) {
       this.setState({
         currentChatUser: resp.retList[0],
+      }, () => {
+        this.getCurrentUserMsg(id);
       });
     }
   }
 
   getCurrentUserMsg = async (userId) => {
+    const { user_id, avatar } = this.user;
     const resp =  await request({
       url: '/message',
       data: {
-        userId,
+        fromUser: user_id,
+        toUser: userId,
       },
     });
     if (Array.isArray(resp.retList)) {
-      
       const messages = resp.retList;
       const msgEl = [];
       messages.forEach(msg => {
         const { from_user, to_user, content } = msg;
         if (from_user == userId) {
-          msgEl.push(<div className="msginfo-left"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+          msgEl.push(<div className="msginfo-left"  key={Math.random()} >
+            <Link to={`/user-info/${userId}`}><img src={this.state.currentChatUser.avatar} className="avatar"/></Link>
+            <div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+          </div>);
         }
         if (to_user == userId) {
-          msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+          
+          msgEl.push(<div className="msginfo-right"  key={Math.random()} >
+            <div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+            <Link to={`/user-info/${user_id}`}><img src={avatar} className="avatar"/></Link>
+          </div>);
         }
       });
       this.setState({ msgEl }, () => {
@@ -111,11 +120,9 @@ class ChatRoom extends React.Component {
   showEmoji = (e) => {
     const { pageX, pageY } = e;
     const emojiArr = [];
-    
     const content = (
       <Tab
         isBoxed={false}
-        handleClick={this.handleToggle}
         size='small'
       >
         <TabItem content={t('QQ Emoji')}>
@@ -135,14 +142,24 @@ class ChatRoom extends React.Component {
     })
   }
 
-  sendMsg = async () => {
-    const html = this.state.html;
+  sendMsg = async (e) => {
+    const keyCode = e.keyCode || e.which || e.charCode;
+    const ctrlKey = e.ctrlKey || e.metaKey;
+    const { html } = this.state;
     const userId = this.props.params.id;
+
+    if (keyCode && (!ctrlKey || keyCode !== 13)) {
+      return;
+    }
+    this.setState({
+      html: '',
+    });
+    if (!html.trim()) {
+      alert('消息内容不能为空!');
+      return;
+    }
     if (!this.props.params.id) {
       alert('No chats selected!');
-      this.setState({
-        html: '',
-      });
       return;
     }
     const ret = await request({
@@ -156,10 +173,13 @@ class ChatRoom extends React.Component {
     });
     if (ret.code) {
       socket.emit('chatToOne', html, this.user.user_id, userId);
+      const { avatar, user_id } = this.user;
       const msgEl = [...this.state.msgEl];
-      msgEl.push(<div className="msginfo-right"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+      msgEl.push(<div className="msginfo-right"  key={Math.random()} >
+        <div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+        <Link to={`/user-info/${user_id}`}><img src={avatar} className="avatar"/></Link>
+      </div>);
       this.setState({
-        html: '',
         msgEl: msgEl,
       }, () => {
         this.msgBox.scrollTop = this.msgBox.scrollHeight;
@@ -169,7 +189,10 @@ class ChatRoom extends React.Component {
 
   handleRecvMsg = (msg) => {
     const msgEl = [...this.state.msgEl];
-    msgEl.push(<div className="msginfo-left"  key={Math.random()} ><div dangerouslySetInnerHTML={{ __html: msg.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/></div>);
+    msgEl.push(<div className="msginfo-left"  key={Math.random()} >
+      <Link to={`/user-info/${this.state.currentChatUser.id}`}><img src={this.state.currentChatUser.avatar} className="avatar"/></Link>
+      <div dangerouslySetInnerHTML={{ __html: msg.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+    </div>);
     this.setState({
       msgEl: msgEl,
     }, () => {
@@ -190,8 +213,9 @@ class ChatRoom extends React.Component {
             <Icon name="smile-o" size="medium" onClick={this.showEmoji}/>
             <Icon name="folder-o" size="medium"/>
           </div>
-          <Textarea className="textarea is-primary" html={this.state.html} onChange={this.handleChange}/>
-          <button className="pull-right" onClick={this.sendMsg}>{t('Send')}</button>
+          <Textarea ref={ref => { this.textarea = ref; }} className="textarea is-primary" html={this.state.html} onChange={this.handleChange} onKeyDown={this.sendMsg}/>
+          <span>(按ctrl/cmd + enter组合键发送)</span>
+          <button className="pull-right button is-small" onClick={this.sendMsg}>{t('Send')}</button>
         </div>
       </div>
     )
@@ -200,4 +224,4 @@ class ChatRoom extends React.Component {
 
 export {
   ChatRoom
-}
+};
