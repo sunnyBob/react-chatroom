@@ -1,9 +1,7 @@
-@import './status.less';
 @import './emoji.less';
 html, body {
   height: 100%;
 }
-
 #app {
   height: 100%;
   margin-top: 12px;
@@ -15,7 +13,15 @@ html, body {
   width: 80% !important;
   margin: 0 auto !important;
 }
-
+.topbar {
+  background: #fff;
+  margin-bottom: 10px;
+  padding:  15px;
+  overflow: hidden;
+}
+.column.is-10 {
+  padding-top: 20px;
+}
 .user-info {
   display: flex;
   align-items: center;
@@ -30,10 +36,19 @@ html, body {
     height: 40px;
     cursor: pointer;
   }
-  .status {
+  .avatar-wrap {
+    position: relative;
+  }
+  .avatar-wrap::after {
     position: absolute;
-    margin-top: 15px;
-    margin-left: 24px;
+    content: '';
+    background: #0ff116;
+    width: 8px;
+    height: 8px;
+    display: block;
+    border-radius: 50%;
+    bottom: 5px;
+    right: 6px;
   }
   .add-user {
     font-family: 'Serif';
@@ -65,6 +80,20 @@ html, body {
     vertical-align: middle;
     margin-right: 5px;
   }
+  .avatar-wrap {
+    position: relative;
+  }
+  .avatar-wrap[data-status="1"]::after {
+    position: absolute;
+    content: '';
+    background: #0ff116;
+    width: 8px;
+    height: 8px;
+    display: block;
+    border-radius: 50%;
+    top: 18px;
+    right: 6px;
+  }
 }
 .menu-list .is-active {
   background: #25a0f3 !important;
@@ -85,12 +114,29 @@ html, body {
   flex-wrap: wrap;
   justify-content: flex-start;
   .cols-3-1 {
-    width: 30%;
+    min-width: 30%;
   }
   .cols-3-2 {
-    width: 60%;
+    min-width: 60%;
   }
   .cols-3-3 {
-    width: 95%;
+    min-width: 95%;
   }
+}
+.pagination {
+  justify-content: flex-end !important;
+  ul {
+    list-style: none;
+    li {
+      display: inline-block;
+    }
+    margin-right: 10px;
+  }
+  .input {
+    width: 50px;
+    vertical-align: middle;
+  }
+}
+.data-table {
+  font-size: 14px;
 }

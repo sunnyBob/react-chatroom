@@ -1,4 +1,5 @@
 const dao = require('../dao');
+
 exports.findUser = async (user) => {
   const ret = await dao.query('user.findUser', user);
   return ret;
@@ -19,7 +20,12 @@ exports.findFriend = async (userId) => {
   return ret;
 }
 
-exports.updateStatus = async (userId, type) => {
-  const ret = await dao.update('user', { status: type, id: userId },  idKey = "id");
+exports.addFriend = async (user_id, friend_id) => {
+  const ret = await dao.insert('friend', { user_id, friend_id });
+  return ret;
+}
+
+exports.updateUserInfo = async (user) => {
+  const ret = await dao.update('user', user,  idKey = "id");
   return ret;
 }

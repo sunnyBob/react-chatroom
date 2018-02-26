@@ -27,7 +27,7 @@ export default class LoginReg extends React.Component {
       method: 'PUT',
       data: {
         status: 1,
-        userId,
+        id: userId,
       }
     }).then(resp => {
       console.log(resp);
@@ -75,7 +75,6 @@ export default class LoginReg extends React.Component {
         avatar: this.nameToImage(username),
       },
     });
-    console.log(ret)
     if (ret.code === 1) {
       alert('注册成功');
       // browserHistory.replace('/chat');
@@ -130,7 +129,7 @@ export default class LoginReg extends React.Component {
             isCenter={true}
             handleClick={this.handleToggle}
           >
-            <TabItem icon='sign-in' content="登录">
+            <TabItem icon='sign-in' content={t('Sign In')}>
               <div className="content">
                 <Input
                   placeholder="username"
@@ -152,7 +151,7 @@ export default class LoginReg extends React.Component {
                 <a className="button is-primary is-small pull-right" onClick={this.handleLogin}>登录</a>
               </div>
             </TabItem>
-            <TabItem icon='registered' content="注册">
+            <TabItem icon='registered' content={t('Register')}>
               <div className="content">
                 <Input
                   placeholder="username"
@@ -191,10 +190,10 @@ export default class LoginReg extends React.Component {
                   name="sex"
                   options={[{
                     label: 'male',
-                    value: '男'
+                    value: t('Male')
                   }, {
                     label: 'female',
-                    value: '女'
+                    value: t('Female')
                   }]}
                   onChange={this.handleChange}
                 />

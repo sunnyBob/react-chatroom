@@ -8,19 +8,33 @@ const routers = require('./routes/route');
 const sendData = require('./utils/sendHelp');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
-io.on('connection', function(socket){
-  console.log(socket);
-  console.log('a user connected');
-  socket.emit('news', '1111')
-});
+const userSocket = {};
+const onlineUsers = {};
+let token = '';
 
 app.use(express.static(path.join(__dirname, '..', 'client')));
 app.use(sendData);
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cookieParser());
 app.use(routers(express.Router()));
+app.get('*', (req, res, next) => {
+  token = req.cookies && req.cookies.token;
+})
 http.listen(PORT, () => {
   console.log(`server start on port ${PORT}`);
+});
+
+io.on('connection', (socket) => {
+  const user = jwt.decode(token) || {};
+  user.userId && (userSocket[user.userId] = socket);
+  user.userId && (onlineUsers[user.userId] = user.name);
+  
+  socket.on('chatToOne', (msg, fromUser, toUser) => {
+    if (userSocket.hasOwnProperty(toUser)) {
+      userSocket[toUser].emit('chatToOne', msg, fromUser);
+    }
+  });
 });

@@ -1,4 +1,4 @@
-import { LoginReg, ChatRoom, Root, UserDetail } from '../component';
+import { LoginReg, ChatRoom, Root, UserDetail, Invitation } from '../component';
 const routeConfig = [
   {
     path: '/login',
@@ -14,6 +14,7 @@ const routeConfig = [
       { path: 'chat', component: ChatRoom, childRoutes: [
         {path: '/chat/:id', component: ChatRoom},
       ]},
+      { path: 'invitation', component: Invitation },
     ]
   }
 ];

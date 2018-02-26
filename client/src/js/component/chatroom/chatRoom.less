@@ -4,28 +4,58 @@
   overflow: hidden;
   .chatInfo {
     width: 100%;
-    height: 9%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 14px;
   }
   .message {
-    height: 59%;
+    height: 60%;
     margin: 0 !important;
     overflow: scroll;
+    padding: 10px 20px;
   }
-  .wordarea {
-    width: 100%;
-    height: 19%;
-    textarea {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border-width: 0px;
+  .textarea {
+    border: 1px solid gray;
+    height: 28px;
+    overflow: auto;
+    padding: 2px;
+    resize: both;
+    width: 400px;
+    background: rgba(107, 106, 106, 0.404);
+  }
+  .msginfo-left, .msginfo-right{
+    clear: both;
+    margin-bottom: 14px;
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: inline-block;
     }
-    .toolbar {
-      margin: 8px auto;
+    & > div {
+      vertical-align: text-top;
+      max-width: 600px;
+      display: inline-block;
+      border-radius: 10px;
+      min-width: 60px;
+      padding: 5px 10px;
+      overflow: scroll;
     }
-    button {
-      height: 20%;
-      margin: 8px 0;
+  }
+  .msginfo-right {
+    float: right;
+    div {
+      margin-right: 10px;
+      background: #56a5b3;
+    }
+  }
+  .msginfo-left {
+    float: left;
+    div {
+      margin-left: 10px;
+      background: #264b38;
+      color: white;
     }
   }
 }

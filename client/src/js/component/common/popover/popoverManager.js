@@ -4,7 +4,7 @@ import Popover from './popover';
 
 export default class PopoverManager extends Component {
   static open(options = {}) {
-    const { x = 0, y = 0, content } = options;
+    const { x = 0, y = 0, content, reverse = false } = options;
     if (document.getElementsByClassName("popover").length) {
       const result = ReactDOM.unmountComponentAtNode(document.getElementsByClassName("popover"));
       if (result) {
@@ -14,8 +14,6 @@ export default class PopoverManager extends Component {
     const container = document.createElement('div');
     container.className = 'popover';
     document.body.appendChild(container);
-    container.style.left = x + 'px';
-    container.style.top = y + 'px';
     const close = (popover) => {
       const result = ReactDOM.unmountComponentAtNode(popover);
       if (result) {
@@ -48,5 +46,14 @@ export default class PopoverManager extends Component {
       <Popover content={content}/>,
       container
     );
+    container.style.left = x + 'px';
+    container.style.top = (reverse ? y - container.clientHeight : y) + 'px';
+    return container;
+  }
+  static close(popover) {
+    const unmountResult = ReactDOM.unmountComponentAtNode(popover);
+    if (unmountResult && popover.parentNode) {
+      popover.parentNode.removeChild(popover);
+    }
   }
 }

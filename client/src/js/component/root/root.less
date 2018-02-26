@@ -3,3 +3,28 @@
     background: #838282;
   }
 }
+.right-bar {
+  position: fixed;
+  right: 30px;
+  top: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 55px;
+  .alert-bell {
+    margin-left: 12px;
+    color: #4a4a4a;
+    cursor: pointer;
+    &::after {
+      content: '22';
+      background: #38e038;
+      color: white;
+      display: block;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      padding: 0 5px;
+      font-size: 12px;
+    }
+  }
+}

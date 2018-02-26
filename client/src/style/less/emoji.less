@@ -1,18 +1,15 @@
-.qq_emoji {
-  a {
+.loops(@col) when (@col < 15) {
+  @index: @row * 15 + @col;
+  .qemoji-@{index}{
+    @y: @row * (-29px);
+    @x: @col * (-29px);
     background-image: url('/src/images/QQ.png');
+    background-position: @x @y;
     background-size: 434px 202px;
     display: inline-block;
     width: 29px;
     height: 29px;
-  }
-}
-.loops(@col) when (@col < 15) {
-  @index: @row * 15 + @col;
-  .qq_emoji .qemoji-@{index}{
-    @y: @row * (-29px);
-    @x: @col * (-29px);
-    background-position: @x @y;
+    vertical-align: middle;
   }
   .loops((@col + 1));
 }
@@ -21,28 +18,3 @@
   .loop((@row + 1));
 }
 .loop(0);
-
-/*------------------------------symbol emoji---------------------------------*/
-.symbol_emoji {
-  a {
-    background-image: url('/src/images/symbol.png');
-    background-size: 434px 360px;
-    display: inline-block;
-    width: 29px;
-    height: 29px;
-  }
-}
-.symbol-loops(@col) when (@col < 15) {
-  @index: @row * 15 + @col;
-  .symbol_emoji .symemoji-@{index}{
-    @y: @row * (-29px);
-    @x: @col * (-29px);
-    background-position: @x @y;
-  }
-  .symbol-loops((@col + 1));
-}
-.symbol-loop(@row) when (@row < 7) {
-  .symbol-loops(0);
-  .symbol-loop((@row + 1));
-}
-.symbol-loop(0);

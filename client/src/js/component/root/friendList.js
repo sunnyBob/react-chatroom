@@ -6,11 +6,11 @@ import { Menu, Menus, Icon } from '../common';
 class UserInfo extends React.Component {
   handleClick(friend, e) {
     const tagName = e.target.tagName;
-    const { friend_id } = friend;
+    const { id } = friend;
     if (tagName === 'IMG') {
-      browserHistory.push(`/user-info/${friend_id}`);
+      browserHistory.push(`/user-info/${id}`);
     } else if (tagName === 'A') {
-      browserHistory.push(`/chat/${friend_id}`);
+      browserHistory.push(`/chat/${id}`);
     }
   }
 
@@ -18,18 +18,18 @@ class UserInfo extends React.Component {
     const { friendsList } = this.props;
     const pathname = window.location.pathname
     return (
-      <Menus label="我的好友" isSub={true} selected={true}>
+      <Menus label={t('My Friends')} isSub={true} selected={true}>
         {
           toJS(friendsList).map(friend => (
             <Menu
               onClick={this.handleClick.bind(this, friend)}
               attachEl={
-                <img src={friend.avatar}/>
+                <span className="avatar-wrap" data-status={friend.status}><img src={friend.avatar} className="avatar"/></span>
               }
-              isActive={parseInt(pathname.split('/').reverse()[0], 10) === friend.friend_id}
-              key={friend.friend_id}
+              isActive={parseInt(pathname.split('/').reverse()[0], 10) === friend.id}
+              key={friend.id}
             >
-              {friend.friend_name}
+              {friend.username}
             </Menu>
           ))
         }

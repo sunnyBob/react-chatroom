@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 class Tab extends Component {
   constructor(props) {
@@ -34,11 +35,10 @@ class Tab extends Component {
 
   render() {
     const tab = this.renderTab();
-    const { isCenter } = this.props;
-    const style = isCenter ? 'is-centered' : '';
+    const { isCenter, isBoxed = true, size } = this.props;
     return (
       <div>
-        <div className={`tabs is-boxed ${style}`}>
+        <div className={classNames('tabs', {'is-boxed': isBoxed}, {'is-centered': isCenter}, {[`is-${size}`]: size})}>
           <ul>
             {tab}
           </ul>

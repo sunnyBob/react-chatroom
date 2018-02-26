@@ -1,11 +1,8 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
-import { Icon, PopoverManager } from '../common';
+import { Icon, PopoverManager, Dropdown } from '../common';
 import AddUserGroup from './addUserOrGroup';
 
-const statusType = {
-  1: 'online',
-};
 class UserInfo extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.info !== nextProps.info) {
@@ -19,21 +16,23 @@ class UserInfo extends React.Component {
     if (tagName === 'IMG') {
       browserHistory.push(`/user-info/${info.id}`);
     } else if (className.indexOf('fa-user-plus') >= 0) {
-      PopoverManager.open({
+      const popover = PopoverManager.open({
         x: e.pageX,
         y: e.pageY,
-        content: <AddUserGroup/>,
-      })
+        content: <AddUserGroup onClose={() => {
+          PopoverManager.close(popover);
+        }}/>,
+      });
     }
   }
 
   render() {
     const { info } = this.props;
-    const statusStyle = statusType[info.status] || '';
     return (
       <div className="user-info" onClick={this.handleClick}>
-        <img src={info.avatar || ''} className="avatar"/>
-        {info.status !== 0 && <Icon name="circle" className={`status ${statusStyle}`}/>}
+        <span className="avatar-wrap" data-status={info.status}>
+          <img src={info.avatar || ''} className="avatar" />
+        </span>
         <Icon name="user-plus" className="add-user"/>
       </div>
     );

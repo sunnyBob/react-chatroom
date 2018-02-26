@@ -9,5 +9,6 @@ findUserById:
   - where id = :id
 
 showFriend:
-  - select friend_id, friend_name, avatar from friend
-  - where user_id = :userId
+  - select * from friend as f, user as u
+  - where (f.user_id = :userId and f.friend_id = u.id)
+  - or (f.friend_id = :userId and f.user_id = u.id)
