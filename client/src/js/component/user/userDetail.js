@@ -5,7 +5,7 @@ import Cropper from 'cropperjs';
 import { Card, ModalManager, AttrList } from '../common';
 import request from '../../utils/request';
 import UploadAvatar from './uploadAvatar';
-import ModifyPasswd from './ModifyPasswd';
+import ModifyPasswd from './modifyPasswd';
 
 import './user.less';
 

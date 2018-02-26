@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import Transition from '../transition/Transition';
+import Transition from '../transition';
 
 class Modal extends React.Component {
   static propTypes = {
