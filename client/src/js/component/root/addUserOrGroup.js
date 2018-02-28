@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Icon } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
+import { toast } from 'react-toastify';
 
 import './addUserOrGroup.less';
 
@@ -19,7 +20,7 @@ class AddUsrGroup extends React.Component {
   handleSearch = (e) => {
     const id = ReactDOM.findDOMNode(this.input).value.trim();
     if (!id) {
-      alert("请输入id后再进行查找");
+      toast.error('请输入id后再进行查找', toastOption);
       return;
     }
     const name = e.target.name;
@@ -49,11 +50,11 @@ class AddUsrGroup extends React.Component {
   sendInvitation = (id) => {
     const { user_id, user_name } = this.user;
     if (user_id == id) {
-      alert('无法添加自己为好友');
+      toast.error('无法添加自己为好友', toastOption);
     } else {
       commonUtils.isFriend(user_id, id, {
         success: () => {
-          alert('您和该用户已经是好友关系');
+          toast.error('该用户已经是您的好友', toastOption);
         },
         fail: async () => {
           await request({
@@ -67,7 +68,7 @@ class AddUsrGroup extends React.Component {
             },
           }).then(resp => {
             if (resp.code == 1) {
-              alert('成功发送好友申请');
+              toast.success('成功发送好友申请', toastOption);
               socket.emit('updateInvitation', id);
               this.props.onClose();
             }

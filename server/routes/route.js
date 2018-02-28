@@ -31,6 +31,7 @@ module.exports = function(router) {
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
     if (req.path !== '/login' && !tokenChecker(token)) {
+      res.clearCookie('token');
       res.send("<script>window.location.href='/login'</script>")
     } else {
       res.sendFile(path.resolve(__dirname, '../index.html'));

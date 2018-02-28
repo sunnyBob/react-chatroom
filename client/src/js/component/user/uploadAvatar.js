@@ -1,7 +1,8 @@
 import React from 'react';
-import { browserHistory } from 'react-router'
+import { browserHistory } from 'react-router';
 import Cropper from 'cropperjs';
-import { Card } from '../common'
+import { Card } from '../common';
+import { toast } from 'react-toastify';
 
 import '../../../../node_modules/cropperjs/dist/cropper.min.css';
 import './user.less';
@@ -18,11 +19,11 @@ export default class extends React.Component {
   handleImage = (e) => {
     const file = e.target.files[0];
     if(!/image\/\w+/.test(file.type)) {
-      alert("请确保文件类型为图像类型");
+      toast.error('请确保文件类型为图像类型', toastOption);
       return;
     }
     if(typeof FileReader == 'undefined') {
-      alert("抱歉，你的浏览器不支持FileReader, 无法裁剪头像");
+      toast.error('抱歉，你的浏览器不支持FileReader, 无法裁剪头像', toastOption);
       return;
     } else {
       const reader = new FileReader();

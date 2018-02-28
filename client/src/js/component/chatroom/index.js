@@ -4,6 +4,8 @@ import { Icon, PopoverManager, Tab, TabItem } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
 import Textarea from 'react-contenteditable';
+import { toast } from 'react-toastify';
+
 import './chatRoom.less';
 
 class ChatRoom extends React.Component {
@@ -160,21 +162,21 @@ class ChatRoom extends React.Component {
     const ctrlKey = e.ctrlKey || e.metaKey;
     const { html } = this.state;
     const friendId = this.props.params.id;
-    
-    this.setState({
-      html: '',
-    });
 
     if (keyCode && (!ctrlKey || keyCode !== 13)) {
       return;
     }
+
+    this.setState({
+      html: '',
+    });
     if (!friendId) {
-      alert('No chats selected!');
+      toast.error('No chats selected!', toastOption);
       return;
     }
     
     if (!html.trim()) {
-      alert('消息内容不能为空!');
+      toast.error('消息内容不能为空!', toastOption);
       return;
     }
 

@@ -1,6 +1,7 @@
 import axios from 'axios';
 require("babel-core/register");
 require("babel-polyfill");
+import { toast } from 'react-toastify';
 
 export default function(options) {
   axios.defaults.timeout = 100000;
@@ -26,7 +27,9 @@ export default function(options) {
           window.location.href = '/login'
         }
         if (resp.code === '5000') {
-          alert(resp.message);
+          toast.error(resp.message, {
+            closeButton: false,
+          });
         }
       }
       return response.data || response;

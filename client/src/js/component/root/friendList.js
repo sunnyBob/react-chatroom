@@ -17,7 +17,6 @@ class FriendList extends React.Component {
   render() {
     const { friendsList } = this.props;
     const pathname = window.location.pathname
-    console.log(toJS(friendsList));
     return (
       <Menus label={t('My Friends')} isSub={true} selected={true}>
         {
