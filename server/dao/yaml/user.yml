@@ -12,3 +12,9 @@ showFriend:
   - select * from friend as f, user as u
   - where (f.user_id = :userId and f.friend_id = u.id)
   - or (f.friend_id = :userId and f.user_id = u.id)
+
+
+delFriend:
+  - delete from friend
+  - where (user_id = :userId and friend_id = :friendId)
+  - or (user_id = :friendId and friend_id = :userId)

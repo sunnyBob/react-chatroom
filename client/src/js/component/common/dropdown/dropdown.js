@@ -20,6 +20,38 @@ class Dropdown extends React.Component {
     };
   } 
 
+  componentWillMount() {
+    document.addEventListener('mouseup', (e) => {
+      const _con = this.container;
+      if (window.Node && Node.prototype && !Node.prototype.contains){
+        Node.prototype.contains = function (arg) {
+          return !!(this.compareDocumentPosition(arg) & 16)
+        }
+      }
+      if (!_con.contains(e.target)){
+        this.setState({
+          isShow: false,
+        });
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', (e) => {
+      const _con = this.container;
+      if (window.Node && Node.prototype && !Node.prototype.contains){
+        Node.prototype.contains = function (arg) {
+          return !!(this.compareDocumentPosition(arg) & 16)
+        }
+      }
+      if (!_con.contains(e.target)){
+        this.setState({
+          isShow: false,
+        });
+      }
+    });
+  }
+
   toggle() {
     this.setState({isShow: !this.state.isShow});
   }
@@ -47,13 +79,13 @@ class Dropdown extends React.Component {
     const { isShow } = this.state;
 
     return (
-      <div className={classNames('dropdown', className, {[`is-${align}`]: align}, {'is-active': isShow})}>
+      <div ref={con => { this.container = con }} className={classNames('dropdown', className, {[`is-${align}`]: align}, {'is-active': isShow})}>
         <div className="dropdown-trigger" onClick={::this.toggle}>
           {triggerEl}
         </div>
         <div className="dropdown-menu" id="dropdown-menu6" role="menu">
           <div className="dropdown-content">
-            {::this.genItems()}
+            {this.genItems()}
           </div>
         </div>
       </div>

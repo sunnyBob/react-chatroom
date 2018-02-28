@@ -30,7 +30,9 @@ export default class LoginReg extends React.Component {
         id: userId,
       }
     }).then(resp => {
-      console.log(resp);
+      if (resp.code == 1) {
+        socket.emit('updateStatus', userId);
+      }
     })
   }
 
@@ -75,9 +77,8 @@ export default class LoginReg extends React.Component {
         avatar: this.nameToImage(username),
       },
     });
-    if (ret.code === 1) {
-      alert('注册成功');
-      // browserHistory.replace('/chat');
+    if (ret.code == 1) {
+      alert('注册成功, 请登录！');
     }
   }
 

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Icon } from '../common';
 import request from '../../utils/request';
+import commonUtils from '../../utils/commonUtils';
 
 import './addUserOrGroup.less';
 
@@ -12,11 +13,11 @@ class AddUsrGroup extends React.Component {
     this.state = {
       result: {},
     };
-    this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
+    this.user = JSON.parse(localStorage.getItem('user'));
   }
 
   handleSearch = (e) => {
-    const id = ReactDOM.findDOMNode(this.input).value;
+    const id = ReactDOM.findDOMNode(this.input).value.trim();
     if (!id) {
       alert("请输入id后再进行查找");
       return;
@@ -45,24 +46,33 @@ class AddUsrGroup extends React.Component {
     this.setState({ result: {} });
   }
 
-  sendInvitation = (id, username, avatar) => {
-    if (this.userId == id) {
+  sendInvitation = (id) => {
+    const { user_id, user_name } = this.user;
+    if (user_id == id) {
       alert('无法添加自己为好友');
     } else {
-      request({
-        url:'invitation',
-        method: 'post',
-        data: {
-          user_id: this.userId,
-          friend_id: id,
-          username,
-          invite_type: '好友申请',
+      commonUtils.isFriend(user_id, id, {
+        success: () => {
+          alert('您和该用户已经是好友关系');
         },
-      }).then(resp => {
-        if (resp.code === 1) {
-          alert('成功发送好友申请');
-          this.props.onClose();
-        }
+        fail: async () => {
+          await request({
+            url:'/invitation',
+            method: 'post',
+            data: {
+              user_id: user_id,
+              friend_id: id,
+              username: user_name,
+              invite_type: '好友申请',
+            },
+          }).then(resp => {
+            if (resp.code == 1) {
+              alert('成功发送好友申请');
+              socket.emit('updateInvitation', id);
+              this.props.onClose();
+            }
+          });
+        },
       });
     }
   }
@@ -90,7 +100,7 @@ class AddUsrGroup extends React.Component {
               <img src={avatar} className="avatar"/>
               <span>{username}</span>
             </div>
-            <button className="button is-info is-small" onClick={this.sendInvitation.bind(null, id, username)}>{t('Add')}</button>
+            <button className="button is-info is-small" onClick={this.sendInvitation.bind(null, id)}>{t('Add')}</button>
           </div> : null
         }
       </div>

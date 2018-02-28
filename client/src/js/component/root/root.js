@@ -2,6 +2,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Menu, Menus, Icon, Dropdown } from '../common';
 import { browserHistory, Link } from 'react-router';
+import request from '../../utils/request';
 import UserInfo from './userInfo';
 import FriendList from './friendList';
 import '../../../local';
@@ -16,16 +17,41 @@ class Root extends React.Component {
     super(props);
     
     this.lang_index = 0;
-    const user = localStorage.getItem('user');
-    this.user = JSON.parse(user);
+    this.user = JSON.parse(localStorage.getItem('user'));
     this.store = new props.RootStore();
-    this.fetchData();
+
+    socket.on('updateLeftList', () => {
+      this.fetchData();
+    });
+    socket.on('updateInvitation', () => {
+      const id = this.user.user_id;
+      console.log(id);
+      id && this.store.getInvitation(id);
+    });
+    socket.on('updateStatus', userId => {
+      this.store.friendsInfo.some(friend => {
+        if(friend.friend_id == userId || friend.user_id == userId) {
+          this.store.getFriends(this.user.user_id);
+          return true;
+        }
+        return false;
+      });
+    });
+  }
+
+  componentDidMount() {
+    this.user && this.fetchData();
   }
 
   fetchData = () => {
-    this.store.getFriends(this.user.user_id);
-    this.store.getUser(this.user.user_id);
+    const id = this.user.user_id;
+    if (id) {
+      this.store.getFriends(id);
+      this.store.getUser(id);
+      this.store.getInvitation(id);
+    }
   }
+
   handleToggleLang = () => {
     this.lang_index = 1 - this.lang_index;
     i18next.changeLanguage(lang[this.lang_index], err => {
@@ -36,7 +62,24 @@ class Root extends React.Component {
   }
 
   handleSignOut = () => {
-  
+    request({
+      url: '/signout',
+      data: {},
+    }).then(resp => {
+      request({
+        url: '/user',
+        method: 'PUT',
+        data: {
+          status: 0,
+          id: this.user.user_id,
+        }
+      }).then(resp => {
+        if (resp.code == 1) {
+          socket.emit('updateStatus', this.user.user_id);
+          location.reload();
+        }
+      });
+    });
   }
 
   handleAddGroup = () => {
@@ -59,6 +102,7 @@ class Root extends React.Component {
     }];
     const child = React.Children.only(this.props.children);
     const cloneChild = React.cloneElement(child, { fetchData: this.fetchData });
+
     return (
       <div className="container is-fluid mainpage">
         <div className="columns" style={{height: '100%'}}>
@@ -82,7 +126,7 @@ class Root extends React.Component {
                 triggerEl={<Icon name="cog"/>}
                 hasDividers={true}
               />
-              <Link to="/invitation"><Icon name="bell" className="alert-bell"/></Link>
+              <Link to="/invitations"><Icon name="bell" className="alert-bell" data-bell={this.store.inviteCount}/></Link>
             </div>
             {cloneChild}
           </div>

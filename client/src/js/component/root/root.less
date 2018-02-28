@@ -5,19 +5,22 @@
 }
 .right-bar {
   position: fixed;
-  right: 30px;
+  right: 40px;
   top: 20px;
-  z-index: 999;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 55px;
   .alert-bell {
-    margin-left: 12px;
     color: #4a4a4a;
     cursor: pointer;
+    position: relative;
     &::after {
-      content: '22';
+      content: attr(data-bell);
+      left: 16px;
+      margin-top: -10px;
+      position: absolute;
       background: #38e038;
       color: white;
       display: block;

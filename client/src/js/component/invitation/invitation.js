@@ -1,7 +1,8 @@
 import React from 'react';
-import { browserHistory } from 'react-router'
+import { browserHistory } from 'react-router';
 import { Card, ModalManager, Table, Tab, TabItem } from '../common';
 import request from '../../utils/request';
+import commonUtils from '../../utils/commonUtils';
 
 import './invitation.less';
 
@@ -10,14 +11,16 @@ class Invitation extends React.Component {
     super(props);
 
     this.state = {
-      inviteType: '好友申请',
       tbData: [],
     };
-    console.log(props);
     this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
   }
 
   componentDidMount() {
+    this.fetchData();
+  }
+
+  componentWillReceiveProps() {
     this.fetchData();
   }
 
@@ -51,46 +54,62 @@ class Invitation extends React.Component {
   handleAccept = (invitation) => {
     const { id, user_id, friend_id, username, invite_type } = invitation;
     if (invite_type === '好友申请') {
-      request({
-        url: '/friends',
-        method: 'post',
-        data: {
-          userId: user_id,
-          friendId: friend_id,
+      commonUtils.isFriend(friend_id, user_id, {
+        success: () => {
+          alert(`${username}已经是您的好友`);
+          this.handleDeleteInvitation(invitation, () => {
+            this.fetchData();
+            this.props.fetchData && this.props.fetchData();
+          });
         },
-      }).then(resp => {
-        if (resp.code == 1) {
-          alert(`成功添加${username}为好友`);
-          this.props.fetchData && this.props.fetchData();
-          this.handleDeleteInvitation(id);
-        } else {
-          alert(`添加好友失败`);
-        }
+        fail: () => {
+          request({
+            url: '/friends',
+            method: 'post',
+            data: {
+              userId: user_id,
+              friendId: friend_id,
+            },
+          }).then(resp => {
+            if (resp.code == 1) {
+              alert(`成功添加${username}为好友`);
+              this.props.fetchData && this.props.fetchData();
+              this.handleDeleteInvitation(invitation);
+              socket.emit('updateLeftList', user_id);
+            } else {
+              alert(`添加好友失败`);
+            }
+          });
+        },
       });
     }
   }
 
   handleReject = (invitation) => {
-    const { id, username } = invitation;
+    const { user_id, username } = invitation;
     ModalManager.confirm({
       content: `确定拒绝${username}的好友申请？`,
-      onOk: this.handleDeleteInvitation.bind(null, id, () => {
+      onOk: this.handleDeleteInvitation.bind(null, invitation, () => {
         alert(`您已拒绝${username}的好友申请`);
+        socket.emit('updateInvitation', user_id);
         this.fetchData();
       }),
     })
   }
 
-  handleDeleteInvitation = (id, cb = () => {}) => {
-    request({
+  handleDeleteInvitation = async (invitation, cb = () => {}) => {
+    const { user_id, friend_id } = invitation;
+    await request({
       url: '/invitation',
       method: 'delete',
       data: {
-        id,
+        userId: user_id,
+        friendId: friend_id,
       },
     }).then(resp => {
       if (resp.code == 1) {
        cb();
+       return true;
       }
     });
   }

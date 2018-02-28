@@ -1,7 +1,6 @@
 const dao = require('../dao');
 
 exports.getInvitation = async (friendId, userId, inviteType) => {
-  console.log(friendId);
   const ret = await dao.query('invitation.findInvitation', { friendId, userId, inviteType });
   return ret;
 }
@@ -11,7 +10,7 @@ exports.sendInvitation = async (invitation) => {
   return ret;
 }
 
-exports.deleteInvitation = async (id) => {
-  const ret = await dao.del('invite', id, idKey = "id");
+exports.deleteInvitation = async (friendId, userId, groupId) => {
+  const ret = await dao.execute('invitation.deleteInvitation', { friendId, userId, groupId });
   return ret;
 }

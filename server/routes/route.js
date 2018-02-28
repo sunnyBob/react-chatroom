@@ -8,6 +8,7 @@ module.exports = function(router) {
   //friend
   router.get('/api/friends', ctrl.showFriends);
   router.post('/api/friends', ctrl.addFriend);
+  router.delete('/api/friends', ctrl.deleteFriend);
 
 
   //user
@@ -23,6 +24,9 @@ module.exports = function(router) {
   router.get('/api/invitation', ctrl.getInvitation);
   router.post('/api/invitation', ctrl.sendInvitation);
   router.delete('/api/invitation', ctrl.deleteInvitation);
+
+  //sign out
+  router.get('/api/signout', ctrl.signOut);
 
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';

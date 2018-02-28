@@ -3,7 +3,7 @@ require("babel-core/register");
 require("babel-polyfill");
 
 export default function(options) {
-  axios.defaults.timeout = 5000;
+  axios.defaults.timeout = 100000;
   axios.defaults.baseURL = '/api'
 
   const config = {

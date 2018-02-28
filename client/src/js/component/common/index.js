@@ -1,4 +1,4 @@
-import { Tab, TabItem } from './Tab';
+import { Tab, TabItem } from './tab';
 import { Input } from './form';
 import { Menu, Menus } from './menu';
 import { Icon } from './icon';

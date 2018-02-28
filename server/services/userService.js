@@ -25,6 +25,11 @@ exports.addFriend = async (user_id, friend_id) => {
   return ret;
 }
 
+exports.deleteFriend = async (userId, friendId) => {
+  const ret = await dao.execute('user.delFriend', { userId, friendId });
+  return ret;
+}
+
 exports.updateUserInfo = async (user) => {
   const ret = await dao.update('user', user,  idKey = "id");
   return ret;

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Link, browserHistory } from 'react-router';
 import { Icon, PopoverManager, Tab, TabItem } from '../common';
 import request from '../../utils/request';
+import commonUtils from '../../utils/commonUtils';
 import Textarea from 'react-contenteditable';
 import './chatRoom.less';
 
@@ -27,9 +28,14 @@ class ChatRoom extends React.Component {
 
   componentDidMount() {
     const id = this.props.params.id;
-    if (id) {
-      this.getCurrentUser(id);
-    }
+    id && commonUtils.isFriend(this.user.user_id, id, {
+      success: () => {
+        this.getCurrentUser(id);
+      },
+      fail: () => {
+        browserHistory.push('/');
+      },
+    })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -37,9 +43,16 @@ class ChatRoom extends React.Component {
     const nextId = nextProps.params.id;
     if (id !== nextId) {
       if (nextId) {
-        this.getCurrentUser(nextId);
-        this.setState({
-          html: '',
+        nextId && commonUtils.isFriend(this.user.user_id, nextId, {
+          success: () => {
+            this.getCurrentUser(nextId);
+            this.setState({
+              html: '',
+            });
+          },
+          fail: () => {
+            browserHistory.push('/');
+          },
         });
       } 
     }
@@ -146,33 +159,36 @@ class ChatRoom extends React.Component {
     const keyCode = e.keyCode || e.which || e.charCode;
     const ctrlKey = e.ctrlKey || e.metaKey;
     const { html } = this.state;
-    const userId = this.props.params.id;
+    const friendId = this.props.params.id;
+    
+    this.setState({
+      html: '',
+    });
 
     if (keyCode && (!ctrlKey || keyCode !== 13)) {
       return;
     }
-    this.setState({
-      html: '',
-    });
+    if (!friendId) {
+      alert('No chats selected!');
+      return;
+    }
+    
     if (!html.trim()) {
       alert('消息内容不能为空!');
       return;
     }
-    if (!this.props.params.id) {
-      alert('No chats selected!');
-      return;
-    }
+
     const ret = await request({
       url: '/message',
       method: 'post',
       data: {
         from_user: this.user.user_id,
-        to_user: parseInt(userId),
+        to_user: parseInt(friendId),
         content: html,
       },
     });
     if (ret.code) {
-      socket.emit('chatToOne', html, this.user.user_id, userId);
+      socket.emit('chatToOne', html, this.user.user_id, friendId);
       const { avatar, user_id } = this.user;
       const msgEl = [...this.state.msgEl];
       msgEl.push(<div className="msginfo-right"  key={Math.random()} >

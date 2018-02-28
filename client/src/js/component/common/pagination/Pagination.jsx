@@ -331,7 +331,6 @@ class Pagination extends React.Component {
       total, sizer, pager, jumper,
     };
     const components = this.props.layout.split(',');
-    console.log(components);
     return show ? (
       <nav className={`pagination ${sizeClass} ${alignClass}`}>
         {components.map(item => items[item.trim()])}

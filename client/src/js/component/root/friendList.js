@@ -3,7 +3,7 @@ import { browserHistory, Link } from 'react-router';
 import { toJS } from 'mobx';
 import { Menu, Menus, Icon } from '../common';
 
-class UserInfo extends React.Component {
+class FriendList extends React.Component {
   handleClick(friend, e) {
     const tagName = e.target.tagName;
     const { id } = friend;
@@ -17,6 +17,7 @@ class UserInfo extends React.Component {
   render() {
     const { friendsList } = this.props;
     const pathname = window.location.pathname
+    console.log(toJS(friendsList));
     return (
       <Menus label={t('My Friends')} isSub={true} selected={true}>
         {
@@ -38,4 +39,4 @@ class UserInfo extends React.Component {
   }
 }
 
-export default UserInfo;
+export default FriendList;

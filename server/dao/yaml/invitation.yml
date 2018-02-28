@@ -2,13 +2,17 @@ namespace: 'invitation'
 
 findInvitation:
   - select * from invite
-  - where 1 = 1
-  - if:
-      test: :friendId
-      sql: and (friend_id = :friendId or user_id = :friendId)
-  - if:
-      test: :userId
-      sql: and (user_id = :userId or friend_id = :userId)
+  - where friend_id = :friendId
   - if:
       test: :inviteType
       sql: and invite_type = :inviteType
+
+deleteInvitation:
+  - delete from invite
+  - where user_id = :userId
+  - if:
+      test: :friendId
+      sql: and friend_id = :friendId
+  - if:
+      test: :groupId
+      sql: and group_id = :groupId

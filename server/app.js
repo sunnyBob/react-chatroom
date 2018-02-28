@@ -32,6 +32,22 @@ io.on('connection', (socket) => {
   user.userId && (userSocket[user.userId] = socket);
   user.userId && (onlineUsers[user.userId] = user.name);
   
+  socket.on('updateStatus', userId => {
+    io.emit('updateStatus', userId);
+  });
+
+  socket.on('updateLeftList', userId => {
+    if (userSocket.hasOwnProperty(userId)) {
+      userSocket[userId].emit('updateLeftList');
+    }
+  });
+
+  socket.on('updateInvitation', userId => {
+    if (userSocket.hasOwnProperty(userId)) {
+      userSocket[userId].emit('updateInvitation');
+    }
+  });
+
   socket.on('chatToOne', (msg, fromUser, toUser) => {
     if (userSocket.hasOwnProperty(toUser)) {
       userSocket[toUser].emit('chatToOne', msg, fromUser);
