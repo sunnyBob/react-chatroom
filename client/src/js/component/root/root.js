@@ -5,6 +5,7 @@ import { browserHistory, Link } from 'react-router';
 import request from '../../utils/request';
 import UserInfo from './userInfo';
 import FriendList from './friendList';
+import { ToastContainer } from 'react-toastify';
 import '../../../local';
 
 import './root.less';
@@ -105,6 +106,7 @@ class Root extends React.Component {
 
     return (
       <div className="container is-fluid mainpage">
+        <ToastContainer/>
         <div className="columns" style={{height: '100%'}}>
           <div className="column is-2 menubox">
             <UserInfo info={this.store.userInfo}/>

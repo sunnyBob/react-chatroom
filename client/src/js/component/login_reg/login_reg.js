@@ -2,6 +2,7 @@ import React from 'react';
 import { Tab, TabItem, Input, RadioGroup } from '../common';
 import { browserHistory } from 'react-router';
 import request from '../../utils/request';
+import { toast } from 'react-toastify';
 import './loginReg.less';
 
 export default class LoginReg extends React.Component {
@@ -61,7 +62,7 @@ export default class LoginReg extends React.Component {
   handleReg = async () => {
     const { username, password, repassword, age, phone, email, sex } = this.state;
     if (password !== repassword) {
-      alert('两次输入密码不一致');
+      toast.error('两次输入密码不一致', toastOption);
       return;
     }
     const ret = await request({
@@ -78,7 +79,7 @@ export default class LoginReg extends React.Component {
       },
     });
     if (ret.code == 1) {
-      alert('注册成功, 请登录！');
+      toast.success('注册成功, 请登录！', toastOption);
     }
   }
 

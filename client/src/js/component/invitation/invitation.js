@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router';
 import { Card, ModalManager, Table, Tab, TabItem } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
+import { toast } from 'react-toastify';
 
 import './invitation.less';
 
@@ -56,7 +57,9 @@ class Invitation extends React.Component {
     if (invite_type === '好友申请') {
       commonUtils.isFriend(friend_id, user_id, {
         success: () => {
-          alert(`${username}已经是您的好友`);
+          toast.success(`${username}已经是您的好友`, {
+
+          });
           this.handleDeleteInvitation(invitation, () => {
             this.fetchData();
             this.props.fetchData && this.props.fetchData();
@@ -72,12 +75,12 @@ class Invitation extends React.Component {
             },
           }).then(resp => {
             if (resp.code == 1) {
-              alert(`成功添加${username}为好友`);
+              toast.success(`成功添加${username}为好友`, toastOption);
               this.props.fetchData && this.props.fetchData();
               this.handleDeleteInvitation(invitation);
               socket.emit('updateLeftList', user_id);
             } else {
-              alert(`添加好友失败`);
+              toast.error('添加好友失败', toastOption);
             }
           });
         },
@@ -90,7 +93,7 @@ class Invitation extends React.Component {
     ModalManager.confirm({
       content: `确定拒绝${username}的好友申请？`,
       onOk: this.handleDeleteInvitation.bind(null, invitation, () => {
-        alert(`您已拒绝${username}的好友申请`);
+        toast.success(`您已成功拒绝${username}的好友申请`, toastOption);
         socket.emit('updateInvitation', user_id);
         this.fetchData();
       }),

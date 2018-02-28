@@ -1,5 +1,5 @@
 import React from 'react';
-import { browserHistory } from 'react-router'
+import { browserHistory } from 'react-router';
 import { inject, observer } from 'mobx-react';
 import Cropper from 'cropperjs';
 import { Card, ModalManager, AttrList } from '../common';
@@ -7,6 +7,7 @@ import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
 import UploadAvatar from './uploadAvatar';
 import ModifyPasswd from './modifyPasswd';
+import { toast } from 'react-toastify';
 
 import './user.less';
 
@@ -69,7 +70,7 @@ class UserDetail extends React.Component {
             this.props.fetchData && this.props.fetchData();
             ModalManager.close(modal);
           } else {
-            alert("failed");
+            toast.error('头像上传失败', toastOption);
           }
         });
       } else {
@@ -99,13 +100,13 @@ class UserDetail extends React.Component {
           data: user,
         }).then(resp => {
           if (resp.code == 1) {
-            alert('success');
+            toast.success('密码修改成功', toastOption);
           } else {
-            alert("failed");
+            toast.error("密码修改失败", toastOption);
           }
         });
       } else {
-        alert('原始/新密码不能为空');
+        toast.success('原始/新密码不能为空', toastOption);
       }
     }
   }
@@ -125,7 +126,7 @@ class UserDetail extends React.Component {
         }
         cb();
       } else {
-        alert("failed");
+        toast.error("failed", toastOption);
       }
     })
   }
@@ -151,7 +152,7 @@ class UserDetail extends React.Component {
       },
     }).then(resp => {
       if (resp.code == 1) {
-        alert('成功删除好友');
+        toast.success('成功删除好友', toastOption);
         this.props.fetchData && this.props.fetchData();
         socket.emit('updateLeftList', this.props.params.id);
         return true;
