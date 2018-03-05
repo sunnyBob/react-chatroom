@@ -32,6 +32,11 @@ io.on('connection', (socket) => {
   user.userId && (userSocket[user.userId] = socket);
   user.userId && (onlineUsers[user.userId] = user.name);
   
+  socket.on('login', userId => {
+    userId && (userSocket[userId] = socket);
+    userId && (onlineUsers[userId] = user.name);
+  });
+
   socket.on('updateStatus', userId => {
     io.emit('updateStatus', userId);
   });

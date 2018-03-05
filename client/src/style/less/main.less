@@ -19,8 +19,11 @@ html, body {
   padding:  15px;
   overflow: hidden;
 }
-.column.is-10 {
-  padding-top: 20px;
+.column.is-9 {
+  overflow: scroll;
+  & > div {
+    padding: 0;
+  }
 }
 .user-info {
   display: flex;
@@ -70,6 +73,12 @@ html, body {
   border-left-width: 0 !important;
 }
 .menu-list li {
+  a {
+    font-size: 12px;
+  }
+  a.has-children {
+    font-size: 14px;
+  }
   a:hover {
     background: #88c2ec;
   }
@@ -139,4 +148,44 @@ html, body {
 }
 .data-table {
   font-size: 14px;
+}
+
+.friend-ul {
+  .avatar {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  list-style: none;
+  li {
+    border-bottom: 1px solid #d2d4d4;
+    padding: 5px 10px;
+    span {
+      &:first-child {
+        margin-right: 15px;
+      }
+      margin-right: 5px;
+    }
+  }
+}
+.modal-container {
+  .modal-card-title {
+    font-size: 16px !important;
+    font-weight: 300;
+  }
+  .modal-card-head {
+    height: 30px;
+  }
+  .close {
+    font-size: 22px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .modal-card-foot {
+    .button {
+      font-size: 14px;
+    }
+  }
 }

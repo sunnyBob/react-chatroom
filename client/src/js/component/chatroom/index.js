@@ -30,14 +30,26 @@ class ChatRoom extends React.Component {
 
   componentDidMount() {
     const id = this.props.params.id;
-    id && commonUtils.isFriend(this.user.user_id, id, {
+    const userId = this.user.user_id
+    const pathName = location.pathname;
+    id && commonUtils.isFriend(userId, id, {
       success: () => {
         this.getCurrentUser(id);
       },
       fail: () => {
         browserHistory.push('/');
       },
-    })
+    });
+    if (pathname === 'group-chat') {
+      id && commonUtils.isGroupMember(userId, id, {
+        success: () => {
+          this.getCurrentUser(userId);
+        },
+        fail: () => {
+          browserHistory.push('/');
+        },
+      });
+    }
   }
 
   componentWillReceiveProps(nextProps) {

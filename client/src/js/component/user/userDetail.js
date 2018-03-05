@@ -23,26 +23,34 @@ class UserDetail extends React.Component {
 
   componentDidMount() {
     const id = this.props.params.id;
-    id && commonUtils.isFriend(this.userId, id, {
-      success: () => {
-        this.store.getUser(id);
-      },
-      fail: () => {
-        browserHistory.push('/');
-      },
-    });
+    if (this.userId == id) {
+      this.store.getUser(id);
+    } else {
+      id && commonUtils.isFriend(this.userId, id, {
+        success: () => {
+          this.store.getUser(id);
+        },
+        fail: () => {
+          browserHistory.push('/');
+        },
+      });
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     const id = nextProps.params.id;
-    id && commonUtils.isFriend(this.userId, id, {
-      success: () => {
-        this.store.getUser(id);
-      },
-      fail: () => {
-        browserHistory.push('/');
-      },
-    });
+    if (this.userId == id) {
+      this.store.getUser(id);
+    } else {
+      id && commonUtils.isFriend(this.userId, id, {
+        success: () => {
+          this.store.getUser(id);
+        },
+        fail: () => {
+          browserHistory.push('/');
+        },
+      });
+    }
   }
 
   handleClose = () => {

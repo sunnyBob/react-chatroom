@@ -1,11 +1,13 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Menu, Menus, Icon, Dropdown } from '../common';
+import { Menu, Menus, Icon, Dropdown, ModalManager, Card } from '../common';
 import { browserHistory, Link } from 'react-router';
 import request from '../../utils/request';
 import UserInfo from './userInfo';
 import FriendList from './friendList';
-import { ToastContainer } from 'react-toastify';
+import GroupList from './groupList';
+import { ToastContainer, toast } from 'react-toastify';
+import CreateGroup from './createGroup';
 import '../../../local';
 
 import './root.less';
@@ -21,12 +23,14 @@ class Root extends React.Component {
     this.user = JSON.parse(localStorage.getItem('user'));
     this.store = new props.RootStore();
 
+    this.state = {
+      selectedFriends: [],
+    };
     socket.on('updateLeftList', () => {
       this.fetchData();
     });
     socket.on('updateInvitation', () => {
       const id = this.user.user_id;
-      console.log(id);
       id && this.store.getInvitation(id);
     });
     socket.on('updateStatus', userId => {
@@ -42,6 +46,7 @@ class Root extends React.Component {
 
   componentDidMount() {
     this.user && this.fetchData();
+    this.user && this.fetchGroupData();
   }
 
   fetchData = () => {
@@ -51,6 +56,13 @@ class Root extends React.Component {
       this.store.getUser(id);
       this.store.getInvitation(id);
     }
+  }
+
+  fetchGroupData() {
+    const id = this.user.user_id;
+    this.store.getCreateGroup(id);
+    this.store.getManageGroup(id);
+    this.store.getJoinedGroup(id);
   }
 
   handleToggleLang = () => {
@@ -84,7 +96,36 @@ class Root extends React.Component {
   }
 
   handleAddGroup = () => {
+    ModalManager.open({
+      title: '创建群聊(选择群聊好友)',
+      content: <CreateGroup friendsList={this.store.friendsInfo} handleSelectedChange={this.handleSelectedChange}/>,
+      onOk: async () => {
+        const selectedFriends = this.state.selectedFriends;
+        const { user_id, user_name, avatar } = this.user;
+        const ret = await request({
+          url: '/group',
+          method: 'post',
+          data: {
+            selectedFriends,
+            userId: user_id,
+            userName: user_name,
+            avatar,
+          },
+        });
+        if (ret.code === '1') {
+          toast.success('创建成功', toastOption);
+        } else {
+          toast.error('创建失败', toastOption);
+        }
+      },
+      okText: '创建',
+    })
+  }
 
+  handleSelectedChange = (selectedFriends) => {
+    this.setState({
+      selectedFriends,
+    });
   }
 
   render() {
@@ -108,19 +149,19 @@ class Root extends React.Component {
       <div className="container is-fluid mainpage">
         <ToastContainer/>
         <div className="columns" style={{height: '100%'}}>
-          <div className="column is-2 menubox">
+          <div className="column is-3 menubox">
             <UserInfo info={this.store.userInfo}/>
             <input className="input"/>
             <Menus>
               <FriendList friendsList={this.store.friendsInfo}/>
               <Menus label={t('My Groups')} isSub={true}>
-                <Menus label={t('Joined')} isSub={true}></Menus>
-                <Menus label={t('Created')} isSub={true}></Menus>
-                <Menus label={t('Managed')} isSub={true}></Menus>
+                <GroupList groupList={this.store.joinedGroup} label={t('Joined')}/>
+                <GroupList groupList={this.store.createGroup} label={t('Created')}/>
+                <GroupList groupList={this.store.manageGroup} label={t('Managed')}/>
               </Menus>
             </Menus>
           </div>
-          <div className="column is-10">
+          <Card className="column is-9" showHeader={false} showFooter={false}>
             <div className="right-bar">
               <Dropdown
                 align="right"
@@ -131,7 +172,7 @@ class Root extends React.Component {
               <Link to="/invitations"><Icon name="bell" className="alert-bell" data-bell={this.store.inviteCount}/></Link>
             </div>
             {cloneChild}
-          </div>
+          </Card>
         </div>
       </div>
     )

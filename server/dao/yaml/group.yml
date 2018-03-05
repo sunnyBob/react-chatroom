@@ -1,0 +1,28 @@
+namespace: 'groups'
+
+findGroup:
+  - select * from groups
+  - where 1 = 1
+  - if:
+      test: :id
+      sql: and id = :id
+  - if:
+      test: :create_user_id
+      sql: and create_user_id = :userId
+
+findManageGroup:
+  - select g.* from groups g, manager_group m
+  - where g.id = m.group_id
+  - and m.user_id = :userId
+
+findJoinedGroup:
+  - select g.* from groups g, manager_group m, user_group u
+  - where g.id = m.group_id and u.group_id = g.id
+  - and g.create_user_id != m.user_id
+  - and m.user_id != :userId
+  - and u.user_id = :userId
+
+findUserById:
+  - select u.* from groups g, user_group u
+  - where u.group_id = g.id
+  - and u.user_id = :userId

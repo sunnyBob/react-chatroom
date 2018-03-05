@@ -3,7 +3,7 @@ export default {
     translation: {
       'My Friends': '我的好友',
       'Send': '发送',
-      'My Groups': '我的群组',
+      'My Groups': '我的群聊',
       'Joined': '我加入的',
       'Created': '我创建的',
       'Managed': '我管理的',
@@ -25,7 +25,7 @@ export default {
       'Sign Out': '退出',
       'Register': '注册',
       'Change Language': '切换语言',
-      'New Chat': '创建群组',
+      'New Chat': '创建群聊',
     }
   }
 }

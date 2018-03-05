@@ -16,4 +16,22 @@ export default class {
       }
     });
   }
+
+  static isGroupMember(userId, groupId, options = {}) {
+    request({
+      url: '/group',
+      data: {
+        userId,
+        groupId,
+        type: '4',
+      },
+    }).then(resp => {
+      const isGroupMember = resp.code == 1 && resp.retList.length;
+      if (isGroupMember) {
+        options.success && options.success();
+      } else {
+        options.fail && options.fail();
+      }
+    });
+  }
 }

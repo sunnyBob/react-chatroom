@@ -3,6 +3,7 @@ import { Tab, TabItem, Input, RadioGroup } from '../common';
 import { browserHistory } from 'react-router';
 import request from '../../utils/request';
 import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import './loginReg.less';
 
 export default class LoginReg extends React.Component {
@@ -46,7 +47,7 @@ export default class LoginReg extends React.Component {
         passwd,
       },
     });
-    if (ret.code === 1) {
+    if (ret.code == 1) {
       const { userId, userName, avatar } = ret.retList[0] || {};
       const user = {
         user_id: userId,
@@ -55,6 +56,7 @@ export default class LoginReg extends React.Component {
       };
       localStorage.setItem('user', JSON.stringify(user));
       this.updateStatus(userId);
+      socket.emit('login', userId);
       browserHistory.replace('/chat');
     }
   }
@@ -125,6 +127,7 @@ export default class LoginReg extends React.Component {
   render() {
     return (
       <div className="login-container">
+        <ToastContainer/>
         <canvas ref={(ref) => {this.canvas=ref}} style={{display: 'none'}}></canvas>
         <div className="card login">
           <Tab

@@ -25,6 +25,10 @@ module.exports = function(router) {
   router.post('/api/invitation', ctrl.sendInvitation);
   router.delete('/api/invitation', ctrl.deleteInvitation);
 
+  //group
+  router.get('/api/group', ctrl.getGroup);
+  router.post('/api/group', ctrl.createGroup);
+
   //sign out
   router.get('/api/signout', ctrl.signOut);
 
