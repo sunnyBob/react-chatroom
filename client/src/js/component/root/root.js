@@ -154,7 +154,7 @@ class Root extends React.Component {
             <input className="input"/>
             <Menus>
               <FriendList friendsList={this.store.friendsInfo}/>
-              <Menus label={t('My Groups')} isSub={true}>
+              <Menus label={t('My Groups')} isSub={true} selected={true}>
                 <GroupList groupList={this.store.joinedGroup} label={t('Joined')}/>
                 <GroupList groupList={this.store.createGroup} label={t('Created')}/>
                 <GroupList groupList={this.store.manageGroup} label={t('Managed')}/>

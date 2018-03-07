@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, browserHistory } from 'react-router';
+import { inject, observer } from 'mobx-react';
 import { Icon, PopoverManager, Tab, TabItem } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
@@ -8,6 +9,8 @@ import { toast } from 'react-toastify';
 
 import './chatRoom.less';
 
+@inject('RootStore')
+@observer
 class ChatRoom extends React.Component {
   constructor(props) {
     super(props);
@@ -15,15 +18,24 @@ class ChatRoom extends React.Component {
     this.state = { 
       html: '',
       currentChatUser: {},
+      currentGroup: {},
       msgEl: [],
     };
 
     const user = localStorage.getItem('user');
     this.user = JSON.parse(user);
+    const pathName = location.pathname.split('/')[1];
+    this.isGroup = pathName !== 'chat';
+    this.store = new props.RootStore();
 
     socket.on('chatToOne', (msg, userId) => {
       if (userId == this.props.params.id) {
         this.handleRecvMsg(msg);
+      }
+    });
+    socket.on('chatToMore', (msg, userId, groupId, avatar) => {
+      if (groupId == this.props.params.id && this.user.user_id != userId) {
+        this.handleRecvMsg(msg, userId, avatar);
       }
     });
   }
@@ -31,19 +43,20 @@ class ChatRoom extends React.Component {
   componentDidMount() {
     const id = this.props.params.id;
     const userId = this.user.user_id
-    const pathName = location.pathname;
-    id && commonUtils.isFriend(userId, id, {
-      success: () => {
-        this.getCurrentUser(id);
-      },
-      fail: () => {
-        browserHistory.push('/');
-      },
-    });
-    if (pathname === 'group-chat') {
+    if (!this.isGroup) {
+      id && commonUtils.isFriend(userId, id, {
+        success: () => {
+          this.getCurrentUser(id);
+        },
+        fail: () => {
+          browserHistory.push('/');
+        },
+      });
+    } else {
       id && commonUtils.isGroupMember(userId, id, {
         success: () => {
-          this.getCurrentUser(userId);
+          socket.emit('joinRoom', userId, `room-${id}`);
+          this.getCurrentGroup(id);
         },
         fail: () => {
           browserHistory.push('/');
@@ -55,9 +68,12 @@ class ChatRoom extends React.Component {
   componentWillReceiveProps(nextProps) {
     const id = this.props.params.id;
     const nextId = nextProps.params.id;
+    const userId = this.user.user_id;
+    const pathName = location.pathname.split('/')[1];
     if (id !== nextId) {
-      if (nextId) {
-        nextId && commonUtils.isFriend(this.user.user_id, nextId, {
+      this.isGroup = pathName !== 'chat';
+      if (!this.isGroup) {
+        nextId && commonUtils.isFriend(userId, nextId, {
           success: () => {
             this.getCurrentUser(nextId);
             this.setState({
@@ -68,7 +84,17 @@ class ChatRoom extends React.Component {
             browserHistory.push('/');
           },
         });
-      } 
+      } else {
+        nextId && commonUtils.isGroupMember(userId, nextId, {
+          success: () => {
+            socket.emit('joinRoom', userId, `room-${nextId}`);
+            this.getCurrentGroup(nextId);
+          },
+          fail: () => {
+            browserHistory.push('/');
+          },
+        });
+      }
     }
   }
 
@@ -114,6 +140,55 @@ class ChatRoom extends React.Component {
         }
         if (to_user == userId) {
           
+          msgEl.push(<div className="msginfo-right"  key={Math.random()} >
+            <div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+            <Link to={`/user-info/${user_id}`}><img src={avatar} className="avatar"/></Link>
+          </div>);
+        }
+      });
+      this.setState({ msgEl }, () => {
+        this.msgBox.scrollTop = this.msgBox.scrollHeight;
+      });
+    }
+  }
+
+  getCurrentGroup = async (id) => {
+    const resp =  await request({
+      url: '/group',
+      data: {
+        id,
+        type: '1',
+      }
+    });
+    if (Array.isArray(resp.retList) && resp.retList.length) {
+      this.setState({
+        currentGroup: resp.retList[0],
+      }, () => {
+        this.getCurrentGroupMsg(id);
+      });
+    }
+  }
+
+  getCurrentGroupMsg = async (groupId) => {
+    const { user_id, avatar } = this.user;
+    const resp = await request({
+      url: '/message',
+      data: {
+        fromUser: user_id,
+        groupId,
+      },
+    });
+    if (Array.isArray(resp.retList)) {
+      const messages = resp.retList;
+      const msgEl = [];
+      messages.forEach(msg => {
+        const { from_user, content, avatar } = msg;
+        if (from_user != user_id) {
+          msgEl.push(<div className="msginfo-left"  key={Math.random()} >
+            <Link to={`/user-info/${from_user}`}><img src={avatar} className="avatar"/></Link>
+            <div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+          </div>);
+        } else {
           msgEl.push(<div className="msginfo-right"  key={Math.random()} >
             <div dangerouslySetInnerHTML={{ __html: content.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
             <Link to={`/user-info/${user_id}`}><img src={avatar} className="avatar"/></Link>
@@ -173,7 +248,7 @@ class ChatRoom extends React.Component {
     const keyCode = e.keyCode || e.which || e.charCode;
     const ctrlKey = e.ctrlKey || e.metaKey;
     const { html } = this.state;
-    const friendId = this.props.params.id;
+    const id = this.props.params.id;
 
     if (keyCode && (!ctrlKey || keyCode !== 13)) {
       return;
@@ -182,7 +257,7 @@ class ChatRoom extends React.Component {
     this.setState({
       html: '',
     });
-    if (!friendId) {
+    if (!id) {
       toast.error('No chats selected!', toastOption);
       return;
     }
@@ -192,22 +267,33 @@ class ChatRoom extends React.Component {
       return;
     }
 
+    const data = this.isGroup ? {
+      from_user: this.user.user_id,
+      content: html,
+      groupId: id,
+    } : {
+      from_user: this.user.user_id,
+      to_user: parseInt(id),
+      content: html,
+    };
     const ret = await request({
       url: '/message',
       method: 'post',
-      data: {
-        from_user: this.user.user_id,
-        to_user: parseInt(friendId),
-        content: html,
-      },
+      data,
     });
     if (ret.code) {
-      socket.emit('chatToOne', html, this.user.user_id, friendId);
       const { avatar, user_id } = this.user;
       const msgEl = [...this.state.msgEl];
+      if (this.isGroup) {
+        socket.emit('chatToMore', html, user_id, id, avatar);
+      } else {
+        socket.emit('chatToOne', html, user_id, id);
+      }
       msgEl.push(<div className="msginfo-right"  key={Math.random()} >
         <div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
-        <Link to={`/user-info/${user_id}`}><img src={avatar} className="avatar"/></Link>
+        <Link to={`/user-info/${user_id}`}>
+          <img src={avatar} className="avatar"/>
+        </Link>
       </div>);
       this.setState({
         msgEl: msgEl,
@@ -217,10 +303,16 @@ class ChatRoom extends React.Component {
     }
   }
 
-  handleRecvMsg = (msg) => {
+  handleRecvMsg = (msg, id, avatar) => {
     const msgEl = [...this.state.msgEl];
     msgEl.push(<div className="msginfo-left"  key={Math.random()} >
-      <Link to={`/user-info/${this.state.currentChatUser.id}`}><img src={this.state.currentChatUser.avatar} className="avatar"/></Link>
+      {
+        this.isGroup ? <Link to={`/user-info/${id}`}>
+          <img src={avatar} className="avatar"/>
+        </Link> : <Link to={`/user-info/${this.state.currentChatUser.id}`}>
+          <img src={this.state.currentChatUser.avatar} className="avatar"/>
+        </Link>
+      }
       <div dangerouslySetInnerHTML={{ __html: msg.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
     </div>);
     this.setState({
@@ -231,10 +323,21 @@ class ChatRoom extends React.Component {
   }
 
   render() {
-    const name = this.state.currentChatUser.username;
+    const name = this.isGroup ? this.state.currentGroup.group_name : this.state.currentChatUser.username;
+    const fontStyle = {fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'};
     return (
       <div className="room">
-        <div className="chatInfo">{name && <div>正在与<span style={{fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'}}>{name}</span>聊天...</div>}</div>
+        {
+          !this.isGroup ? (
+            <div className="chatInfo">
+              {name && <div>正在与<span style={fontStyle}>{name}</span>聊天...</div>}
+            </div>
+          ) : (
+            <div className="chatInfo">
+              {name && <div><span style={fontStyle}>{name}</span></div>}
+            </div>
+          )
+        }
         <div className="message" ref={ref => { this.msgBox = ref; }}>
           {this.state.msgEl}
         </div>

@@ -130,8 +130,8 @@ exports.deleteFriend = async (req, res) => {
 
 // message
 exports.addMsg = async (req, res) => {
-  const { from_user, to_user, content } = req.body;
-  const msgInfo = { from_user, to_user, content };
+  const { from_user, to_user, content, groupId } = req.body;
+  const msgInfo = { from_user, to_user, content, group_id: groupId };
   const ret = await msgService.addMsg(msgInfo);
   if (ret.affectedRows) {
     res.sendData('1', '发送成功');
@@ -141,8 +141,8 @@ exports.addMsg = async (req, res) => {
 };
 
 exports.getMsg = async (req, res) => {
-  const { fromUser, toUser } = req.query;
-  const ret = await msgService.getMsg(fromUser, toUser);
+  const { fromUser, toUser, groupId } = req.query;
+  const ret = await msgService.getMsg(fromUser, toUser, groupId);
   if (Array.isArray(ret)) {
     res.sendData('1', ret, '消息查询成功');
   } else {
@@ -205,14 +205,14 @@ exports.createGroup = async (req, res) => {
   }
 };
 
-exports.getGroup = async (req, res) => {
+exports.getGroupInfo = async (req, res) => {
   const { id, userId, groupId, type } = req.query;
-  const ret = await groupService.getGroup(id, userId, groupId, type);
+  const ret = await groupService.getGroupInfo(id, userId, groupId, type);
 
-  if (ret.affectedRows) {
-    res.sendData('1', ret, '创建群聊成功');
+  if (Array.isArray(ret)) {
+    res.sendData('1', ret, '查询成功');
   } else {
-    res.sendData('0', ret, '创建群聊失败');
+    res.sendData('0', ret, '查询失败');
   }
 };
 

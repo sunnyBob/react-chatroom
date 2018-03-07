@@ -964,10 +964,7 @@ body {
   overflow: hidden;
 }
 .column.is-9 {
-  overflow: scroll;
-}
-.column.is-9 > div {
-  padding: 0;
+  padding-top: 20px;
 }
 .user-info {
   display: flex;

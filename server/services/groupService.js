@@ -1,7 +1,7 @@
 const dao = require('../dao');
 const userService = require('./index');
 
-exports.getGroup = async (id, userId, groupId, type) => {
+exports.getGroupInfo = async (id, userId, groupId, type) => {
   if (id || type === '1') {
     const ret = await dao.query('groups.findGroup', { id, userId });
     return ret;
@@ -12,7 +12,7 @@ exports.getGroup = async (id, userId, groupId, type) => {
     const ret = dao.query('groups.findJoinedGroup', { userId });
     return ret;
   } else if (type === '4') {
-    const ret = dao.query('groups.findUserById', { userId, groupId });
+    const ret = dao.query('groups.findGroupUser', { groupId });
     return ret;
   }
 }
@@ -23,7 +23,7 @@ exports.createGroup = async (selectedFriends, create_user_id, group_name, group_
   names.forEach(name => {
     group_name += `、${name}`;
   });
-  group_name += `...(${selectedFriends.length + 1})`;
+  group_name += selectedFriends.length > 2 ? `...(${selectedFriends.length + 1})` : `(${selectedFriends.length + 1})`;
 
   const createRet = await dao.insert('groups', {create_user_id, group_name, group_avatar });
   const reqs = [dao.insert('user_group', { user_id: create_user_id, group_id: createRet.insertId })];

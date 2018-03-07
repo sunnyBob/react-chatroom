@@ -58,4 +58,14 @@ io.on('connection', (socket) => {
       userSocket[toUser].emit('chatToOne', msg, fromUser);
     }
   });
+
+  socket.on('chatToMore', (msg, userId, groupId, avatar) => {
+    io.to(`room-${groupId}`).emit('chatToMore', msg, userId, groupId, avatar);
+  });
+
+  socket.on('joinRoom', (userId, roomName) => {
+    if (userSocket.hasOwnProperty(userId)) {
+      userSocket[userId].join(roomName);
+    }
+  });
 });

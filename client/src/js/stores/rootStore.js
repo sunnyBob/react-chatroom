@@ -9,6 +9,7 @@ export default class RootStore {
   @observable createGroup = [];
   @observable manageGroup = [];
   @observable joinedGroup = [];
+  @observable groupUser = [];
 
   @action
   getUser(id) {
@@ -95,6 +96,19 @@ export default class RootStore {
     }).then((resp) => {
       if (Array.isArray(resp.retList)) {
         this.joinedGroup = resp.retList;
+      }
+    });
+  }
+
+  @action
+  getGroupUser(id, cb = () => {}) {
+    request({
+      url: '/group',
+      data: { id, type: '4' },
+    }).then((resp) => {
+      if (Array.isArray(resp.retList)) {
+        this.groupUser = resp.retList;
+        cb();
       }
     });
   }
