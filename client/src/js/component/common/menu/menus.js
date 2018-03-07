@@ -26,6 +26,17 @@ class Menus extends React.Component {
     };
   }
 
+  componentWillReceiveProps(nextProps) {
+    React.Children.forEach(nextProps.children, child => {
+      if (child.props.isActive) {
+        this.setState({
+          isOpen: true,
+          arrowClass: 'angle-up',
+        });
+      }
+    });
+  }
+
   handleClickOpen = (e) => {
     if (this.props.onClick) {
       this.props.onClick();

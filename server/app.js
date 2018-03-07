@@ -32,6 +32,11 @@ io.on('connection', (socket) => {
   user.userId && (userSocket[user.userId] = socket);
   user.userId && (onlineUsers[user.userId] = user.name);
   
+  socket.on('login', userId => {
+    userId && (userSocket[userId] = socket);
+    userId && (onlineUsers[userId] = user.name);
+  });
+
   socket.on('updateStatus', userId => {
     io.emit('updateStatus', userId);
   });
@@ -51,6 +56,16 @@ io.on('connection', (socket) => {
   socket.on('chatToOne', (msg, fromUser, toUser) => {
     if (userSocket.hasOwnProperty(toUser)) {
       userSocket[toUser].emit('chatToOne', msg, fromUser);
+    }
+  });
+
+  socket.on('chatToMore', (msg, userId, groupId, avatar) => {
+    io.to(`room-${groupId}`).emit('chatToMore', msg, userId, groupId, avatar);
+  });
+
+  socket.on('joinRoom', (userId, roomName) => {
+    if (userSocket.hasOwnProperty(userId)) {
+      userSocket[userId].join(roomName);
     }
   });
 });

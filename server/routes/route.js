@@ -25,12 +25,17 @@ module.exports = function(router) {
   router.post('/api/invitation', ctrl.sendInvitation);
   router.delete('/api/invitation', ctrl.deleteInvitation);
 
+  //group
+  router.get('/api/group', ctrl.getGroupInfo);
+  router.post('/api/group', ctrl.createGroup);
+
   //sign out
   router.get('/api/signout', ctrl.signOut);
 
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
     if (req.path !== '/login' && !tokenChecker(token)) {
+      res.clearCookie('token');
       res.send("<script>window.location.href='/login'</script>")
     } else {
       res.sendFile(path.resolve(__dirname, '../index.html'));

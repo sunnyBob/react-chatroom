@@ -2,5 +2,12 @@ namespace: 'msg'
 
 findMsg:
   - select * from message
-  - where (from_user = :fromUser and to_user = :toUser)
-  - or (from_user = :toUser and to_user = :fromUser)
+  - where 1 = 1
+  - if:
+      test: :fromUser && :toUser
+      sql: and (from_user = :fromUser and to_user = :toUser) or (from_user = :toUser and to_user = :fromUser)
+
+findGroupMsg:
+  - select message.*, user.avatar from message, user
+  - where group_id = :groupId 
+  - and message.from_user = user.id

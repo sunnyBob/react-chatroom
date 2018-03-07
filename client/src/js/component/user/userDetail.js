@@ -2,7 +2,7 @@ import React from 'react';
 import { browserHistory } from 'react-router';
 import { inject, observer } from 'mobx-react';
 import Cropper from 'cropperjs';
-import { Card, ModalManager, AttrList } from '../common';
+import { Card, ModalManager, AttrList, Icon } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
 import UploadAvatar from './uploadAvatar';
@@ -23,26 +23,34 @@ class UserDetail extends React.Component {
 
   componentDidMount() {
     const id = this.props.params.id;
-    id && commonUtils.isFriend(this.userId, id, {
-      success: () => {
-        this.store.getUser(id);
-      },
-      fail: () => {
-        browserHistory.push('/');
-      },
-    });
+    if (this.userId == id) {
+      this.store.getUser(id);
+    } else {
+      id && commonUtils.isFriend(this.userId, id, {
+        success: () => {
+          this.store.getUser(id);
+        },
+        fail: () => {
+          browserHistory.push('/');
+        },
+      });
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     const id = nextProps.params.id;
-    id && commonUtils.isFriend(this.userId, id, {
-      success: () => {
-        this.store.getUser(id);
-      },
-      fail: () => {
-        browserHistory.push('/');
-      },
-    });
+    if (this.userId == id) {
+      this.store.getUser(id);
+    } else {
+      id && commonUtils.isFriend(this.userId, id, {
+        success: () => {
+          this.store.getUser(id);
+        },
+        fail: () => {
+          browserHistory.push('/');
+        },
+      });
+    }
   }
 
   handleClose = () => {
@@ -210,17 +218,16 @@ class UserDetail extends React.Component {
       colSpan: 3,
     }]
     return (
-      <Card
-        title="个人主页"
-        enableClose={true}
-        handleClose={this.handleClose}
-        className="person-info"
-      >
+      <div>
+        <header className="detail-header">
+          <p className="detail-header-title">个人主页</p>
+          <Icon name="close" onClick={this.handleClose}/>
+        </header>
         <div className="info-top">
           <img src={userInfo.avatar}/>
         </div>
         <AttrList attrList={attrList} handleEdit={this.handleEdit}/>
-      </Card>
+      </div>
     );
   }
 }

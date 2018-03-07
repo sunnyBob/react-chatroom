@@ -963,7 +963,7 @@ body {
   padding: 15px;
   overflow: hidden;
 }
-.column.is-10 {
+.column.is-9 {
   padding-top: 20px;
 }
 .user-info {
@@ -1011,6 +1011,12 @@ body {
 .menu-list li ul {
   padding: 0 !important;
   border-left-width: 0 !important;
+}
+.menu-list li a {
+  font-size: 12px;
+}
+.menu-list li a.has-children {
+  font-size: 14px;
 }
 .menu-list li a:hover {
   background: #88c2ec;
@@ -1079,5 +1085,40 @@ body {
   vertical-align: middle;
 }
 .data-table {
+  font-size: 14px;
+}
+.friend-ul {
+  list-style: none;
+}
+.friend-ul .avatar {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.friend-ul li {
+  border-bottom: 1px solid #d2d4d4;
+  padding: 5px 10px;
+}
+.friend-ul li span {
+  margin-right: 5px;
+}
+.friend-ul li span:first-child {
+  margin-right: 15px;
+}
+.modal-container .modal-card-title {
+  font-size: 16px !important;
+  font-weight: 300;
+}
+.modal-container .modal-card-head {
+  height: 30px;
+}
+.modal-container .close {
+  font-size: 22px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.modal-container .modal-card-foot .button {
   font-size: 14px;
 }
