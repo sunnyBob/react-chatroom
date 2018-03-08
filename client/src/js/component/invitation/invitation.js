@@ -1,6 +1,6 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
-import { Card, ModalManager, Table, Tab, TabItem } from '../common';
+import { Card, ModalManager, Table, Tab, TabItem, Icon } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
 import { toast } from 'react-toastify';
@@ -48,7 +48,7 @@ class Invitation extends React.Component {
   handleToggle = (e) => {
     const inviteType = e.target.innerHTML;
     this.setState({
-      inviteType, 
+      inviteType,
     }, () => { this.fetchData(); });
   }
 
@@ -100,7 +100,7 @@ class Invitation extends React.Component {
     })
   }
 
-  handleDeleteInvitation = async (invitation, cb = () => {}) => {
+  handleDeleteInvitation = async (invitation, cb = () => { }) => {
     const { user_id, friend_id } = invitation;
     await request({
       url: '/invitation',
@@ -111,8 +111,8 @@ class Invitation extends React.Component {
       },
     }).then(resp => {
       if (resp.code == 1) {
-       cb();
-       return true;
+        cb();
+        return true;
       }
     });
   }
@@ -123,19 +123,20 @@ class Invitation extends React.Component {
       { label: '申请人姓名', field: 'username' },
       { label: '申请类型', field: 'invite_type' },
       { label: '申请时间', field: 'createTime' },
-      { label: '操作', template: row => <span className="invitation-opt">
-        <a onClick={this.handleAccept.bind(null, row)}>[接受] </a>
-        <a onClick={this.handleReject.bind(null, row)}>[拒绝]</a>
-      </span> },
+      {
+        label: '操作', template: row => <span className="invitation-opt">
+          <a onClick={this.handleAccept.bind(null, row)}>[接受] </a>
+          <a onClick={this.handleReject.bind(null, row)}>[拒绝]</a>
+        </span>
+      },
     ];
     const data = this.state.tbData;
     return (
-      <Card
-        title="申请列表"
-        enableClose={true}
-        handleClose={this.handleClose}
-        className="person-info"
-      >
+      <div>
+        <header className="detail-header">
+          <p className="detail-header-title">申请列表</p>
+          <Icon name="close" onClick={this.handleClose} />
+        </header>
         <div className="invitation-btns">
           <a onClick={this.handleToggle} className="button is-primary is-small">好友申请</a>
           <a onClick={this.handleToggle} className="button is-info is-small">入群申请</a>
@@ -155,7 +156,7 @@ class Invitation extends React.Component {
             layout: 'total, pager, jumper',
           }}
         />
-      </Card>
+      </div>
     );
   }
 }

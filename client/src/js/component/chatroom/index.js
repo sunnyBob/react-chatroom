@@ -334,7 +334,11 @@ class ChatRoom extends React.Component {
             </div>
           ) : (
             <div className="chatInfo">
-              {name && <div><span style={fontStyle}>{name}</span></div>}
+              {name && <div>
+                  <span style={fontStyle}>{name}</span>
+                  <Icon name="angle-down"/>
+              </div>}
+              <div>hello world</div>
             </div>
           )
         }
@@ -347,8 +351,10 @@ class ChatRoom extends React.Component {
             <Icon name="folder-o" size="medium"/>
           </div>
           <Textarea ref={ref => { this.textarea = ref; }} className="textarea is-primary" html={this.state.html} onChange={this.handleChange} onKeyDown={this.sendMsg}/>
-          <span>(按ctrl/cmd + enter组合键发送)</span>
-          <button className="pull-right button is-small" onClick={this.sendMsg}>{t('Send')}</button>
+          <div className="room-bottom">
+            <span>『按ctrl/cmd + enter组合键发送』</span>
+            <button className="button is-small" onClick={this.sendMsg}>{t('Send')}</button>
+          </div>
         </div>
       </div>
     )
