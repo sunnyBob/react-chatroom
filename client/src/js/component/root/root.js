@@ -42,6 +42,9 @@ class Root extends React.Component {
         return false;
       });
     });
+    socket.on('updateGroupList', () => {
+      this.user && this.fetchGroupData();
+    });
   }
 
   componentDidMount() {
@@ -102,7 +105,11 @@ class Root extends React.Component {
       onOk: async () => {
         const selectedFriends = this.state.selectedFriends;
         const { user_id, user_name, avatar } = this.user;
-        const ret = await request({
+        if (selectedFriends.length === 1) {
+          browserHistory.push(`/chat/${selectedFriends[0].id}`);
+          return;
+        }
+        const resp = await request({
           url: '/group',
           method: 'post',
           data: {
@@ -112,8 +119,11 @@ class Root extends React.Component {
             avatar,
           },
         });
-        if (ret.code === '1') {
+        if (resp.code === '1') {
           toast.success('创建成功', toastOption);
+          this.fetchGroupData();
+          const ids = [...selectedFriends].map(user => user.id);
+          socket.emit('createGroup', ids, resp.retList.insertId);
         } else {
           toast.error('创建失败', toastOption);
         }

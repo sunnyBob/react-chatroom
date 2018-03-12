@@ -20,7 +20,7 @@ findJoinedGroup:
   - where u.group_id = g.id
   - and g.create_user_id != :userId
   - and u.user_id = :userId
-  - and u.user_id != (
+  - and u.user_id not in (
       select user_id from manager_group
     )
 
@@ -28,3 +28,14 @@ findGroupUser:
   - select user.* from groups g, user_group u, user
   - where u.group_id = g.id and user.id = u.user_id
   - and u.group_id = :groupId
+  - if:
+      test: :userId
+      sql: and user_id = :userId
+
+findManageGroups:
+  - select groups.* from groups left join manager_group
+  - on groups.id = manager_group.group_id
+  - where (manager_group.user_id = :userId or groups.create_user_id = :userId)
+  - if:
+      test: :groupId
+      sql: and groups.group_id = :groupId

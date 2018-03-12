@@ -63,6 +63,17 @@ io.on('connection', (socket) => {
     io.to(`room-${groupId}`).emit('chatToMore', msg, userId, groupId, avatar);
   });
 
+  socket.on('createGroup', (ids, groupId) => {
+    ids.forEach(id => {
+      if (userSocket.hasOwnProperty(id)) {
+        userSocket[id].join(`room-${groupId}`);
+      }
+    });
+    console.log(666);
+    console.log(ids, groupId);
+    io.to(`room-${groupId}`).emit('updateGroupList')
+  });
+
   socket.on('joinRoom', (userId, roomName) => {
     if (userSocket.hasOwnProperty(userId)) {
       userSocket[userId].join(roomName);

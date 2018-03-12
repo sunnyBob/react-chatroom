@@ -13,6 +13,7 @@ class AddUsrGroup extends React.Component {
 
     this.state = {
       result: {},
+      isGroup: false,
     };
     this.user = JSON.parse(localStorage.getItem('user'));
   }
@@ -33,12 +34,25 @@ class AddUsrGroup extends React.Component {
       }).then(resp => {
         if (Array.isArray(resp.retList)) {
           this.setState({
+            isGroup: false,
             result: resp.retList[0] || [],
           })
         }
-      })
+      });
     } else if (name === 'group') {
-
+      request({
+        url: '/group',
+        data: {
+          id,
+        },
+      }).then(resp => {
+        if (Array.isArray(resp.retList)) {
+          this.setState({
+            isGroup: true,
+            result: resp.retList[0] || [],
+          })
+        }
+      });
     }
   }
 
@@ -47,39 +61,66 @@ class AddUsrGroup extends React.Component {
     this.setState({ result: {} });
   }
 
-  sendInvitation = (id) => {
+  sendInvitation = (id, groupName) => {
     const { user_id, user_name } = this.user;
-    if (user_id == id) {
-      toast.error('无法添加自己为好友', toastOption);
-    } else {
-      commonUtils.isFriend(user_id, id, {
+    if (this.state.isGroup) {
+      commonUtils.isGroupMember(user_id, id, {
         success: () => {
-          toast.error('该用户已经是您的好友', toastOption);
+          toast.error('您已在该群聊', toastOption);
         },
-        fail: async () => {
-          await request({
+        fail: () => {
+          request({
             url:'/invitation',
             method: 'post',
             data: {
+              group_id: String(id),
               user_id: user_id,
-              friend_id: id,
               username: user_name,
-              invite_type: '好友申请',
+              invite_type: '入群申请',
+              group_name: groupName,
             },
           }).then(resp => {
             if (resp.code == 1) {
-              toast.success('成功发送好友申请', toastOption);
+              toast.success('成功发送入群申请', toastOption);
               socket.emit('updateInvitation', id);
               this.props.onClose();
             }
           });
         },
       });
+    } else {
+      if (user_id == id) {
+        toast.error('无法添加自己为好友', toastOption);
+      } else {
+        commonUtils.isFriend(user_id, id, {
+          success: () => {
+            toast.error('该用户已经是您的好友', toastOption);
+          },
+          fail: () => {
+            request({
+              url:'/invitation',
+              method: 'post',
+              data: {
+                user_id: user_id,
+                friend_id: id,
+                username: user_name,
+                invite_type: '好友申请',
+              },
+            }).then(resp => {
+              if (resp.code == 1) {
+                toast.success('成功发送好友申请', toastOption);
+                socket.emit('updateInvitation', id);
+                this.props.onClose();
+              }
+            });
+          },
+        });
+      }
     }
   }
 
   render() {
-    const { id, avatar, username } = this.state.result;
+    const { id, avatar, username, group_name, group_avatar } = this.state.result;
     
     return (
       <div className="adduserorgroup">
@@ -98,10 +139,10 @@ class AddUsrGroup extends React.Component {
         {
           Object.keys(this.state.result).length ? <div className="result">
             <div className="person">
-              <img src={avatar} className="avatar"/>
-              <span>{username}</span>
+              <img src={avatar || group_avatar} className="avatar"/>
+              <span>{username || group_name}</span>
             </div>
-            <button className="button is-info is-small" onClick={this.sendInvitation.bind(null, id)}>{t('Add')}</button>
+            <button className="button is-info is-small" onClick={this.sendInvitation.bind(null, id, group_name)}>{t('Add')}</button>
           </div> : null
         }
       </div>

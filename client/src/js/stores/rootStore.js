@@ -1,5 +1,6 @@
 import { observable, action, computed } from 'mobx';
 import request from '../utils/request';
+import commonUtils from '../utils/commonUtils';
 
 export default class RootStore {
   @observable userInfo = {};
@@ -36,10 +37,12 @@ export default class RootStore {
   }
 
   @action
-  getInvitation(friend_id) {
+  async getInvitation(friend_id) {
+    const groups = await commonUtils.getManageGroups(friend_id) || [];
+    const groupIds = groups.map(group => group.id).join(',');
     request({
       url: '/invitation',
-      data: { friend_id },
+      data: { friend_id, groupIds },
     }).then((resp) => {
       if (Array.isArray(resp.retList)) {
         this.invitation = resp.retList;

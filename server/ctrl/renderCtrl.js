@@ -152,16 +152,20 @@ exports.getMsg = async (req, res) => {
 
 //invitation
 exports.sendInvitation = async (req, res) => {
-  const { user_id, friend_id, username, invite_type } = req.body;
-  const searchRet = await inviteService.getInvitation(friend_id, user_id);
+  const { user_id, friend_id, username, invite_type, group_id, group_name } = req.body;
+  const searchRet = await inviteService.getInvitation(friend_id, user_id, invite_type, [group_id]);
+
   if (searchRet.length && searchRet[0].id) {
-    res.sendData('5000', '已发送过好友申请');
+    const msg = group_id ? '已发送过入群申请' : '已发送过好友申请';
+    res.sendData('5000', msg);
   } else {
     const invitation = {
       user_id,
       friend_id,
       username,
       invite_type,
+      group_id,
+      group_name,
     };
     const ret = await inviteService.sendInvitation(invitation);
     if (ret.affectedRows) {
@@ -173,8 +177,8 @@ exports.sendInvitation = async (req, res) => {
 };
 
 exports.getInvitation = async (req, res) => {
-  const {friend_id, invite_type } = req.query;
-  const searchRet = await inviteService.getInvitation(friend_id, invite_type);
+  const {friend_id, user_id, invite_type, groupIds = ''} = req.query;
+  const searchRet = await inviteService.getInvitation(friend_id, user_id, invite_type, groupIds.split(','));
   if (Array.isArray(searchRet)) {
     res.sendData('1', searchRet, '查询成功');
   } else {
@@ -197,6 +201,17 @@ exports.deleteInvitation = async (req, res) => {
 exports.createGroup = async (req, res) => {
   const { selectedFriends = [], userId, userName, avatar } = req.body;
   const ret = await groupService.createGroup(selectedFriends, userId, userName, avatar);
+
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '创建群聊成功');
+  } else {
+    res.sendData('0', ret, '创建群聊失败');
+  }
+};
+
+exports.joinGroup = async (req, res) => {
+  const { userId, groupId } = req.body;
+  const ret = await groupService.joinGroup(userId, groupId);
 
   if (ret.affectedRows) {
     res.sendData('1', ret, '创建群聊成功');

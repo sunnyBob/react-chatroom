@@ -13,6 +13,7 @@ class Invitation extends React.Component {
 
     this.state = {
       tbData: [],
+      inviteType: '',
     };
     this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
   }
@@ -21,17 +22,17 @@ class Invitation extends React.Component {
     this.fetchData();
   }
 
-  componentWillReceiveProps() {
-    this.fetchData();
-  }
-
-  fetchData = () => {
+  fetchData = async () => {
+    const groups = await commonUtils.getManageGroups(this.userId) || [];
+    const groupIds = groups.map(group => group.id);
+    const data = {
+      friend_id: this.userId,
+      invite_type: this.state.inviteType,
+      groupIds: groupIds.join(','),
+    };
     request({
       url: '/invitation',
-      data: {
-        friend_id: this.userId,
-        invite_type: this.state.inviteType,
-      },
+      data,
     }).then(resp => {
       if (resp.code == 1) {
         this.setState({
@@ -53,13 +54,11 @@ class Invitation extends React.Component {
   }
 
   handleAccept = (invitation) => {
-    const { id, user_id, friend_id, username, invite_type } = invitation;
+    const { id, user_id, friend_id, username, invite_type, group_id } = invitation;
     if (invite_type === '好友申请') {
       commonUtils.isFriend(friend_id, user_id, {
         success: () => {
-          toast.success(`${username}已经是您的好友`, {
-
-          });
+          toast.success(`${username}已经是您的好友`, toastOption);
           this.handleDeleteInvitation(invitation, () => {
             this.fetchData();
             this.props.fetchData && this.props.fetchData();
@@ -82,6 +81,35 @@ class Invitation extends React.Component {
             } else {
               toast.error('添加好友失败', toastOption);
             }
+          });
+        },
+      });
+    } else {
+      commonUtils.isGroupMember(user_id, group_id, {
+        success: () => {
+          toast.success(`${username}已经在该群聊`, toastOption);
+          this.handleDeleteInvitation(invitation, () => {
+            this.fetchData();
+            this.props.fetchData && this.props.fetchData();
+          });
+        },
+        fail: () => {
+          request({
+            url: '/group/join',
+            method: 'post',
+            data: {
+              userId: user_id,
+              groupId: group_id,
+            },
+          }).then(resp => {
+            // if (resp.code == 1) {
+            //   toast.success(`成功添加${username}为好友`, toastOption);
+            //   this.props.fetchData && this.props.fetchData();
+            //   this.handleDeleteInvitation(invitation);
+            //   socket.emit('updateLeftList', user_id);
+            // } else {
+            //   toast.error('添加好友失败', toastOption);
+            // }
           });
         },
       });

@@ -34,4 +34,16 @@ export default class {
       }
     });
   }
+
+  static async getManageGroups(userId, groupId) {
+    const resp = await request({
+      url: '/group',
+      data: {
+        userId,
+        groupId,
+        type: '5',
+      },
+    });
+    return resp.retList || [];
+  }
 }
