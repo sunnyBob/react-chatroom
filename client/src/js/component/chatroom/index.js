@@ -25,6 +25,7 @@ class ChatRoom extends React.Component {
     const user = localStorage.getItem('user');
     this.user = JSON.parse(user);
     const pathName = location.pathname.split('/')[1];
+    console.log(pathName);
     this.isGroup = pathName !== 'chat';
     this.store = new props.RootStore();
 
@@ -70,6 +71,7 @@ class ChatRoom extends React.Component {
     const nextId = nextProps.params.id;
     const userId = this.user.user_id;
     const pathName = location.pathname.split('/')[1];
+    console.log(pathName);
     if (id !== nextId) {
       this.isGroup = pathName !== 'chat';
       if (!this.isGroup) {

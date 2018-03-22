@@ -1,4 +1,4 @@
-const { userService, msgService, inviteService, groupService } = require('../services');
+const { userService, msgService, inviteService, groupService, userOrGroupSerice } = require('../services');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwtConfig');
@@ -224,6 +224,18 @@ exports.getGroupInfo = async (req, res) => {
   const { id, userId, groupId, type } = req.query;
   const ret = await groupService.getGroupInfo(id, userId, groupId, type);
 
+  if (Array.isArray(ret)) {
+    res.sendData('1', ret, '查询成功');
+  } else {
+    res.sendData('0', ret, '查询失败');
+  }
+};
+
+//userOrGroup
+exports.getUserOrGroup = async (req, res) => {
+  const { userId, name } = req.query;
+  const ret = await userOrGroupSerice.getUserOrGroup(userId, name);
+  
   if (Array.isArray(ret)) {
     res.sendData('1', ret, '查询成功');
   } else {

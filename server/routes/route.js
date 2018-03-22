@@ -30,6 +30,9 @@ module.exports = function(router) {
   router.post('/api/group', ctrl.createGroup);
   router.post('/api/group/join', ctrl.joinGroup);
 
+  //user_group
+  router.get('/api/user_group', ctrl.getUserOrGroup)
+
   //sign out
   router.get('/api/signout', ctrl.signOut);
 

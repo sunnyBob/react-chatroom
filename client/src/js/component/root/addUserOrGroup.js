@@ -70,7 +70,7 @@ class AddUsrGroup extends React.Component {
         },
         fail: () => {
           request({
-            url:'/invitation',
+            url: '/invitation',
             method: 'post',
             data: {
               group_id: String(id),
@@ -98,7 +98,7 @@ class AddUsrGroup extends React.Component {
           },
           fail: () => {
             request({
-              url:'/invitation',
+              url: '/invitation',
               method: 'post',
               data: {
                 user_id: user_id,
@@ -121,15 +121,15 @@ class AddUsrGroup extends React.Component {
 
   render() {
     const { id, avatar, username, group_name, group_avatar } = this.state.result;
-    
+
     return (
       <div className="adduserorgroup">
         <h5>{t('Add User/Group')}</h5>
         <div className="field">
           <p className="control has-icons-left has-icons-right">
-            <input placeholder={t('Enter Id')} className="input is-small is-info search" name="userId" ref={ref =>{ this.input = ref }}/>
-            <Icon name="search" className="is-left"/>
-            <Icon name="close" className="is-right" onClick={this.clear}/>
+            <input placeholder={t('Enter Id')} className="input is-small is-info search" name="userId" ref={ref => { this.input = ref }} />
+            <Icon name="search" className="is-left" />
+            <Icon name="close" className="is-right" onClick={this.clear} />
           </p>
         </div>
         <div className="search-btn">
@@ -139,7 +139,7 @@ class AddUsrGroup extends React.Component {
         {
           Object.keys(this.state.result).length ? <div className="result">
             <div className="person">
-              <img src={avatar || group_avatar} className="avatar"/>
+              <img src={avatar || group_avatar} className="avatar" />
               <span>{username || group_name}</span>
             </div>
             <button className="button is-info is-small" onClick={this.sendInvitation.bind(null, id, group_name)}>{t('Add')}</button>

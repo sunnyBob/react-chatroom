@@ -1,0 +1,14 @@
+namespace: 'user_group'
+
+findUser:
+  - select u.id userId, avatar, username from friend as f, user as u
+  - where username like :name
+  - and ((f.user_id = :userId and f.friend_id = u.id)
+  - or (f.friend_id = :userId and f.user_id = u.id))
+
+findGroup:
+  - select g.id group_id, g.group_name, g.group_avatar, u.user_id group_user_id from groups g, user_group u
+  - where u.group_id = g.id
+  - and group_name like :name
+  - and g.create_user_id != :userId
+  - and u.user_id = :userId
