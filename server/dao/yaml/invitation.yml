@@ -5,7 +5,7 @@ findInvitation:
   - where 1 = 1
   - if:
       test: :userId && :friendId
-      sql: and ((friend_id = :userId and user_id = :friendId) or (friend_id = :friendId and user_id = :userId)
+      sql: and ((friend_id = :userId and user_id = :friendId) or (friend_id = :friendId and user_id = :userId))
   - if:
       test: :friendId && !:userId
       sql: and friend_id = :friendId
