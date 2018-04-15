@@ -4,16 +4,51 @@
   overflow: hidden;
   .chatInfo {
     width: 100%;
-    height: 30px;
-    line-height: 30px;
     text-align: center;
     font-size: 14px;
-    margin: 10px 0;
+    margin-bottom: 12px;
+  }
+  .group-user-ul {
+    margin: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+  }
+  li.group-user-li {
+    margin-right: 10px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+    .avatar {
+      height: 50px;
+      width: 50px;
+    }
+    .name {
+      font-size: 12px;
+      font-family: Fantasy;
+    }
+  }
+  .msg-topbar {
+    position: relative;
+    .group-user {
+      margin-top: 0px;
+      position: absolute;
+      background: white;
+      width: 100%;
+      border: 1px solid gray;
+      max-height: 200px;
+      overflow: auto;
+      text-align: left;
+      padding: 10px;
+    }
   }
   .message {
-    height: 450px;
+    height: 410px;
     margin: 0 !important;
-    overflow: scroll;
+    overflow: auto;
     padding: 10px 20px;
     border-top: 1px solid #d6d6d6;
     border-bottom: 1px solid #d6d6d6;
@@ -43,7 +78,7 @@
       border-radius: 10px;
       min-width: 60px;
       padding: 5px 10px;
-      overflow: scroll;
+      overflow: auto;
     }
   }
   .msginfo-right {

@@ -104,10 +104,10 @@ export default class RootStore {
   }
 
   @action
-  getGroupUser(id, cb = () => {}) {
+  getGroupUser(userId, groupId, cb = () => {}) {
     request({
       url: '/group',
-      data: { id, type: '4' },
+      data: { userId, groupId, type: '4' },
     }).then((resp) => {
       if (Array.isArray(resp.retList)) {
         this.groupUser = resp.retList;

@@ -13,12 +13,16 @@ class Invitation extends React.Component {
 
     this.state = {
       tbData: [],
-      inviteType: '',
+      inviteType: '好友申请',
     };
     this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
   }
 
   componentDidMount() {
+    this.fetchData();
+  }
+
+  componentWillReceiveProps() {
     this.fetchData();
   }
 
@@ -102,14 +106,17 @@ class Invitation extends React.Component {
               groupId: group_id,
             },
           }).then(resp => {
-            // if (resp.code == 1) {
-            //   toast.success(`成功添加${username}为好友`, toastOption);
-            //   this.props.fetchData && this.props.fetchData();
-            //   this.handleDeleteInvitation(invitation);
-            //   socket.emit('updateLeftList', user_id);
-            // } else {
-            //   toast.error('添加好友失败', toastOption);
-            // }
+            if (resp.code === '1') {
+              toast.success('加入群聊成功', toastOption);
+              this.props.fetchData && this.props.fetchData();
+              this.handleDeleteInvitation(invitation, () => {
+              this.fetchData();
+              this.props.fetchData && this.props.fetchData();
+            });
+              socket.emit('updateLeftList', user_id);
+            } else {
+              toast.error('加入群聊失败', toastOption);
+            }
           });
         },
       });
@@ -117,18 +124,19 @@ class Invitation extends React.Component {
   }
 
   handleReject = (invitation) => {
-    const { user_id, username } = invitation;
+    const { user_id, username, invite_type } = invitation;
     ModalManager.confirm({
-      content: `确定拒绝${username}的好友申请？`,
+      content: `确定拒绝${username}的${invite_type}？`,
       onOk: this.handleDeleteInvitation.bind(null, invitation, () => {
-        toast.success(`您已成功拒绝${username}的好友申请`, toastOption);
+        toast.success(`您已成功拒绝${username}的${invite_type}`, toastOption);
         socket.emit('updateInvitation', user_id);
         this.fetchData();
+        this.props.fetchData && this.props.fetchData();
       }),
     })
   }
 
-  handleDeleteInvitation = async (invitation, cb = () => { }) => {
+  handleDeleteInvitation = async (invitation, cb = () => {}) => {
     const { user_id, friend_id } = invitation;
     await request({
       url: '/invitation',
@@ -159,6 +167,12 @@ class Invitation extends React.Component {
       },
     ];
     const data = this.state.tbData;
+    const groupColumns = [...columns];
+    groupColumns.splice(3, 0, {
+      label: '群名称',
+      field: 'group_name',
+    });
+
     return (
       <div>
         <header className="detail-header">
@@ -171,7 +185,7 @@ class Invitation extends React.Component {
         </div>
         <Table
           data={data}
-          columns={columns}
+          columns={this.state.inviteType === '好友申请' ? columns : groupColumns}
           total={data.length}
           className="is-narrow"
           pagination={{

@@ -26,7 +26,7 @@ exports.createGroup = async (selectedFriends, create_user_id, group_name, group_
   names.forEach(name => {
     group_name += `、${name}`;
   });
-  group_name += selectedFriends.length > 2 ? `...(${selectedFriends.length + 1})` : `(${selectedFriends.length + 1})`;
+  group_name += `...(${selectedFriends.length + 1})`;
 
   const createRet = await dao.insert('groups', {create_user_id, group_name, group_avatar });
   const reqs = [dao.insert('user_group', { user_id: create_user_id, group_id: createRet.insertId })];
@@ -44,14 +44,21 @@ exports.joinGroup = async (user_id, group_id) => {
   const group = (await dao.query('groups.findGroup', { id: group_id }))[0] || {};
   const groupName = group.group_name || '';
   const count = parseInt(groupName.match(/\d+/g)) + 1;
-  let newGroupName = groupName;
-  if (count === '3') {
-    newGroupName = `${groupName.split('(')[0]}...(${count})`;
-  } else {
-    newGroupName = `${groupName.split('(')[0]}(${count})`;
-  }
-  console.log(newGroupName);
+  const newGroupName = `${groupName.split('(')[0]}(${count})`;
   await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
-  console.log('3333333333333333-----------------------------------------------33333333');
+  return ret;
+}
+
+exports.inviteIntoGroup = async (users, group_id) => {
+  const group = (await dao.query('groups.findGroup', { id: group_id }))[0] || {};
+  const groupName = group.group_name || '';
+  const count = parseInt(groupName.match(/\d+/g)) + users.length;
+  const newGroupName = `${groupName.split('(')[0]}(${count})`;
+
+  users.forEach(async user_id => {
+    await dao.insert('user_group', {user_id, group_id});
+  });
+  const ret = await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
+
   return ret;
 }

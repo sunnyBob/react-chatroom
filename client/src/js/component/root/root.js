@@ -91,9 +91,9 @@ class Root extends React.Component {
           id: this.user.user_id,
         }
       }).then(resp => {
-        if (resp.code === '1') {
-          socket.emit('updateStatus', this.user.user_id);
+        if (resp.code === 1) {
           location.reload();
+          socket.emit('updateStatus', this.user.user_id);
         }
       });
     });
@@ -106,10 +106,14 @@ class Root extends React.Component {
       onOk: async () => {
         const selectedFriends = this.state.selectedFriends;
         const { user_id, user_name, avatar } = this.user;
+        if (selectedFriends.length === 0) {
+          return;
+        }
         if (selectedFriends.length === 1) {
           browserHistory.push(`/chat/${selectedFriends[0].id}`);
           return;
         }
+        
         const resp = await request({
           url: '/group',
           method: 'post',
@@ -124,13 +128,13 @@ class Root extends React.Component {
           toast.success('创建成功', toastOption);
           this.fetchGroupData();
           const ids = [...selectedFriends].map(user => user.id);
-          socket.emit('createGroup', ids, resp.retList.insertId);
+          socket.emit('addToRoom', ids, resp.retList.insertId);
         } else {
           toast.error('创建失败', toastOption);
         }
       },
       okText: '创建',
-    })
+    });
   }
 
   handleSelectedChange = (selectedFriends) => {

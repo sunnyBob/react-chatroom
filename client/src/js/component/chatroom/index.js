@@ -6,6 +6,7 @@ import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
 import Textarea from 'react-contenteditable';
 import { toast } from 'react-toastify';
+import GroupUser from './groupUser';
 
 import './chatRoom.less';
 
@@ -20,6 +21,7 @@ class ChatRoom extends React.Component {
       currentChatUser: {},
       currentGroup: {},
       msgEl: [],
+      isShowGroupUser: false,
     };
 
     const user = localStorage.getItem('user');
@@ -38,6 +40,10 @@ class ChatRoom extends React.Component {
       if (groupId == this.props.params.id && this.user.user_id != userId) {
         this.handleRecvMsg(msg, userId, avatar);
       }
+    });
+    socket.on('updateGroupUser', (groupId) => {
+      console.log(groupId)
+      this.getCurrentGroup(groupId);
     });
   }
 
@@ -71,7 +77,6 @@ class ChatRoom extends React.Component {
     const nextId = nextProps.params.id;
     const userId = this.user.user_id;
     const pathName = location.pathname.split('/')[1];
-    console.log(pathName);
     if (id !== nextId) {
       this.isGroup = pathName !== 'chat';
       if (!this.isGroup) {
@@ -324,6 +329,12 @@ class ChatRoom extends React.Component {
     });
   }
 
+  toggleShowGroupUser = () => {
+    this.setState({
+      isShowGroupUser: !this.state.isShowGroupUser,
+    });
+  }
+
   render() {
     const name = this.isGroup ? this.state.currentGroup.group_name : this.state.currentChatUser.username;
     const fontStyle = {fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'};
@@ -336,11 +347,11 @@ class ChatRoom extends React.Component {
             </div>
           ) : (
             <div className="chatInfo">
-              {name && <div>
-                  <span style={fontStyle}>{name}</span>
-                  <Icon name="angle-down"/>
+              {name && <div className="msg-topbar">
+                <span style={fontStyle}>{name}</span>
+                <Icon name={this.state.isShowGroupUser ? 'angle-up' : 'angle-down'} onClick={this.toggleShowGroupUser}/>
+                { this.state.isShowGroupUser && <GroupUser groupId={this.props.params.id}/>}
               </div>}
-              <div>hello world</div>
             </div>
           )
         }

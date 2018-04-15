@@ -10,43 +10,53 @@ class CreateGroup extends React.Component {
   constructor(props) {
     super(props);
     
-    this.selectedFriends = [];
+    this.state = {
+      selectedFriends: [],
+    };
     this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
   }
 
   handleCheck = (e) => {
     const { checked, name, id } = e.target;
+    const selectedFriends = [...this.state.selectedFriends];
     if (checked) {
-      this.selectedFriends.push({name, id});
+      selectedFriends.push({name, id});
     } else {
-      this.selectedFriends.some((oneId, index) => {
-        if (oneId === id) {
-          this.selectedFriends.splice(index, 1);
+      selectedFriends.some((friend, index) => {
+        if (friend.id === id) {
+          selectedFriends.splice(index, 1);
           return true;
         }
         return false;
       });
     }
-    this.props.handleSelectedChange(this.selectedFriends);
+
+    this.setState({
+      selectedFriends,
+    }, () => {
+      this.props.handleSelectedChange(this.state.selectedFriends);
+    });
   }
 
   render() {
     const data = this.props.friendsList || [];
-
+    const groupId = this.props.groupId;
     return (
       <ul className="friend-ul">
         {
-          toJS(data).map(friend => (
-            <li key={friend.id}>
+          toJS(data).length ? toJS(data).map(friend => (
+            <li key={friend.id} style={{background: friend.group_id == groupId ? '#f0f0f0' : ''}}>
               <span>
-                <input type="checkbox" onChange={this.handleCheck} name={friend.username} id={friend.friend_id == this.userId ? friend.user_id.toString() : friend.friend_id.toString()}/>
+                <input type="checkbox" disabled={friend.group_id == groupId} onChange={this.handleCheck} name={friend.username} id={friend.friend_id == this.userId ? friend.user_id.toString() : friend.friend_id.toString()}/>
               </span>
               <span className="avatar-wrap">
                 <img src={friend.avatar} className="avatar"/>
               </span>
               <span>{friend.username}</span>
             </li>
-          ))
+          )) : (
+            <li>暂无数据</li>
+          )
         }
       </ul>
     );

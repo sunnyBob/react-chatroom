@@ -177,7 +177,7 @@ exports.sendInvitation = async (req, res) => {
 };
 
 exports.getInvitation = async (req, res) => {
-  const {friend_id, user_id, invite_type, groupIds = ''} = req.query;
+  const {friend_id, user_id, invite_type = '好友申请', groupIds = ''} = req.query;
   const searchRet = await inviteService.getInvitation(friend_id, user_id, invite_type, groupIds.split(','));
   if (Array.isArray(searchRet)) {
     res.sendData('1', searchRet, '查询成功');
@@ -214,9 +214,9 @@ exports.joinGroup = async (req, res) => {
   const ret = await groupService.joinGroup(userId, groupId);
 
   if (ret.affectedRows) {
-    res.sendData('1', ret, '创建群聊成功');
+    res.sendData('1', ret, '加入群聊成功');
   } else {
-    res.sendData('0', ret, '创建群聊失败');
+    res.sendData('0', ret, '加入群聊失败');
   }
 };
 
@@ -230,6 +230,17 @@ exports.getGroupInfo = async (req, res) => {
     res.sendData('0', ret, '查询失败');
   }
 };
+
+exports.inviteToGroup = async (req, res) => {
+  const { users, groupId } = req.body;
+  const ret = await groupService.inviteIntoGroup(users, groupId);
+
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '加入群聊成功');
+  } else {
+    res.sendData('0', ret, '加入群聊失败');
+  }
+}
 
 //userOrGroup
 exports.getUserOrGroup = async (req, res) => {
