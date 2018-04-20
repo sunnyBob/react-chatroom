@@ -190,18 +190,20 @@ export default class LoginReg extends React.Component {
                   name="age"
                   handleChange={this.handleChange}
                 />
-                <RadioGroup
-                  label="sex"
-                  name="sex"
-                  options={[{
-                    label: 'male',
-                    value: t('Male')
-                  }, {
-                    label: 'female',
-                    value: t('Female')
-                  }]}
-                  onChange={this.handleChange}
-                />
+                <div className="field">
+                  <label className="label is-small">Sex</label>
+                  <RadioGroup
+                    name="sex"
+                    options={[{
+                      label: 'male',
+                      value: t('Male')
+                    }, {
+                      label: 'female',
+                      value: t('Female')
+                    }]}
+                    onChange={this.handleChange}
+                  />
+                </div>
                 <Input
                   placeholder="phone"
                   label="Phone"

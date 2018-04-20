@@ -10,7 +10,8 @@ exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
   const ret = await userService.findUser({name});
   const { id, password, avatar } = ret[0] || {};
-  if (bcrypt.compareSync(passwd, password)) {
+  
+  if (ret[0] && bcrypt.compareSync(passwd, password)) {
     const firstSignIn = Date.now();
     const token = jwt.sign({
       name,
@@ -21,7 +22,7 @@ exports.findUser = async (req, res) => {
     });
     res.cookie('token', token, {
       maxAge: 2592000000,//30天
-      httpOnly: true
+      // httpOnly: true
     });
     const retList = [{
       userName: name,

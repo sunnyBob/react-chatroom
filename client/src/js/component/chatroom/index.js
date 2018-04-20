@@ -10,6 +10,8 @@ import GroupUser from './groupUser';
 
 import './chatRoom.less';
 
+const baseUrl = '/video.html';
+
 @inject('RootStore')
 @observer
 class ChatRoom extends React.Component {
@@ -30,6 +32,7 @@ class ChatRoom extends React.Component {
     console.log(pathName);
     this.isGroup = pathName !== 'chat';
     this.store = new props.RootStore();
+    this.hash = '';
 
     socket.on('chatToOne', (msg, userId) => {
       if (userId == this.props.params.id) {
@@ -335,6 +338,43 @@ class ChatRoom extends React.Component {
     });
   }
 
+  sendVideoUrl = async () => {
+    const id = this.props.params.id;
+    const { user_id, user_name, avatar } = this.user;
+    const html= `<a href='${baseUrl}?hash=${this.hash}' target="_blank">视频邀请，请点击 ${baseUrl}?hash=${this.hash}</a>`;    
+    const data = {
+      from_user: user_id,
+      to_user: parseInt(id),
+      content: html,
+    };
+    const ret = await request({
+      url: '/message',
+      method: 'post',
+      data,
+    });
+    if (ret.code) {
+      const msgEl = [...this.state.msgEl];
+      socket.emit('chatToOne', html, user_id, id);
+      msgEl.push(<div className="msginfo-right"  key={Math.random()} >
+      <div dangerouslySetInnerHTML={{ __html: html }}/>
+        <Link to={`/user-info/${user_id}`}>
+          <img src={avatar} className="avatar"/>
+        </Link>
+      </div>);
+      this.setState({
+        msgEl: msgEl,
+      }, () => {
+        this.msgBox.scrollTop = this.msgBox.scrollHeight;
+      });
+    }
+  }
+
+  handleVideo = () => {
+    this.hash = Math.random();
+    this.sendVideoUrl();
+    window.open(`${baseUrl}?hash=${this.hash}`);
+  }
+
   render() {
     const name = this.isGroup ? this.state.currentGroup.group_name : this.state.currentChatUser.username;
     const fontStyle = {fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'};
@@ -361,7 +401,7 @@ class ChatRoom extends React.Component {
         <div className="wordarea">
           <div className="toolbar is-clearfix">
             <Icon name="smile-o" size="medium" onClick={this.showEmoji}/>
-            <Icon name="folder-o" size="medium"/>
+            {!this.isGroup && <Icon name="camera-retro" size="medium" onClick={this.handleVideo}/>}
           </div>
           <Textarea ref={ref => { this.textarea = ref; }} className="textarea is-primary" html={this.state.html} onChange={this.handleChange} onKeyDown={this.sendMsg}/>
           <div className="room-bottom">

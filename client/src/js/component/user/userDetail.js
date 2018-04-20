@@ -94,8 +94,12 @@ class UserDetail extends React.Component {
       onOk: () => handleOk.call(this),
     });
     function handleOk() {
-      const { originPasswd, nowPasswd } = this.passwdMpdal.state;
-      if (originPasswd && originPasswd) {
+      const { originPasswd, nowPasswd, confirmPasswd } = this.passwdMpdal.state;
+
+      if (originPasswd !== confirmPasswd) {
+        toast.error("两次输入的新密码不一致", toastOption);
+      }
+      if (originPasswd && nowPasswd) {
         const user = {
           originPasswd,
           name: this.store.userInfo.username,
@@ -179,7 +183,7 @@ class UserDetail extends React.Component {
       label: t('User Name'),
       field: 'username',
       value: userInfo.username,
-      editable,
+      // editable,
     }, {
       label: t('Sex'),
       field: 'sex',

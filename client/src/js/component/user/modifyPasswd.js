@@ -11,6 +11,7 @@ export default class extends React.Component {
     this.state = {
       originPasswd: '',
       nowPasswd: '',
+      confirmPasswd: '',
     }
   }
 
@@ -24,7 +25,8 @@ export default class extends React.Component {
     return (
       <div>
         <Input label="原密码" name="originPasswd" handleChange={this.handleChange}/>
-        <Input label="新密码" name="nowPasswd" handleChange={this.handleChange}/>
+        <Input label="新密码" type="password" name="nowPasswd" handleChange={this.handleChange}/>
+        <Input label="确认新密码" type="password" name="confirmPasswd" handleChange={this.handleChange}/>
       </div>
     );
   }

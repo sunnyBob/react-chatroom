@@ -43,7 +43,11 @@ module.exports = function(router) {
       res.clearCookie('token');
       res.send("<script>window.location.href='/login'</script>")
     } else {
-      res.sendFile(path.resolve(__dirname, '../index.html'));
+      if (req.path === '/video.html') {
+        res.sendFile(path.resolve(__dirname, '../video.html'));
+      } else {
+        res.sendFile(path.resolve(__dirname, '../index.html'));
+      }
     }
     next();
   });
