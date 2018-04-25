@@ -26,6 +26,7 @@ export default {
       'Register': '注册',
       'Change Language': '切换语言',
       'New Chat': '创建群聊',
+      'No Data': '暂无数据',
     }
   }
 }

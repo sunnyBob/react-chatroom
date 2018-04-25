@@ -4,6 +4,7 @@ import { UserDetail } from './user';
 import Root from './root/root';
 import Card from './common';
 import Invitation from './invitation/invitation';
+import { GroupDetail } from './group';
 
 export {
   LoginReg,
@@ -12,4 +13,5 @@ export {
   Root,
   Card,
   Invitation,
+  GroupDetail,
 }

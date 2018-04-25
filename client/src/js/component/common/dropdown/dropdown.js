@@ -28,7 +28,7 @@ class Dropdown extends React.Component {
           return !!(this.compareDocumentPosition(arg) & 16)
         }
       }
-      if (!_con.contains(e.target)){
+      if (_con && !_con.contains(e.target)){
         this.setState({
           isShow: false,
         });

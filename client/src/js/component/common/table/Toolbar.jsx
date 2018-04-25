@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
 import { trim } from 'lodash';
-import { Menu, Menus, Dropdown, Icon } from '../../index';
-
+import { Menu, Menus, Dropdown, Icon } from '../';
 class Toolbar extends React.Component {
   static propTypes = {
     hasRefresh: PropTypes.bool,
@@ -31,6 +30,7 @@ class Toolbar extends React.Component {
   constructor(props) {
     super(props);
 
+    console.log(props);
     this.state = {
       columns: [],
       leftItems: [],
@@ -186,7 +186,6 @@ class Toolbar extends React.Component {
     const { items, hasSearch, hasRefresh, hasColumnsControl, showFilter } = this.props;
     const leftItems = [];
     const rightItems = [];
-
     items.forEach(item => {
       if (Object.prototype.hasOwnProperty.call(item, 'content')) {
         item.align === 'right' ? rightItems.push(item.content) : leftItems.push(item.content);

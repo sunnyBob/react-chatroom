@@ -220,7 +220,7 @@ class UserDetail extends React.Component {
         </div>
       ),
       colSpan: 3,
-    }]
+    }];
     return (
       <div>
         <header className="detail-header">

@@ -194,6 +194,7 @@ export default class LoginReg extends React.Component {
                   <label className="label is-small">Sex</label>
                   <RadioGroup
                     name="sex"
+                    value={t('Male')}
                     options={[{
                       label: 'male',
                       value: t('Male')

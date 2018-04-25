@@ -27,12 +27,13 @@ module.exports = function(router) {
 
   //group
   router.get('/api/group', ctrl.getGroupInfo);
+  router.delete('/api/group', ctrl.delGroupMem);
   router.post('/api/group', ctrl.createGroup);
   router.post('/api/group/join', ctrl.joinGroup);
   router.post('/api/group/invite', ctrl.inviteToGroup);
 
   //user_group
-  router.get('/api/user_group', ctrl.getUserOrGroup)
+  router.get('/api/user_group', ctrl.getUserOrGroup);
 
   //sign out
   router.get('/api/signout', ctrl.signOut);
@@ -41,7 +42,7 @@ module.exports = function(router) {
     const token = req.cookies && req.cookies.token || '';
     if (req.path !== '/login' && !tokenChecker(token)) {
       res.clearCookie('token');
-      res.send("<script>window.location.href='/login'</script>")
+      res.send("<script>window.location.href='/login'</script>");
     } else {
       if (req.path === '/video.html') {
         res.sendFile(path.resolve(__dirname, '../video.html'));

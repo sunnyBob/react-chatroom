@@ -16,7 +16,7 @@ class FriendList extends React.Component {
 
   render() {
     const { friendsList = [] } = this.props;
-    const pathname = window.location.pathname
+    const pathname = window.location.pathname;
     return (
       <Menus label={t('My Friends')} isSub={true} selected={true}>
         {
@@ -26,7 +26,7 @@ class FriendList extends React.Component {
               attachEl={
                 <span className="avatar-wrap" data-status={friend.status}><img src={friend.avatar} className="avatar"/></span>
               }
-              isActive={parseInt(pathname.split('/').reverse()[0], 10) === friend.id}
+              isActive={parseInt(pathname.split('/').reverse()[0], 10) === friend.id && pathname.split('/').reverse()[1] === 'chat'}
               key={friend.id}
             >
               {friend.username}

@@ -222,13 +222,18 @@ exports.joinGroup = async (req, res) => {
 };
 
 exports.getGroupInfo = async (req, res) => {
-  const { id, userId, groupId, type } = req.query;
-  const ret = await groupService.getGroupInfo(id, userId, groupId, type);
+  const { id, userId, groupId, type, userName, limit, offset } = req.query;
+  const ret = await groupService.getGroupInfo(id, userId, groupId, type, userName, limit, offset);
 
   if (Array.isArray(ret)) {
-    res.sendData('1', ret, '查询成功');
+    if (type === '4') {
+      const count = ret.pop();
+      res.send({code: '1', retList: ret, total: userName ? ret.length : count['count(1)'], message: 'success'});
+    } else {
+      res.sendData('1', ret, '查询成功');
+    }
   } else {
-    res.sendData('0', ret, '查询失败');
+    res.sendData('0', [], '查询失败');
   }
 };
 
@@ -241,6 +246,12 @@ exports.inviteToGroup = async (req, res) => {
   } else {
     res.sendData('0', ret, '加入群聊失败');
   }
+}
+
+exports.delGroupMem = async (req, res) => {
+  const { ids, groupId, groupName } = req.body;
+  const ret = await groupService.deleteFromGroup(ids, groupId, groupName);
+  res.sendData(ret);
 }
 
 //userOrGroup

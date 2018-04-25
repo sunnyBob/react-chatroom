@@ -6,7 +6,7 @@ import request from '../../utils/request';
 import UserInfo from './userInfo';
 import FriendList from './friendList';
 import UserGroupList from './userGroupList';
-import GroupList from './groupList';
+import { GroupList } from '../group';
 import { ToastContainer, toast } from 'react-toastify';
 import CreateGroup from './createGroup';
 import '../../../local';
@@ -91,7 +91,7 @@ class Root extends React.Component {
           id: this.user.user_id,
         }
       }).then(resp => {
-        if (resp.code === 1) {
+        if (resp.code === '1') {
           location.reload();
           socket.emit('updateStatus', this.user.user_id);
         }

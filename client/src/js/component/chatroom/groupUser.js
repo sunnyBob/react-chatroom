@@ -1,10 +1,8 @@
 import React from 'react';
-import { Link, browserHistory } from 'react-router';
+import { Link } from 'react-router';
 import { inject, observer } from 'mobx-react';
-import { Icon, PopoverManager, Tab, TabItem, ModalManager } from '../common';
+import { ModalManager } from '../common';
 import request from '../../utils/request';
-import commonUtils from '../../utils/commonUtils';
-import Textarea from 'react-contenteditable';
 import { toast } from 'react-toastify';
 import CreateGroup from '../root/createGroup';
 
@@ -82,7 +80,7 @@ export default class extends React.Component {
         {
           this.store.groupUser.map(user => (
             <li className="group-user-li" key={user.id}>
-              <img className="avatar" src={user.avatar}/>
+              <Link to={`/user-info/${user.id}`}><img className="avatar" src={user.avatar}/></Link>
               <div  className="name">
                 {user.username}
               </div>

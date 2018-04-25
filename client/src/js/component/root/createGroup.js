@@ -45,9 +45,9 @@ class CreateGroup extends React.Component {
       <ul className="friend-ul">
         {
           toJS(data).length ? toJS(data).map(friend => (
-            <li key={friend.id} style={{background: friend.group_id == groupId ? '#f0f0f0' : ''}}>
+            <li key={friend.id} style={{ background: friend.group_id && (friend.group_id == groupId) ? '#f0f0f0' : '' }}>
               <span>
-                <input type="checkbox" disabled={friend.group_id == groupId} onChange={this.handleCheck} name={friend.username} id={friend.friend_id == this.userId ? friend.user_id.toString() : friend.friend_id.toString()}/>
+                <input type="checkbox" disabled={friend.group_id && (friend.group_id == groupId)} onChange={this.handleCheck} name={friend.username} id={friend.friend_id == this.userId ? friend.user_id.toString() : friend.friend_id.toString()}/>
               </span>
               <span className="avatar-wrap">
                 <img src={friend.avatar} className="avatar"/>
@@ -55,7 +55,7 @@ class CreateGroup extends React.Component {
               <span>{friend.username}</span>
             </li>
           )) : (
-            <li>暂无数据</li>
+            <li>{t('No Data')}</li>
           )
         }
       </ul>
