@@ -46,7 +46,7 @@
     }
   }
   .message {
-    height: 410px;
+    height: 420px;
     margin: 0 !important;
     overflow: auto;
     padding: 10px 20px;
@@ -102,5 +102,39 @@
     span {
       margin-right: 5px;
     }
+  }
+}
+
+.sendFile {
+  margin-left: 2px;
+  position: relative;
+  display: inline-block;
+}
+
+.file-desc {
+  overflow: hidden;
+  progress {
+    border-radius: 4%;
+  }
+ 
+  progress::-webkit-progress-bar {
+      background-color: #d7d7d7;
+  }
+  
+  progress::-webkit-progress-value {
+      background-color: #aadd6a;
+  }
+  a {
+    color: #0f67ea !important;
+    font-weight: 500;
+  }
+  .column:first-child {
+    text-align: right;
+    display: flex;
+    align-items: center;
+  }
+  .file-size {
+    color: #e5e2e2;
+    font-weight: 500;
   }
 }

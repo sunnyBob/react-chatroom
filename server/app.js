@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const multer  = require('multer')
 const options = {
   key: fs.readFileSync('./cert/privatekey.pem'),
   cert: fs.readFileSync('./cert/certificate.pem')
@@ -18,6 +19,34 @@ const io = require('socket.io')(https);
 const userSocket = {};
 const onlineUsers = {};
 let token = '';
+
+const createFolder = (folder) => { 
+  try{ 
+      fs.accessSync(folder);  
+  }catch(e){ 
+      fs.mkdirSync(folder); 
+  }   
+}; 
+const uploadFolder = './upload/'; 
+createFolder(uploadFolder); 
+const storage = multer.diskStorage({ 
+  destination: (req, file, cb) => { 
+    cb(null, uploadFolder);
+  }, 
+  filename: (req, file, cb) => { 
+    cb(null, file.originalname);   
+  } 
+}); 
+const upload = multer({ storage: storage }).single('file');
+app.post('/api/upload', function(req, res, next){
+  upload(req, res, (err) => {
+    if (err) {
+      return;
+    }
+    const file = req.file;
+    res.send({ code: '1', fileName: file.originalname }); 
+  })
+}); 
 
 app.use(express.static(path.join(__dirname, '..', 'client')));
 app.use(sendData);

@@ -1136,3 +1136,6 @@ body {
 .modal-container .modal-card-foot .button {
   font-size: 14px;
 }
+.fa-edit {
+  color: #bd5214;
+}

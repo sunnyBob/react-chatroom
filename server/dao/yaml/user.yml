@@ -9,10 +9,20 @@ findUserById:
   - where id = :id
 
 showFriend:
-  - select t.id, t.avatar, t.username, group_id, t.friend_id, t.user_id from (select u.id, u.avatar, u.username, f.user_id, f.friend_id from friend as f, user as u
+  - select u.id, u.avatar, u.username, u.status, f.user_id, f.friend_id from friend as f, user as u
+  - where (f.user_id = :userId and f.friend_id = u.id)
+  - or (f.friend_id = :userId and f.user_id = u.id)
+
+showFriendNotInGroup:
+  - select * from (
+  - select u.id, u.avatar, u.username, f.user_id, f.friend_id from friend as f, user as u
+  - where (f.user_id = :userId and f.friend_id = u.id)
+  - or (f.friend_id = :userId and f.user_id = u.id)) t1
+  - where t1.id not in (
+  - select distinct t.id from (select u.id, u.avatar, u.username, f.user_id, f.friend_id from friend as f, user as u
   - where (f.user_id = :userId and f.friend_id = u.id)
   - or (f.friend_id = :userId and f.user_id = u.id)) t left join user_group
-  - on t.friend_id = user_group.user_id
+  - on (t.friend_id = user_group.user_id or t.user_id = user_group.user_id) and user_group.group_id = :groupId)
 
 delFriend:
   - delete from friend

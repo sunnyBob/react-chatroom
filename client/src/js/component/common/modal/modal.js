@@ -142,7 +142,7 @@ class Modal extends React.Component {
         headerEl = (
           <header className="modal-card-head">
             <p className="modal-card-title">{title}</p>
-            {closable ? <span className="close" onClick={this.handleClose}>×</span> : null}
+            {closable ? <span className="times" onClick={this.handleClose}>×</span> : null}
           </header>
         );
       }

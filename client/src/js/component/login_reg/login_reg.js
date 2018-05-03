@@ -17,7 +17,7 @@ export default class LoginReg extends React.Component {
       password: '',
       repassword: '',
       age: 0,
-      sex: null,
+      sex: 'male',
       email: null,
       phone: null,
     };
@@ -40,6 +40,14 @@ export default class LoginReg extends React.Component {
 
   handleLogin = async () => {
     const { name, passwd } = this.state;
+    if (!name) {
+      toast.error('用户名不能为空', toastOption);
+      return;
+    }
+    if (!passwd) {
+      toast.error('密码不能为空', toastOption);
+      return;
+    }
     const ret = await request({
       url: '/login',
       data: {
@@ -63,8 +71,28 @@ export default class LoginReg extends React.Component {
 
   handleReg = async () => {
     const { username, password, repassword, age, phone, email, sex } = this.state;
+    if (!username) {
+      toast.error('用户名不能为空', toastOption);
+      return;
+    }
+    if (!(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/).test(password)) {
+      toast.error('密码必须是8-16位数字和字母的组合', toastOption);
+      return;
+    }
     if (password !== repassword) {
       toast.error('两次输入密码不一致', toastOption);
+      return;
+    }
+    if (age && !/^((1[0-1])|[1-9])?\d$/.test(age)) {
+      toast.error('年龄格式不正确', toastOption);
+      return;
+    }
+    if (phone && !/^1[34578]\d{9}$/.test(phone)) {
+      toast.error('手机号格式不正确', toastOption);
+      return;
+    }   
+    if (email.trim() && !/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/.test(email)) {
+      toast.error('邮箱格式不正确', toastOption);
       return;
     }
     const ret = await request({
@@ -118,9 +146,9 @@ export default class LoginReg extends React.Component {
       password: '',
       repassword: '',
       age: 0,
-      sex: null,
-      email: null,
-      phone: null,
+      sex: '',
+      email: '',
+      phone: '',
     })
   }
 

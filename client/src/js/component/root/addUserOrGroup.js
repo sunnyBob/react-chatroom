@@ -129,7 +129,7 @@ class AddUsrGroup extends React.Component {
           <p className="control has-icons-left has-icons-right">
             <input placeholder={t('Enter Id')} className="input is-small is-info search" name="userId" ref={ref => { this.input = ref }} />
             <Icon name="search" className="is-left" />
-            <Icon name="close" className="is-right" onClick={this.clear} />
+            <Icon name="times" className="is-right" onClick={this.clear} />
           </p>
         </div>
         <div className="search-btn">

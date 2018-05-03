@@ -31,7 +31,7 @@ export default class extends React.Component {
 
   fetchData = () => {
     this.store.getGroupUser('', this.props.groupId);
-    this.store.getFriends(this.user.user_id);
+    this.store.getFriends(this.user.user_id, this.props.groupId);
   }
 
   handleSelectedChange = (selectedFriends) => {
@@ -43,7 +43,7 @@ export default class extends React.Component {
   addGroupUser = () => {
     const groupId = this.props.groupId;
     ModalManager.open({
-      title: '邀请好友(灰色不可选)',
+      title: '邀请好友',
       content: <CreateGroup
         friendsList={this.store.friendsInfo}
         handleSelectedChange={this.handleSelectedChange}

@@ -184,7 +184,7 @@ class Root extends React.Component {
       handleClick: this.handleAddGroup,
     }, {
       content: t('Sign Out'),
-      icon: 'sign-out',
+      icon: 'sign-out-alt',
       handleClick: this.handleSignOut,
     }];
     const child = React.Children.only(this.props.children);

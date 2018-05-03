@@ -15,7 +15,7 @@ const routeConfig = [
       ]},
       { path: 'invitations', component: Invitation },
       { path: '/group', component: ChatRoom, childRoutes: [
-        {path: '/group-chat/:id', component: ChatRoom },
+        { path: '/group-chat/:id', component: ChatRoom },
       ]},
     ]
   }

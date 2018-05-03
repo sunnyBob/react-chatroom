@@ -25,10 +25,10 @@ export default class RootStore {
   }
 
   @action
-  getFriends(userId) {
+  getFriends(userId, groupId) {
     request({
       url: '/friends',
-      data: { userId },
+      data: { userId, groupId },
     }).then((resp) => {
       if (Array.isArray(resp.retList)) {
         this.friendsInfo = resp.retList;

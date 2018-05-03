@@ -225,7 +225,7 @@ class UserDetail extends React.Component {
       <div>
         <header className="detail-header">
           <p className="detail-header-title">个人主页</p>
-          <Icon name="close" onClick={this.handleClose}/>
+          <Icon name="times" onClick={this.handleClose}/>
         </header>
         <div className="info-top">
           <img src={userInfo.avatar}/>

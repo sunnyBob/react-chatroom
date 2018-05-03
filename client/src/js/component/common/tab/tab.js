@@ -22,8 +22,6 @@ class Tab extends Component {
     const tab = [];
     let content = [];
     React.Children.forEach(this.props.children, (tabItem, index) => {
-      console.log("index", index);
-      console.log("this.state.index",this.state.index);
       tab.push(React.cloneElement(
         tabItem,
         {isActive: this.state.index === index, key: index, index, handleClick: this.handleClick},

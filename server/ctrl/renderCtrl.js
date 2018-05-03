@@ -2,9 +2,8 @@ const { userService, msgService, inviteService, groupService, userOrGroupSerice 
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwtConfig');
-const bcrypt = require('bcrypt');
-
-const saltRounds = 10;
+const bcrypt = require('bcryptjs');
+const salt = bcrypt.genSaltSync(10);
 
 exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
@@ -51,7 +50,7 @@ exports.addUser = async (req, res) => {
   if (searchRet.length && searchRet[0].id) {
     res.sendData('5000', '用户名已经被占用');
   } else {
-    const hash = bcrypt.hashSync(password, saltRounds);
+    const hash = bcrypt.hashSync(password, salt);
     const user = {
       username,
       password: hash,
@@ -99,8 +98,8 @@ exports.updateUserInfo = async (req, res) => {
 
 //friend
 exports.showFriends = async (req, res) => {
-  const { userId } = req.query;
-  const ret = await userService.findFriend(userId);
+  const { userId, groupId } = req.query;
+  const ret = await userService.findFriend(userId, groupId);
   if (Array.isArray(ret)) {
     res.sendData(1, ret, 'success');
   } else {

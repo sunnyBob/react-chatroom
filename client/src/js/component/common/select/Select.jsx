@@ -180,7 +180,7 @@ class Select extends React.Component {
           />
           {this.state.searched ? (
             <span className="icon is-small is-right" onClick={this.handleClearSearch}>
-              <Icon name="remove"/>
+              <Icon name="times"/>
             </span>
           ) : (
             <span className="icon is-small is-right" onClick={this.handleSearch}>

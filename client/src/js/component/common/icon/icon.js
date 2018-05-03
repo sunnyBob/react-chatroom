@@ -4,20 +4,22 @@ import classNames from 'classnames';
 
 class Icon extends React.Component {
   static propTypes = {
-    prefix: PropTypes.string,
+    prefix1: PropTypes.string,
+    prefix2: PropTypes.string,
     name: PropTypes.string,
     size: PropTypes.string,
     className: PropTypes.string,
   };
 
   static defaultProps = {
-    prefix: 'fa',
+    prefix1: 'fa',
+    prefix2: 'fa',
     size: 'small',
   };
 
   render() {
-    const { prefix, name, size, className } = this.props;
-    const classes = `${prefix} ${prefix}-${name}`;
+    const { prefix1, prefix2, name, size, className } = this.props;
+    const classes = `${prefix1} ${prefix2}-${name}`;
     let fa = '';
     if (size === 'small') {
       fa = '1x';

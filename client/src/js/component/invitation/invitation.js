@@ -177,7 +177,7 @@ class Invitation extends React.Component {
       <div>
         <header className="detail-header">
           <p className="detail-header-title">申请列表</p>
-          <Icon name="close" onClick={this.handleClose} />
+          <Icon name="times" onClick={this.handleClose} />
         </header>
         <div className="invitation-btns">
           <a onClick={this.handleToggle} className="button is-primary is-small">好友申请</a>

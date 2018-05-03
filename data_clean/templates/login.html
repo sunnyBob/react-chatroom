@@ -1,0 +1,20 @@
+{% extends './common/layout.html' %}
+{% block title %}管理员登录{% endblock %}
+{% block body %}
+
+  <div class="login">
+    <h1>{{ title }}</h1>
+    <form method="post">
+      <div>
+          <label>account</label>
+          <input type=text name=username>
+      </div>
+      <div>
+          <label>password</label>
+          <input type=text name=password>
+      </div>
+      <p><input type=submit value=Login>
+    </form>
+  </div>
+
+{% endblock %}

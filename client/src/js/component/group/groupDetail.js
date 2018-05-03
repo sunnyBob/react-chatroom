@@ -62,7 +62,6 @@ class GroupDetail extends React.Component {
   render() {
     const { group, modal } = this.props;
     const countInfo = this.state.countInfo;
-    console.log("detail", countInfo);
     return (
       <div className="group-detail">
         <div className="group-lt">

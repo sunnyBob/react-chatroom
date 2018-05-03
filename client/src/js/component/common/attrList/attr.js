@@ -43,10 +43,10 @@ class Attr extends React.Component {
     const {field} = item;
     const status = this.state[field] || 'edit';
     const value = keyVlaue[field] || t('No Data');
-    return status === 'edit' ? <Icon name="pencil-square-o" className="attr-opt" onClick={this.handleEdit.bind(this, field, value)}/>
+    return status === 'edit' ? <Icon name="edit" className="attr-opt" onClick={this.handleEdit.bind(this, field, value)}/>
     : (
       <span>
-        <Icon name="close" className="attr-opt" onClick={this.handleCancel.bind(this, field, value)}/>
+        <Icon name="times" className="attr-opt" onClick={this.handleCancel.bind(this, field, value)}/>
         <Icon name="check" className="attr-opt" onClick={this.handleOk.bind(this, field, value)}/>
       </span>
     );

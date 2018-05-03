@@ -1,6 +1,7 @@
 const path = require('path');
 const ctrl = require('../ctrl/renderCtrl');
 const tokenChecker = require('../utils/tokenChecker');
+const fs = require('fs');
 
 module.exports = function(router) {
   router.get('/api/login', ctrl.findUser);
@@ -9,7 +10,6 @@ module.exports = function(router) {
   router.get('/api/friends', ctrl.showFriends);
   router.post('/api/friends', ctrl.addFriend);
   router.delete('/api/friends', ctrl.deleteFriend);
-
 
   //user
   router.get('/api/user', ctrl.findUserById);
@@ -38,14 +38,41 @@ module.exports = function(router) {
   //sign out
   router.get('/api/signout', ctrl.signOut);
 
+  //download
+  router.get('/download', (req, res, next) => {
+    const fileName = req.query.name,
+      currFile = path.join( __dirname, '/../upload/',fileName);
+    let fReadStream;
+    fs.exists(currFile, function(exist) {
+      if(exist){
+        res.set({
+            "Content-type":"application/octet-stream",
+            "Content-Disposition":"attachment;filename="+encodeURI(fileName)
+        });
+        fReadStream = fs.createReadStream(currFile);
+        fReadStream.on("data",(chunk) => res.write(chunk,"binary"));
+        fReadStream.on("end",function () {
+            res.end();
+        });
+      }else{
+        res.set("Content-type","text/html");
+        res.send("file not exist!");
+        res.end();
+      }
+    });
+  });
+
   router.get('*', (req, res, next) => {
     const token = req.cookies && req.cookies.token || '';
+    console.log(req.path);
     if (req.path !== '/login' && !tokenChecker(token)) {
       res.clearCookie('token');
       res.send("<script>window.location.href='/login'</script>");
     } else {
       if (req.path === '/video.html') {
         res.sendFile(path.resolve(__dirname, '../video.html'));
+      } else if(/^\/upload\/*/.test(req.path)) {
+        res.send({ code: '1' });
       } else {
         res.sendFile(path.resolve(__dirname, '../index.html'));
       }

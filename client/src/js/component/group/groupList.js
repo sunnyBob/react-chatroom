@@ -34,12 +34,14 @@ class GroupList extends React.Component {
             <Menu
               onClick={this.handleClick.bind(this, group)}
               attachEl={
-                <span className="avatar-wrap" onClick={this.viewDetail.bind(this, group)}><img src={group.group_avatar} className="avatar"/></span>
+                <span className="avatar-wrap column" onClick={this.viewDetail.bind(this, group)}><img src={group.group_avatar} className="avatar"/></span>
               }
               isActive={parseInt(pathname.split('/').reverse()[0], 10) === group.id && pathname.split('/').reverse()[1] === 'group-chat'}
               key={group.id}
+              className="columns is-gapless"
             >
-              {group.group_name}
+              <span className="column is-8">{group.group_name}</span>
+              <span className="column is-1"><i className="fa fa-comment"></i></span>
             </Menu>
           ))
         }

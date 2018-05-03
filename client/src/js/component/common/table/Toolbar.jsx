@@ -206,7 +206,7 @@ class Toolbar extends React.Component {
           />
           {this.state.searched ? (
             <span className="icon is-small is-right" onClick={this.handleClearSearch}>
-              <Icon name="remove"/>
+              <Icon name="times"/>
             </span>
           ) : (
             <span className="icon is-small is-right" onClick={this.handleSearch}>
@@ -220,7 +220,7 @@ class Toolbar extends React.Component {
     const refreshBtn = hasRefresh ? (
       <div className="level-item">
         <a className="button is-light" onClick={this.handleRefresh}>
-          <Icon name="refresh"/>
+          <Icon name="sync"/>
         </a>
       </div>
     ) : null;
