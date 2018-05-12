@@ -3,6 +3,7 @@ const userService = require('./index');
 
 exports.getGroupInfo = async (id, userId, groupId, type, userName, limit = '10', offset = '0') => {
   if (id || type === '1') {
+    console.log("id",id, "   userId:", userId)
     const ret = await dao.query('groups.findGroup', { id, userId });
     return ret;
   } else if (type === '2') {
@@ -29,9 +30,26 @@ exports.getGroupInfo = async (id, userId, groupId, type, userName, limit = '10',
       after90Count: after90Count[0]['count(1)'],
     }];
   } else if (type === '7') {
-    const ret = await dao.query('groups.findCreaterOrManager', { userId, groupId });
-
-    return ret;
+    const creater = await dao.query('groups.findCreater', { groupId });
+    const manager = await dao.query('groups.findGroupManager', { groupId, limit: parseInt(limit), offset: parseInt(offset) });
+    return [{
+      creater,
+      manager,
+    }];
+  } else if (type === '8') {
+    const groupMem = await dao.query('groups.findGroupOrdinary', { userId, groupId, limit: parseInt(limit), offset: parseInt(offset) });
+    const groupMemCount = await dao.query('groups.findGroupOrdinaryCount', { userId, groupId, limit: parseInt(limit), offset: parseInt(offset) });
+    return [{
+      ret: groupMem,
+      count: groupMemCount[0]['count(1)'],
+    }];
+  } else if (type === '9') {
+    const groupManager = await dao.query('groups.findGroupManager', { groupId, limit: parseInt(limit), offset: parseInt(offset) });
+    const groupManagerCount = await dao.query('groups.findGroupManagerCount', { groupId, limit: parseInt(limit), offset: parseInt(offset) });
+    return [{
+      ret: groupManager,
+      count: groupManagerCount[0]['count(1)'],
+    }];
   }
 }
 
@@ -60,7 +78,7 @@ exports.joinGroup = async (user_id, group_id) => {
   const groupName = group.group_name || '';
   const count = parseInt(groupName.match(/\d+/g)) + 1;
   const newGroupName = `${groupName.split('(')[0]}(${count})`;
-  await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
+  groupName.match(/\d+/g) && await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
   return ret;
 }
 
@@ -73,22 +91,50 @@ exports.inviteIntoGroup = async (users, group_id) => {
   users.forEach(async user_id => {
     await dao.insert('user_group', {user_id, group_id});
   });
-  const ret = await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
+  const ret = groupName.match(/\d+/g) && await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
 
-  return ret;
+  return ret || [];
 }
 
 exports.deleteFromGroup = async (ids, group_id, groupName) => {
+  const count = parseInt(groupName.match(/\d+/g)) - ids.length;
+  const userCount = await dao.query('groups.findGroupUsersCount', { groupId: group_id});
+  const newGroupName = `${groupName.split('(')[0]}(${count})`;
+  let removeGroup  = false;
+  if (userCount[0]['count(1)'] - 1 <= 2) {
+    await dao.del('groups', group_id, idKey='id');
+    removeGroup = true;
+  }
   ids.forEach(async user_id => {
     await dao.execute('groups.delMember', { user_id, group_id });
     await dao.execute('groups.delManager', { user_id, group_id });
   });
-
-  const count = parseInt(groupName.match(/\d+/g)) - ids.length;
-  const newGroupName = `${groupName.split('(')[0]}(${count})`;
-  const ret = await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
-  if (count == 2) {
-    await dao.del('groups', group_id, idKey='id');
+  const ret = groupName.match(/\d+/g) && await dao.update('groups', { group_name: newGroupName, id: group_id },  idKey = "id");
+  if (removeGroup) {
+    return [0];
+  } else {
+    return ret || [];
   }
+}
+
+exports.updateGroupInfo = async (id, announce, group_name, introduce, group_avatar) => {
+  const ret = await dao.update('groups', JSON.parse(JSON.stringify({ id, announce, group_name, introduce, group_avatar })), idKey="id")
+  return ret;
+}
+
+exports.removeGroup = async (id) => {
+  const ret = await dao.del('groups', id, idKey="id")
+  await dao.execute('groups.delMember', { group_id: id });
+  await dao.execute('groups.delManager', { group_id: id });
+  return ret;
+}
+
+exports.addManager = async (user_id, group_id) => {
+  const ret = await dao.insert('manager_group', { user_id, group_id });
+  return ret;
+}
+
+exports.delManager = async (user_id, group_id) => {
+  const ret = await dao.execute('groups.delManager', { user_id, group_id });
   return ret;
 }

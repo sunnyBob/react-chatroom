@@ -46,7 +46,7 @@ class ModalManager extends React.Component {
     props.wrapClass = 'modal-confirm borderless';
     if (!props.width) props.width = 400;
     if (!props.title) props.title = '提示';
-    this.open(props);
+    return this.open(props);
   }
 
   static alert(props) {

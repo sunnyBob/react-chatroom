@@ -30,7 +30,6 @@ class FriendList extends React.Component {
               key={friend.id}
             >
               {friend.username}
-              <i className="fa fa-comment" style={{ float: 'right', marginTop: '10px' }}></i>
             </Menu>
           ))
         }

@@ -2,10 +2,9 @@ import React from 'react';
 import { browserHistory } from 'react-router';
 import { inject, observer } from 'mobx-react';
 import Cropper from 'cropperjs';
-import { Card, ModalManager, AttrList, Icon } from '../common';
+import { Card, ModalManager, AttrList, Icon, UploadAvatar } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
-import UploadAvatar from './uploadAvatar';
 import ModifyPasswd from './modifyPasswd';
 import { toast } from 'react-toastify';
 

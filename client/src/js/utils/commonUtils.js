@@ -47,11 +47,10 @@ export default class {
     return resp.retList || [];
   }
 
-  static async isCreaterOrManager(userId, groupId, options = {}) {
+  static async findCreaterOrManager(groupId, options = {}) {
     const resp = await request({
       url: '/group',
       data: {
-        userId,
         groupId,
         type: '7',
       },
@@ -59,7 +58,7 @@ export default class {
   
     const isCreaterOrManager = resp.code == 1 && resp.retList.length;
     if (isCreaterOrManager) {
-      options.success && options.success(resp.retList);
+      options.success && options.success.call(this, resp.retList);
     } else {
       options.fail && options.fail();
     }

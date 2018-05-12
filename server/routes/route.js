@@ -28,12 +28,18 @@ module.exports = function(router) {
   //group
   router.get('/api/group', ctrl.getGroupInfo);
   router.delete('/api/group', ctrl.delGroupMem);
+  router.delete('/api/delgroup', ctrl.delGroup);
   router.post('/api/group', ctrl.createGroup);
   router.post('/api/group/join', ctrl.joinGroup);
   router.post('/api/group/invite', ctrl.inviteToGroup);
+  router.put('/api/group', ctrl.updateGroupInfo);
 
   //user_group
   router.get('/api/user_group', ctrl.getUserOrGroup);
+
+  //manager
+  router.post('/api/manager', ctrl.addManager);
+  router.delete('/api/manager', ctrl.delManager);
 
   //sign out
   router.get('/api/signout', ctrl.signOut);

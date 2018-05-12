@@ -22,9 +22,9 @@ let token = '';
 
 const createFolder = (folder) => { 
   try{ 
-      fs.accessSync(folder);  
+    fs.accessSync(folder);  
   }catch(e){ 
-      fs.mkdirSync(folder); 
+    fs.mkdirSync(folder); 
   }   
 }; 
 const uploadFolder = './upload/'; 
@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
   } 
 }); 
 const upload = multer({ storage: storage }).single('file');
-app.post('/api/upload', function(req, res, next){
+app.post('/api/upload', function(req, res, next) {
   upload(req, res, (err) => {
     if (err) {
       return;
@@ -105,6 +105,16 @@ io.on('connection', (socket) => {
     });
 
     io.to(`room-${groupId}`).emit('updateGroupList');
+  });
+
+  socket.on('updateGroupList', groupId => {
+    io.to(`room-${groupId}`).emit('updateGroupList');
+  });
+
+  socket.on('updateMyGroupList', userId => {
+    if (userSocket.hasOwnProperty(userId)) {
+      userSocket[userId].emit('updateMyGroupList');
+    }
   });
 
   socket.on('updateGroupUser', (groupId) => {

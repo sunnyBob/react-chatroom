@@ -5,6 +5,8 @@ import sys
 import time
 from configparser import ConfigParser
 import threading
+import  pymysql
+import  pymysql.cursors
 
 cf = ConfigParser()
 path = '../server/upload'
@@ -33,13 +35,17 @@ def logout():
 
 @app.route('/clean', methods=['POST'])
 def clean():
-    print(request.form)
-    cf.set('clean', 'expired', request.form['file_time'])
-    cf.set('clean', 'expired_unit', request.form['file_time_unit'])
-    f = open(confFilePath ,'w')
-    cf.write(f)
-    f.close()
-    return '应用成功'
+    if request.form['file_time']:
+        cf.set('file', 'expired', request.form['file_time'])
+        cf.set('file', 'expired_unit', request.form['file_time_unit'])
+    if request.form['msg_time']:
+        cf.set('message', 'expired', request.form['msg_time'])
+        cf.set('message', 'expired_unit', request.form['msg_time_unit'])
+    if request.form['file_time'] or request.form['msg_time']:
+        f = open(confFilePath ,'w')
+        cf.write(f)
+        f.close()
+    return "配置成功"
 
 def delDir(dir,t):
     files = os.listdir(dir)
@@ -48,8 +54,7 @@ def delDir(dir,t):
         if os.path.isfile(filePath):
             last = int(os.stat(filePath).st_mtime)
             now = int(time.time())
-            print()
-            if (now - last >= t):
+            if (now - last >= int(t)):
                 os.remove(filePath)
                 print(filePath + " was removed!")
         elif os.path.isdir(filePath):
@@ -58,26 +63,65 @@ def delDir(dir,t):
                 os.rmdir(filePath)
                 print(filePath + " was removed!")
 
+def delMsg(t):
+    host = cf.get('mysql', 'host')
+    user = cf.get('mysql', 'user')
+    password = cf.get('mysql', 'password')
+    db = cf.get('mysql', 'db')
+    port = cf.get('mysql', 'port')
+    charset = cf.get('mysql', 'charset')
+    connection=pymysql.connect(host=host,
+                           user=user,
+                           password=password,
+                           db=db,
+                           port=int(port),
+                           charset=charset)
+    try:
+        with connection.cursor() as cursor:
+            sql='delete from message where now() - createTime >= %d' %t
+            count=cursor.execute(sql)
+            if count >= 1:
+                print("删除消息数量： "+str(count))
+            connection.commit()
+    finally:
+        connection.close()
+
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
-def circleRun():
+def fileRun():
     while True:
         cf.read(confFilePath)
-        times = cf.get('clean', 'expired')
-        unit = cf.get('clean', 'expired_unit')
-        print(times)
-        if unit == 's':
-            delDir(path, times)
-        if unit == 'm':
-            delDir(path, times * 60)
-        if unit == 'h':
-            delDir(path, times * 3600)
-        if unit == 'd':
-            delDir(path, times * 3600 * 24)
-        time.sleep(60)
+        times = cf.get('file', 'expired')
+        unit = cf.get('file', 'expired_unit')
+        if unit == "s":
+            delDir(path, int(times))
+        if unit == "m":
+            delDir(path, int(times) * 60)
+        if unit == "h":
+            delDir(path, int(times) * 3600)
+        if unit == "d":
+            delDir(path, int(times) * 3600 * 24)
+        time.sleep(6)
+def msgRun():
+    while True:
+        cf.read(confFilePath)
+        times = cf.get('message', 'expired')
+        unit = cf.get('message', 'expired_unit')
+        if unit == "s":
+            delMsg(int(times))
+        if unit == "m":
+            delMsg(int(times) * 60)
+        if unit == "h":
+            delMsg(int(times) * 3600)
+        if unit == "d":
+            delMsg(int(times) * 3600 * 24)
+        time.sleep(6)
 
 if __name__ == '__main__':
-    t1 = threading.Thread(target=circleRun, args=())
-    t2 = threading.Thread(target=app.run, args=())
+    t1 = threading.Thread(target=app.run)
+    t2 = threading.Thread(target=fileRun, args=())
+    t3 = threading.Thread(target=msgRun, args=())
+
     t1.start()
     t2.start()
+    t3.start()

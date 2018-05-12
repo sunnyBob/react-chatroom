@@ -253,6 +253,26 @@ exports.delGroupMem = async (req, res) => {
   res.sendData(ret);
 }
 
+exports.updateGroupInfo = async (req, res) => {
+  const { groupId, announce, group_name, introduce, group_avatar } = req.body;
+  const ret = await groupService.updateGroupInfo(groupId, announce, group_name, introduce, group_avatar);
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '修改成功');
+  } else {
+    res.sendData('0', ret, '修改失败');
+  }
+}
+
+exports.delGroup = async (req, res) => {
+  const { groupId } = req.body;
+  const ret = await groupService.removeGroup(groupId);
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '删除成功');
+  } else {
+    res.sendData('0', ret, '删除失败');
+  }
+}
+
 //userOrGroup
 exports.getUserOrGroup = async (req, res) => {
   const { userId, name } = req.query;
@@ -269,4 +289,27 @@ exports.getUserOrGroup = async (req, res) => {
 exports.signOut = async (req, res) => {
   res.clearCookie('token');
   res.sendData('1', '登出成功');
+};
+
+
+//manager
+exports.addManager = async (req, res) => {
+  const { userId, groupId } = req.body;
+  const ret = await groupService.addManager(userId, groupId);
+
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '设置管理员成功');
+  } else {
+    res.sendData('0', ret, '设置管理员失败');
+  }
+};
+
+exports.delManager = async (req, res) => {
+  const { userId, groupId } = req.body;
+  const ret = await groupService.delManager(userId, groupId);
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '取消管理员成功');
+  } else {
+    res.sendData('0', ret, '取消管理员失败');
+  }
 };

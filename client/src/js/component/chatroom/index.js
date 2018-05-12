@@ -541,7 +541,7 @@ class ChatRoom extends React.Component {
           </div>
           <Textarea ref={ref => { this.textarea = ref; }} className="textarea is-primary" html={this.state.html} onChange={this.handleChange} onKeyDown={this.sendMsg}/>
           <div className="room-bottom">
-            <span>『按ctrl/cmd + enter组合键发送』</span>
+            <span>『按Ctrl/Cmd + Enter组合键发送』</span>
             <button className="button is-small" onClick={this.sendMsg}>{t('Send')}</button>
           </div>
         </div>

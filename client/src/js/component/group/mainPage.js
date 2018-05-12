@@ -8,27 +8,31 @@ import {AttrList} from '../common';
 
 @observer
 class MainPage extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.store = new RootStore();
-  }
-
-  componentDidMount() {
-    this.fetchData();
-  }
-
-  fetchData() {
-    const group = this.props.group;
-    this.store.getGroupUser('', group.id);
+  handleEdit = (data, cb) => {
+    data.groupId = this.props.group.id;
+    request({
+      url: '/group',
+      method: 'put',
+      data,
+    }).then(resp => {
+      if (resp.code === '1') {
+        cb();
+        this.props.fetchData();
+        socket.emit('updateGroupList', this.props.group.id);
+      }
+    });
   }
 
   render() {
     const { count, maleCount, after90Count } = this.props.countInfo;
-    const { announce, instroduce, group_name} = this.props.group;
-    const { isCreater, isManager } = this.props;
+    const { announce, introduce, group_name} = this.props.group;
+    const { isCreater, isManager, creater } = this.props;
 
     const attrList = [{
+      label: t('群主'),
+      value: creater.username,
+      colSpan: 3,
+    }, {
       label: t('群名称'),
       field: 'group_name',
       value: group_name,
@@ -42,8 +46,8 @@ class MainPage extends React.Component {
       editable: isCreater || isManager,
     }, {
       label: t('群公告'),
-      field: 'instroduce',
-      value: instroduce,
+      field: 'introduce',
+      value: introduce,
       editable: true,
       colSpan: 3,
       editable: isCreater || isManager,
@@ -51,7 +55,7 @@ class MainPage extends React.Component {
 
     return (
       <div className="main-page">
-        <AttrList attrList={attrList} wrapClass="group-attr"/>
+        <AttrList attrList={attrList} wrapClass="group-attr" handleEdit={this.handleEdit}/>
         <div>
           <label className="attr-label">成员分布</label>
           <div className="columns">

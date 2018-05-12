@@ -24,6 +24,7 @@ class DataTable extends React.Component {
   fetchData = (params) => {
     request(params).then(resp => {
       if (resp.code === '1') {
+        this.props.convertParms && (resp = this.props.convertParms(resp));
         this.setState({ data: resp.retList, total: resp.total });
       }
     });

@@ -37,6 +37,42 @@ findGroupUser:
   - limit :limit
   - offset :offset
 
+findGroupOrdinary:
+    - select * from (
+    - SELECT `user`.*
+    - FROM user, user_group
+    - WHERE user_group.group_id = :groupId
+    - AND user_group.user_id = `user`.id) group_user
+    - where group_user.id not in (select `user`.id from user, manager_group where manager_group.user_id = `user`.id and manager_group.group_id = :groupId)
+    - if:
+        test: :userId
+        sql: and id != :userId
+    - limit :limit
+    - offset :offset
+
+findGroupOrdinaryCount:
+  - select count(1) from (
+  - SELECT `user`.*
+  - FROM USER, user_group
+  - WHERE user_group.group_id = :groupId
+  - AND user_group.user_id = `user`.id) group_user
+  - where group_user.id not in (select `user`.id from user, manager_group where manager_group.user_id = `user`.id and manager_group.group_id = :groupId)
+  - if:
+      test: :userId
+      sql: and id != :userId
+
+findGroupManager:
+  - select user.* from user, manager_group
+  - where manager_group.user_id = `user`.id
+  - and manager_group.group_id = :groupId
+  - limit :limit
+  - offset :offset
+
+findGroupManagerCount:
+  - select count(1) from user, manager_group
+  - where manager_group.user_id = `user`.id
+  - and manager_group.group_id = :groupId
+
 findManageGroups:
   - select groups.* from groups left join manager_group
   - on groups.id = manager_group.group_id
@@ -60,14 +96,26 @@ findAfter90Count:
   - where u.group_id = g.id and user.id = u.user_id
   - and u.group_id = :groupId and user.age between 19 and 28
 
-findCreaterOrManager:
-  - select g.create_user_id, m.group_id manager_id from groups g LEFT JOIN manager_group m on g.id = m.group_id
-  - and ((g.create_user_id = :userId and g.id = :groupId) or (m.user_id = :userId and m.group_id = :groupId))
+findCreater:
+  - select user.* from groups, user
+  - where groups.create_user_id = user.id and groups.id = :groupId
 
 delMember:
   - delete from user_group
-  - where user_id = :user_id and group_id = :group_id
+  - where 1 = 1
+  - if:
+      test: :user_id
+      sql: and user_id = :user_id
+  - if:
+      test: :group_id
+      sql: and group_id = :group_id
 
 delManager:
   - delete from manager_group
-  - where user_id = :user_id and group_id = :group_id
+  - where 1 = 1
+  - if:
+      test: :user_id
+      sql: and user_id = :user_id
+  - if:
+      test: :group_id
+      sql: and group_id = :group_id

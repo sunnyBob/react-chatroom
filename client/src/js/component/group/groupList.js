@@ -3,6 +3,7 @@ import { browserHistory, Link } from 'react-router';
 import { toJS } from 'mobx';
 import GroupDetail from './groupDetail'
 import { Menu, Menus, Icon, ModalManager } from '../common';
+import request from '../../utils/request';
 
 class GroupList extends React.Component {
   handleClick(group, e) {
@@ -13,9 +14,34 @@ class GroupList extends React.Component {
     }
   }
 
+  handleRemoveGroup = (groupId) => {
+    this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
+    const modal = ModalManager.confirm({
+      content: '确定要解散该群吗？',
+      onOk: () => {
+        request({
+          url: '/delgroup',
+          method: 'delete',
+          data: {
+            groupId,
+          },
+        }).then(resp => {
+          ModalManager.close(modal);
+          ModalManager.close(this.groupModal);
+          if (resp.code === '1') {
+            socket.emit('updateMyGroupList', this.userId);
+            browserHistory.push('/chat');
+          } else {
+            toast.error('解散失败', toastOption);
+          }
+        });
+      }
+    });
+  }
+
   viewDetail(group) {
-    ModalManager.open({
-      content: <GroupDetail group={group}/>,
+    this.groupModal = ModalManager.open({
+      content: <GroupDetail groupId={group.id} handleRemoveGroup={this.handleRemoveGroup}/>,
       showHeader: false,
       showFooter: false,
       height: 500,
@@ -26,7 +52,7 @@ class GroupList extends React.Component {
 
   render() {
     const { groupList, label } = this.props;
-    const pathname = window.location.pathname
+    const pathname = window.location.pathname;
     return (
       <Menus label={label} isSub={true}>
         {
@@ -34,14 +60,12 @@ class GroupList extends React.Component {
             <Menu
               onClick={this.handleClick.bind(this, group)}
               attachEl={
-                <span className="avatar-wrap column" onClick={this.viewDetail.bind(this, group)}><img src={group.group_avatar} className="avatar"/></span>
+                <span className="avatar-wrap" onClick={this.viewDetail.bind(this, group)}><img src={group.group_avatar} className="avatar"/></span>
               }
               isActive={parseInt(pathname.split('/').reverse()[0], 10) === group.id && pathname.split('/').reverse()[1] === 'group-chat'}
               key={group.id}
-              className="columns is-gapless"
             >
-              <span className="column is-8">{group.group_name}</span>
-              <span className="column is-1"><i className="fa fa-comment"></i></span>
+              <span>{group.group_name}</span>
             </Menu>
           ))
         }

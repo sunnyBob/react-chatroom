@@ -9,25 +9,25 @@
           <legend>消息设置</legend>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label for="msg_time" class="label">过期时间</label>
+              <label for="msg_time" class="label">消息数据保留时长</label>
             </div>
             <div class="field-body">
               <div class="field is-narrow">
                 <div class="control">
-                  <input class="input is-small" id="msg_time" type="number" placeholder="Please input number">
+                  <input class="input is-small" id="msg_time" name="msg_time" type="number" placeholder="Please input number">
                 </div>
               </div>
             </div>
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label for="msg_time_unit" class="label">时间单位</label>
+              <label for="msg_time_unit" class="label">单位</label>
             </div>
             <div class="field-body">
               <div class="field is-narrow">
                 <div class="control">
                   <div class="select is-fullwidth">
-                    <select id="msg_time_unit">
+                    <select id="msg_time_unit" name="msg_time_unit">
                       <option value="s">秒</option>
                       <option value="m">分</option>
                       <option value="h">小时</option>
@@ -41,7 +41,7 @@
           <legend>文件设置</legend>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label for="file_time" class="label">过期时间</label>
+              <label for="file_time" class="label">文件保留时长</label>
             </div>
             <div class="field-body">
               <div class="field is-narrow">
@@ -53,7 +53,7 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label for="file_time_unit" class="label">时间单位</label>
+              <label for="file_time_unit" class="label">单位</label>
             </div>
             <div class="field-body">
               <div class="field is-narrow">
