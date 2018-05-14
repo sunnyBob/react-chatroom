@@ -62,10 +62,18 @@ export default class LoginReg extends React.Component {
         user_name: userName,
         avatar,
       };
-      localStorage.setItem('user', JSON.stringify(user));
-      this.updateStatus(userId);
-      socket.emit('login', userId);
-      browserHistory.replace('/chat');
+      const pageloader = document.getElementById("pageloader");
+      if (pageloader) {
+        pageloader.classList.toggle('is-active');
+        const pageloaderTimeout = setTimeout(() => {
+          pageloader.classList.toggle('is-active');
+          clearTimeout(pageloaderTimeout);
+          localStorage.setItem('user', JSON.stringify(user));
+          this.updateStatus(userId);
+          socket.emit('login', userId);
+          browserHistory.replace('/chat');
+        }, 3000);
+      }
     }
   }
 
@@ -119,6 +127,12 @@ export default class LoginReg extends React.Component {
     })
   }
 
+  handleSexChange = (value, name) => {
+    this.setState({
+      [name]: value,
+    })
+  }
+
   nameToImage = (name) => {
     const Initials = name.charAt(0);
     const fontSize = 60;
@@ -146,7 +160,7 @@ export default class LoginReg extends React.Component {
       password: '',
       repassword: '',
       age: 0,
-      sex: '',
+      sex: 'male',
       email: '',
       phone: '',
     })
@@ -162,7 +176,7 @@ export default class LoginReg extends React.Component {
             isCenter={true}
             handleClick={this.handleToggle}
           >
-            <TabItem icon='sign-in' content={t('Sign In')}>
+            <TabItem icon='sign-in-alt' content={t('Sign In')}>
               <div className="content">
                 <Input
                   placeholder="username"
@@ -222,15 +236,15 @@ export default class LoginReg extends React.Component {
                   <label className="label is-small">Sex</label>
                   <RadioGroup
                     name="sex"
-                    value={t('Male')}
+                    value='male'
                     options={[{
                       label: 'male',
-                      value: t('Male')
+                      value: 'male',
                     }, {
                       label: 'female',
-                      value: t('Female')
+                      value: 'female',
                     }]}
-                    onChange={this.handleChange}
+                    onChange={this.handleSexChange}
                   />
                 </div>
                 <Input
@@ -249,6 +263,9 @@ export default class LoginReg extends React.Component {
               </div>
             </TabItem>
           </Tab>
+        </div>
+        <div id="pageloader" className="pageloader is-right-to-left">
+          <span className="title">Loading...</span>
         </div>
         <div className="footer">
           © Copyright 2017. jerry chatRoom, All rights reserved.

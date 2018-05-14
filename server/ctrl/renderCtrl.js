@@ -77,6 +77,8 @@ exports.updateUserInfo = async (req, res) => {
     const { password: nowPassword, id } = ret[0] || {};
     if (bcrypt.compareSync(originPasswd, nowPassword)) {
       delete user.originPasswd;
+      delete user.name;
+      user.password = bcrypt.hashSync(password, salt);
       const ret = await userService.updateUserInfo(user);
       if (ret.affectedRows) {
         res.sendData(ret);

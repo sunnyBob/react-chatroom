@@ -20,13 +20,21 @@ export default {
       'Add': '添加',
       'QQ Emoji': 'QQ表情',
       'Male': '男',
+      'male': '男',
       'Female': '女',
+      'female': '女',
       'Sign In': '登录',
       'Sign Out': '退出',
       'Register': '注册',
       'Change Language': '切换语言',
       'New Chat': '创建群聊',
       'No Data': '暂无数据',
+      'More Options': '更多操作',
+      'Modify Password': '密码修改',
+      'Upload Avatar': '头像上传',
+      'Delete Friend': '删除好友',
+      'Send Msg': '发消息',
+      'Personal Page': '个人主页',
     }
   }
 }

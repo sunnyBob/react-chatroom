@@ -1,3 +1,4 @@
+@import '/node_modules/bulma-pageloader/dist/bulma-pageloader.min.css';
 @import '/node_modules/bulma-tooltip/dist/bulma-tooltip.min.css';
 .qemoji-0 {
   background-image: url('/src/images/QQ.png');
@@ -1138,7 +1139,7 @@ body {
   font-size: 14px;
 }
 .fa-edit {
-  color: #bd5214;
+  color: #267dce;
 }
 nav.pagination {
   margin-top: 20px;

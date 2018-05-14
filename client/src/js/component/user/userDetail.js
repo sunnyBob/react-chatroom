@@ -92,11 +92,24 @@ class UserDetail extends React.Component {
       content: <ModifyPasswd ref={(ref) => { this.passwdMpdal = ref; }}/>,
       onOk: () => handleOk.call(this),
     });
-    function handleOk() {
+    async function handleOk() {
       const { originPasswd, nowPasswd, confirmPasswd } = this.passwdMpdal.state;
 
-      if (originPasswd !== confirmPasswd) {
+      if (!originPasswd) {
+        toast.error('原始密码不能为空', toastOption);
+        return false;
+      }
+      if (!nowPasswd) {
+        toast.error('新密码不能为空', toastOption);
+        return false;
+      }
+      if (nowPasswd && !(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/).test(nowPasswd)) {
+        toast.error('密码必须是8-16位数字和字母的组合', toastOption);
+        return false;
+      }
+      if (nowPasswd !== confirmPasswd) {
         toast.error("两次输入的新密码不一致", toastOption);
+        return false;
       }
       if (originPasswd && nowPasswd) {
         const user = {
@@ -105,25 +118,37 @@ class UserDetail extends React.Component {
           id: this.props.params.id,
           password: nowPasswd,
         };
-        request({
+       await request({
           url: '/user',
           method: 'PUT',
           data: user,
         }).then(resp => {
           if (resp.code == 1) {
             toast.success('密码修改成功', toastOption);
+            return true;
           } else {
             toast.error("密码修改失败", toastOption);
           }
         });
-      } else {
-        toast.success('原始/新密码不能为空', toastOption);
       }
     }
   }
 
   handleEdit = (user, cb) => {
     user.id = this.props.params.id;
+    const { age, phone, email } = user;
+    if (age && !/^((1[0-1])|[1-9])?\d$/.test(age)) {
+      toast.error('年龄格式不正确', toastOption);
+      return;
+    }
+    if (phone && !/^1[34578]\d{9}$/.test(phone)) {
+      toast.error('手机号格式不正确', toastOption);
+      return;
+    }   
+    if (email && !/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/.test(email)) {
+      toast.error('邮箱格式不正确', toastOption);
+      return;
+    }
     request({
       url: '/user',
       method: 'PUT',
@@ -212,10 +237,10 @@ class UserDetail extends React.Component {
       label: t('More Options'),
       value: (
         <div className="options">
-          {userInfo.id === this.userId && <span onClick={this.modPasswd}>密码修改</span>}
-          {userInfo.id === this.userId && <span onClick={this.handleUpload}>头像上传</span>}
-          {userInfo.id !== this.userId && <span onClick={this.handleDelFriend}>删除好友</span>}
-          {userInfo.id !== this.userId && <span onClick={this.handleChat}>发消息</span>}
+          {userInfo.id === this.userId && <span onClick={this.modPasswd}>{t('Modify Password')}</span>}
+          {userInfo.id === this.userId && <span onClick={this.handleUpload}>{t('Upload Avatar')}</span>}
+          {userInfo.id !== this.userId && <span onClick={this.handleDelFriend}>{t('Delete Friend')}</span>}
+          {userInfo.id !== this.userId && <span onClick={this.handleChat}>{t('Send Msg')}</span>}
         </div>
       ),
       colSpan: 3,
@@ -223,7 +248,7 @@ class UserDetail extends React.Component {
     return (
       <div>
         <header className="detail-header">
-          <p className="detail-header-title">个人主页</p>
+          <p className="detail-header-title">{t("Personal Page")}</p>
           <Icon name="times" onClick={this.handleClose}/>
         </header>
         <div className="info-top">
