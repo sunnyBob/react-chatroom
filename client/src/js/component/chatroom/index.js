@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, browserHistory } from 'react-router';
+import { toJS } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import axios from 'axios';
 import { Icon, PopoverManager, Tab, TabItem } from '../common';
@@ -30,12 +31,12 @@ class ChatRoom extends React.Component {
     const user = localStorage.getItem('user');
     this.user = JSON.parse(user);
     const pathName = location.pathname.split('/')[1];
-    this.isGroup = pathName !== 'chat';
+    this.isGroup = pathName !== 'group-chat';
     this.store = new props.RootStore();
     this.hash = '';
 
     socket.on('chatToOne', (msg, userId) => {
-      if (userId == this.props.params.id) {
+      if (userId == this.props.params.id && pathName === 'chat') {
         this.handleRecvMsg(msg);
       }
     });
@@ -64,7 +65,7 @@ class ChatRoom extends React.Component {
     } else {
       id && commonUtils.isGroupMember(userId, id, {
         success: () => {
-          socket.emit('joinRoom', userId, `room-${id}`);
+          this.store.getGroupUser('', id);
           this.getCurrentGroup(id);
         },
         fail: () => {
@@ -96,7 +97,7 @@ class ChatRoom extends React.Component {
       } else {
         nextId && commonUtils.isGroupMember(userId, nextId, {
           success: () => {
-            socket.emit('joinRoom', userId, `room-${nextId}`);
+            this.store.getGroupUser('', nextId);
             this.getCurrentGroup(nextId);
           },
           fail: () => {
@@ -116,7 +117,7 @@ class ChatRoom extends React.Component {
       url: '/user',
       data: {
         id,
-      }
+      },
     });
     if (Array.isArray(resp.retList) && resp.retList.length) {
       this.setState({
@@ -294,6 +295,7 @@ class ChatRoom extends React.Component {
       const { avatar, user_id } = this.user;
       const msgEl = [...this.state.msgEl];
       if (this.isGroup) {
+        console.log("more")
         socket.emit('chatToMore', html, user_id, id, avatar);
       } else {
         socket.emit('chatToOne', html, user_id, id);
@@ -506,6 +508,7 @@ class ChatRoom extends React.Component {
   }
 
   render() {
+    this.isGroup && toJS(this.store.groupUser) && socket.emit('joinRoom', toJS(this.store.groupUser).map(user => user.id), this.props.params.id);
     const name = this.isGroup ? this.state.currentGroup.group_name : this.state.currentChatUser.username;
     const fontStyle = {fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'};
     return (

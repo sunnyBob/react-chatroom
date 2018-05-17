@@ -6,11 +6,36 @@ import { Menu, Menus, Icon, ModalManager } from '../common';
 import request from '../../utils/request';
 
 class GroupList extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showMsgIcon: null,
+    };
+
+    this.user = localStorage.getItem('user');
+  }
+
+  componentDidMount() {
+    socket.on('chatToMore', (msg, userId, groupId, avatar) => {
+      const pathname = window.location.pathname;
+      const pathId = pathname.split('/').reverse()[0];
+      const path = pathname.split('/').reverse()[1];
+      if (this.user.user_id != userId && pathId != groupId) {
+        this.setState({
+          showMsgIcon: groupId,
+        });
+      }
+    }); 
+  }
+
   handleClick(group, e) {
     const tagName = e.target.tagName;
     const { id } = group;
-    if (tagName === 'A') {
-      browserHistory.push(`/group-chat/${id}`);
+    if (tagName !== 'IMG') {
+      this.setState({ showMsgIcon: null }, () => {
+        browserHistory.push(`/group-chat/${id}`);
+      });
     }
   }
 
@@ -52,7 +77,10 @@ class GroupList extends React.Component {
 
   render() {
     const { groupList, label } = this.props;
+    const showMsgIcon = this.state.showMsgIcon;
     const pathname = window.location.pathname;
+    const pathId = pathname.split('/').reverse()[0];
+    const path = pathname.split('/').reverse()[1];
     return (
       <Menus label={label} isSub={true}>
         {
@@ -60,12 +88,15 @@ class GroupList extends React.Component {
             <Menu
               onClick={this.handleClick.bind(this, group)}
               attachEl={
-                <span className="avatar-wrap" onClick={this.viewDetail.bind(this, group)}><img src={group.group_avatar} className="avatar"/></span>
+                <span className="avatar-wrap column is-3" onClick={this.viewDetail.bind(this, group)}><img src={group.group_avatar} className="avatar"/></span>
               }
-              isActive={parseInt(pathname.split('/').reverse()[0], 10) === group.id && pathname.split('/').reverse()[1] === 'group-chat'}
+              isActive={pathId == group.id && path === 'group-chat'}
               key={group.id}
+              className="columns is-gapless group-item"
             >
-              <span>{group.group_name}</span>
+              { showMsgIcon == group.id && !(parseInt(pathId, 10) === group.id && path === 'group-chat') && <audio autoPlay src="/src/music/QQ_msg.mp3"/> }
+              <span className="column">{group.group_name}</span>
+              { showMsgIcon == group.id && !(parseInt(pathId, 10) === group.id && path === 'group-chat') && <Icon name="comment" className="column is-1"/> }
             </Menu>
           ))
         }

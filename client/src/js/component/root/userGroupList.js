@@ -11,7 +11,7 @@ class UserGroupList extends React.Component {
     let url = '';
     if (tagName === 'IMG') {
       url = ug.group_name ? `/group-info/${id}` : `/user-info/${id}`;
-    } else if (tagName === 'A') {
+    } else {
       url = ug.group_name ? `/group-chat/${id}` : `/chat/${id}`;
     }
     browserHistory.push(url);

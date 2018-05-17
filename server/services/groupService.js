@@ -3,7 +3,6 @@ const userService = require('./index');
 
 exports.getGroupInfo = async (id, userId, groupId, type, userName, limit = '10', offset = '0') => {
   if (id || type === '1') {
-    console.log("id",id, "   userId:", userId)
     const ret = await dao.query('groups.findGroup', { id, userId });
     return ret;
   } else if (type === '2') {

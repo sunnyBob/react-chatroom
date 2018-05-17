@@ -98,13 +98,15 @@ io.on('connection', (socket) => {
   });
 
   socket.on('addToRoom', (ids, groupId, cb) => {
-    ids.forEach(id => {
-      if (userSocket.hasOwnProperty(id)) {
-        userSocket[id].join(`room-${groupId}`);
-      }
-    });
+    if (ids && groupId) {
+      ids.forEach(id => {
+        if (userSocket.hasOwnProperty(id)) {
+          userSocket[id].join(`room-${groupId}`);
+        }
+      });
 
-    io.to(`room-${groupId}`).emit('updateGroupList');
+      io.to(`room-${groupId}`).emit('updateGroupList');
+    }
   });
 
   socket.on('updateGroupList', groupId => {
@@ -121,9 +123,13 @@ io.on('connection', (socket) => {
     io.to(`room-${groupId}`).emit('updateGroupUser', groupId);
   });
 
-  socket.on('joinRoom', (userId, roomName) => {
-    if (userSocket.hasOwnProperty(userId)) {
-      userSocket[userId].join(roomName);
+  socket.on('joinRoom', (ids, groupId, cb) => {
+    if (ids && groupId) {
+      ids.forEach(id => {
+        if (userSocket.hasOwnProperty(id)) {
+          userSocket[id].join(`room-${groupId}`);
+        }
+      });
     }
   });
 });
