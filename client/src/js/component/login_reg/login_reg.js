@@ -216,6 +216,8 @@ export default class LoginReg extends React.Component {
                   key="password"
                   required={true}
                   handleChange={this.handleChange}
+                  reg={/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/}
+                  regTip="密码为8-16位数字与字母的组合"
                 />
                 <Input
                   placeholder="password again"
@@ -224,6 +226,8 @@ export default class LoginReg extends React.Component {
                   name="repassword"
                   required={true}
                   handleChange={this.handleChange}
+                  reg={/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/}
+                  regTip="密码为8-16位数字与字母的组合"
                 />
                 <Input
                   placeholder="age"
@@ -231,6 +235,7 @@ export default class LoginReg extends React.Component {
                   type="number"
                   name="age"
                   handleChange={this.handleChange}
+                  reg={/^((1[0-1])|[1-9])?\d$/}
                 />
                 <div className="field">
                   <label className="label is-small">Sex</label>
@@ -252,12 +257,14 @@ export default class LoginReg extends React.Component {
                   label="Phone"
                   name="phone"
                   handleChange={this.handleChange}
+                  reg={/^1[34578]\d{9}$/}
                 />
                 <Input
                   placeholder="email"
                   label="Email"
                   name="email"
                   handleChange={this.handleChange}
+                  reg={/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/}
                 />
                 <a className="button is-primary is-small pull-right" onClick={this.handleReg}>注册</a>
               </div>
