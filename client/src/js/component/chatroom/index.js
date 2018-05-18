@@ -295,7 +295,6 @@ class ChatRoom extends React.Component {
       const { avatar, user_id } = this.user;
       const msgEl = [...this.state.msgEl];
       if (this.isGroup) {
-        console.log("more")
         socket.emit('chatToMore', html, user_id, id, avatar);
       } else {
         socket.emit('chatToOne', html, user_id, id);
@@ -416,6 +415,10 @@ class ChatRoom extends React.Component {
     const fileName = file.name;
     const progressId = Date.now();
     const msgEl = [...this.state.msgEl];
+    if (!id) {
+      toast.error('No chats selected!', toastOption);
+      return;
+    }
     if (size < 1024) {
       size = `${Number(size).toFixed(2)}B`;
     } else if (size / 1024 < 1024) {
@@ -507,6 +510,55 @@ class ChatRoom extends React.Component {
     });
   }
 
+  sendImg = (e) => {
+    const id = this.props.params.id;
+    const file = e.target.files[0];
+    if (!id) {
+      toast.error('No chats selected!', toastOption);
+      return;
+    }
+    if(window.FileReader) {  
+      const reader = new FileReader();  
+      reader.onloadend = async () => {  
+        const html = `<img src="${reader.result}" class="msg-pic"/>`;
+        const { avatar, user_id } = this.user;
+        const msgEl = [...this.state.msgEl];
+        if (this.isGroup) {
+          socket.emit('chatToMore', html, user_id, id, avatar);
+        } else {
+          socket.emit('chatToOne', html, user_id, id);
+        }
+        const data = this.isGroup ? {
+          from_user: this.user.user_id,
+          content: html,
+          groupId: id,
+        } : {
+          from_user: this.user.user_id,
+          to_user: parseInt(id),
+          content: html,
+        };
+        await request({
+          url: '/message',
+          method: 'post',
+          data,
+        });
+        msgEl.push(<div className="msginfo-right"  key={Math.random()} >
+          <div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+          <Link to={`/user-info/${user_id}`}>
+            <img src={avatar} className="avatar"/>
+          </Link>
+        </div>);
+        this.setState({
+          msgEl: msgEl,
+        }, () => {
+          this.msgBox.scrollTop = this.msgBox.scrollHeight;
+          document.getElementById('pic').value = '';
+        });
+      };  
+      reader.readAsDataURL(file); 
+    } 
+  }
+
   render() {
     this.isGroup && toJS(this.store.groupUser) && socket.emit('joinRoom', toJS(this.store.groupUser).map(user => user.id), this.props.params.id);
     const name = this.isGroup ? this.state.currentGroup.group_name : this.state.currentChatUser.username;
@@ -534,6 +586,10 @@ class ChatRoom extends React.Component {
         <div className="wordarea">
           <div className="toolbar is-clearfix">
             <Icon name="smile" prefix1='far' onClick={this.showEmoji}/>
+            <div className="sendImg">
+              <input type="file" id="pic" name="file" style={{position:'absolute',clip:'rect(0 0 0 0)'}} onChange={this.sendImg}/>
+              <label htmlFor="pic"><Icon name="images" prefix1='far'/></label>
+            </div>
             {!this.isGroup && <Icon name="camera-retro" prefix1='fal' onClick={this.handleVideo}/>}
             <div className="sendFile">
               <form ref={form => { this.form = form; }}>

@@ -52,6 +52,11 @@
     padding: 10px 20px;
     border-top: 1px solid #d6d6d6;
     border-bottom: 1px solid #d6d6d6;
+    img.msg-pic {
+      max-width: 200px;
+      max-height: 200px;
+      margin-right: 2px;
+    }
   }
   .textarea {
     height: 28px;
@@ -83,17 +88,16 @@
   }
   .msginfo-right {
     float: right;
-    div {
+    & > div {
       margin-right: 10px;
-      background: #56a5b3;
+      border: 1px solid #c0c0c0;
     }
   }
   .msginfo-left {
     float: left;
-    div {
+    & > div {
       margin-left: 10px;
-      background: #264b38;
-      color: white;
+      border: 1px solid #c0c0c0;
     }
   }
   .room-bottom {
@@ -105,7 +109,17 @@
   }
 }
 
+.sendImg {
+  width: 18px;
+  display: inline-block;
+  margin-left: 2px;
+  position: relative;
+  display: inline-block;
+}
+
 .sendFile {
+  width: 18px;
+  display: inline-block;
   margin-left: 2px;
   position: relative;
   display: inline-block;
@@ -134,7 +148,7 @@
     align-items: center;
   }
   .file-size {
-    color: #e5e2e2;
+    color: #aaa4a4;
     font-weight: 500;
   }
 }
