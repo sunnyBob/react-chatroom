@@ -42,7 +42,7 @@ class Modal extends React.Component {
     showHeader: true,
     showFooter: true,
     transition: 'fade',
-    onOk: () => true,
+    onOk: () => false,
     onCancel: () => {},
     onClose: () => {},
     asyncConfirm: false,
@@ -53,7 +53,7 @@ class Modal extends React.Component {
     super(props);
 
     this.handleBackdropClose = this.handleBackdropClose.bind(this);
-    this.handleOk = this.handleOk.bind(this);
+    // this.handleOk = this.handleOk.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleClose = this.handleClose.bind(this);
 
@@ -63,17 +63,18 @@ class Modal extends React.Component {
     };
   }
 
-  handleOk() {
+  handleOk = async () => {
     if (this.props.asyncConfirm) {
       this.setState({ isLoading: true });
-      const isOk = this.props.onOk();
+      const isOk = await this.props.onOk();
       if (isOk) {
         this.handleClose();
       } else {
         this.setState({ isLoading: false });
       }
     } else {
-      const isOk = this.props.onOk();
+      const isOk = await this.props.onOk();
+      console.log(isOk)
       if (isOk) this.handleClose();
     }
   }

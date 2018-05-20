@@ -47,6 +47,9 @@ findGroupOrdinary:
     - if:
         test: :userId
         sql: and id != :userId
+    - if:
+        test: :userName
+        sql: and username like :userName
     - limit :limit
     - offset :offset
 
@@ -60,11 +63,17 @@ findGroupOrdinaryCount:
   - if:
       test: :userId
       sql: and id != :userId
+  - if:
+      test: :userName
+      sql: and username like :userName
 
 findGroupManager:
   - select user.* from user, manager_group
   - where manager_group.user_id = `user`.id
   - and manager_group.group_id = :groupId
+  - if:
+      test: :userName
+      sql: and username like :userName
   - limit :limit
   - offset :offset
 
@@ -72,6 +81,9 @@ findGroupManagerCount:
   - select count(1) from user, manager_group
   - where manager_group.user_id = `user`.id
   - and manager_group.group_id = :groupId
+  - if:
+      test: :userName
+      sql: and username like :userName
 
 findManageGroups:
   - select groups.* from groups left join manager_group
@@ -89,7 +101,7 @@ findGroupUsersCount:
 findGroupMaleCount:
   - select count(1) from groups g, user_group u, user
   - where u.group_id = g.id and user.id = u.user_id
-  - and u.group_id = :groupId and user.sex = '男'
+  - and u.group_id = :groupId and user.sex = 'male'
 
 findAfter90Count:
   - select count(1) from groups g, user_group u, user

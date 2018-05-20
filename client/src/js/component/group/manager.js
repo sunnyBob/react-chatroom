@@ -38,7 +38,7 @@ class Member extends React.Component {
           if (resp.code === '1') {
             this.table.refresh();
             toast.success('移除成功', toastOption);
-            socket.emit('updateMyGroupList', this.user.user_id);
+            socket.emit('updatePersonGroupList', this.user.user_id);
             this.handleRedirect(this.user.user_id);
             return true;
           }
@@ -70,6 +70,7 @@ class Member extends React.Component {
       if (resp.code === '1') {
         this.table.refresh();
         toast.success('取消管理员成功', toastOption);
+        socket.emit('updatePersonGroupList', userId);
       }
     });
   }
@@ -104,6 +105,7 @@ class Member extends React.Component {
       url: '/group',
       data: {
         groupId: this.props.group.id,
+        userName: this.state.userName,
         type: '9',
         limit: pageSize,
       },

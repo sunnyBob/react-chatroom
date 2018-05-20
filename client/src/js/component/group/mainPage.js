@@ -25,13 +25,17 @@ class MainPage extends React.Component {
 
   render() {
     const { count, maleCount, after90Count } = this.props.countInfo;
-    const { announce, introduce, group_name} = this.props.group;
+    const { announce, introduce, group_name, id} = this.props.group;
     const { isCreater, isManager, creater } = this.props;
 
     const attrList = [{
+      label: t('群Id'),
+      value: id,
+      colSpan: 1,
+    }, {
       label: t('群主'),
       value: creater.username,
-      colSpan: 3,
+      colSpan: 1,
     }, {
       label: t('群名称'),
       field: 'group_name',

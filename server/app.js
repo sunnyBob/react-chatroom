@@ -87,6 +87,10 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('updateGroupInvitation', id => {
+    io.to(`room-${id}`).emit('updateInvitation');
+  });
+
   socket.on('chatToOne', (msg, fromUser, toUser) => {
     if (userSocket.hasOwnProperty(toUser)) {
       userSocket[toUser].emit('chatToOne', msg, fromUser);
@@ -113,9 +117,9 @@ io.on('connection', (socket) => {
     io.to(`room-${groupId}`).emit('updateGroupList');
   });
 
-  socket.on('updateMyGroupList', userId => {
+  socket.on('updatePersonGroupList', userId => {
     if (userSocket.hasOwnProperty(userId)) {
-      userSocket[userId].emit('updateMyGroupList');
+      userSocket[userId].emit('updatePersonGroupList');
     }
   });
 

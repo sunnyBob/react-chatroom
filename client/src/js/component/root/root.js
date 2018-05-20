@@ -46,7 +46,7 @@ class Root extends React.Component {
     socket.on('updateGroupList', () => {
       this.user && this.fetchGroupData();
     });
-    socket.on('updateMyGroupList', () => {
+    socket.on('updatePersonGroupList', () => {
       this.user && this.fetchGroupData();
     });
   }

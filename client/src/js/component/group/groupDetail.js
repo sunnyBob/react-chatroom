@@ -7,6 +7,7 @@ import GroupMember from './member';
 import GroupManager from './manager';
 import MainPage from './mainPage';
 import commonUtils from '../../utils/commonUtils';
+import { toast } from 'react-toastify';
 import './group.less';
 
 class GroupDetail extends React.Component {
@@ -19,19 +20,27 @@ class GroupDetail extends React.Component {
         maleCount: 0,
         after90Count: 0,
       },
+      isCreater: false,
       group: {},
     };
     const userId = JSON.parse(localStorage.getItem('user'))['user_id'];
-    this.creater = {}
     commonUtils.findCreaterOrManager(props.groupId, {
       success: (resp) => {
         if (Array.isArray(resp)) {
+          let isCreater = false;
+          let creater = null;
+          let isManager = null;
           if (resp[0].creater[0].id == userId) {
-            this.isCreater = true;
+            isCreater = true;
           }
           const managerIds = resp[0].manager.map(manager => manager.id);
-          this.creater = resp[0].creater[0];
-          this.isManager = managerIds.includes(parseInt(userId));
+          creater = resp[0].creater[0];
+          isManager = managerIds.includes(parseInt(userId));
+          this.setState({
+            isCreater,
+            creater,
+            isManager,
+          });
         }
       }
     });
@@ -97,11 +106,13 @@ class GroupDetail extends React.Component {
           },
         }).then(resp => {
           if (resp.code === '1') {
-            socket.emit('updateGroupList', this.props.groupId);
+            const userId = JSON.parse(localStorage.getItem('user'))['user_id'];
+            socket.emit('updatePersonGroupList', userId);
+            toast.success('头像修改成功', toastOption);
             this.fetchData();
             ModalManager.close(modal);
           } else {
-            toast.error('头像上传失败', toastOption);
+            toast.error('头像修改失败', toastOption);
           }
         });
       } else {
@@ -115,7 +126,7 @@ class GroupDetail extends React.Component {
   }
 
   render() {
-    const { countInfo, group={} } = this.state;
+    const { countInfo, group={}, isCreater, creater = {}, isManager } = this.state;
     return (
       <div className="group-detail">
         <div className="group-lt">
@@ -124,21 +135,21 @@ class GroupDetail extends React.Component {
             <p>{group.group_name}</p>
           </div>
           <div id="group-lt-bottom">
-            {this.isCreater && <button className="button is-small is-danger" onClick={this.handleRemoveGroup}>解散群</button>}
-            {(this.isCreater || this.isManager) && <button className="button is-small is-primary" onClick={this.handleUpload}>修改头像</button>}
+            {isCreater && <button className="button is-small is-danger" onClick={this.handleRemoveGroup}>解散群</button>}
+            {(isCreater || isManager) && <button className="button is-small is-primary" onClick={this.handleUpload}>修改头像</button>}
             <button className="button is-small is-success" onClick={this.handleRedirect}>发消息</button>
           </div>
         </div>
         <div className="group-rt">
           <Tab>
             <TabItem content="首页">
-              <MainPage group={group} countInfo={countInfo} isCreater={this.isCreater} creater={this.creater} isManager={this.isManager} fetchData={this.fetchData}/>
+              <MainPage group={group} countInfo={countInfo} isCreater={isCreater} creater={creater} isManager={isManager} fetchData={this.fetchData}/>
             </TabItem>
             <TabItem content="普通成员">
-              <GroupMember group={group} countInfo={countInfo} createrId={this.creater.id} isCreater={this.isCreater} isManager={this.isManager}  fetchData={this.fetchData}/>
+              <GroupMember group={group} countInfo={countInfo} createrId={creater.id} isCreater={isCreater} isManager={isManager}  fetchData={this.fetchData}/>
             </TabItem>
             <TabItem content="管理员">
-              <GroupManager group={group} countInfo={countInfo} createrId={this.creater.id} isCreater={this.isCreater} isManager={this.isManager}  fetchData={this.fetchData}/>
+              <GroupManager group={group} countInfo={countInfo} createrId={creater.id} isCreater={isCreater} isManager={isManager}  fetchData={this.fetchData}/>
             </TabItem>
           </Tab>
         </div>

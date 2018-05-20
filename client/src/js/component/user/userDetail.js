@@ -75,6 +75,7 @@ class UserDetail extends React.Component {
         }).then(resp => {
           if (resp.code == 1) {
             this.props.fetchData && this.props.fetchData();
+            localStorage.setItem('user', JSON.stringify(Object.assign({} ,JSON.parse(localStorage.getItem('user')), { avatar })));
             ModalManager.close(modal);
           } else {
             toast.error('头像上传失败', toastOption);
@@ -90,48 +91,52 @@ class UserDetail extends React.Component {
     ModalManager.open({
       title: <small>密码修改</small>,
       content: <ModifyPasswd ref={(ref) => { this.passwdMpdal = ref; }}/>,
-      onOk: () => handleOk.call(this),
-    });
-    async function handleOk() {
-      const { originPasswd, nowPasswd, confirmPasswd } = this.passwdMpdal.state;
-
-      if (!originPasswd) {
-        toast.error('原始密码不能为空', toastOption);
-        return false;
-      }
-      if (!nowPasswd) {
-        toast.error('新密码不能为空', toastOption);
-        return false;
-      }
-      if (nowPasswd && !(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/).test(nowPasswd)) {
-        toast.error('密码必须是8-16位数字和字母的组合', toastOption);
-        return false;
-      }
-      if (nowPasswd !== confirmPasswd) {
-        toast.error("两次输入的新密码不一致", toastOption);
-        return false;
-      }
-      if (originPasswd && nowPasswd) {
-        const user = {
-          originPasswd,
-          name: this.store.userInfo.username,
-          id: this.props.params.id,
-          password: nowPasswd,
-        };
-       await request({
-          url: '/user',
-          method: 'PUT',
-          data: user,
-        }).then(resp => {
+      onOk: async () => {
+        const { originPasswd, nowPasswd, confirmPasswd } = this.passwdMpdal.state;
+  
+        if (!originPasswd) {
+          toast.error('原始密码不能为空', toastOption);
+          return false;
+        }
+        if (!nowPasswd) {
+          toast.error('新密码不能为空', toastOption);
+          return false;
+        }
+        if (nowPasswd && !(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/).test(nowPasswd)) {
+          toast.error('密码必须是8-16位数字和字母的组合', toastOption);
+          return false;
+        }
+        if (nowPasswd === originPasswd) {
+          toast.error("新密码不能和原始密码一样", toastOption);
+          return false;
+        }
+        if (nowPasswd !== confirmPasswd) {
+          toast.error("两次输入的新密码不一致", toastOption);
+          return false;
+        }
+        if (originPasswd && nowPasswd) {
+          const user = {
+            originPasswd,
+            name: this.store.userInfo.username,
+            id: this.props.params.id,
+            password: nowPasswd,
+          };
+          const resp = await request({
+            url: '/user',
+            method: 'PUT',
+            data: user,
+          });
           if (resp.code == 1) {
             toast.success('密码修改成功', toastOption);
+            await request(({ url: '/signout' }));
+            location.reload();
             return true;
           } else {
             toast.error("密码修改失败", toastOption);
           }
-        });
-      }
-    }
+        }
+      },
+    });
   }
 
   handleEdit = (user, cb) => {
@@ -179,21 +184,21 @@ class UserDetail extends React.Component {
   }
 
   handleOkDelFriend = async () => {
-    await request({
+    const resp = await request({
       url: '/friends',
       method: 'delete',
       data: {
         friendId: this.props.params.id,
         userId: this.userId,
       },
-    }).then(resp => {
-      if (resp.code == 1) {
-        toast.success('成功删除好友', toastOption);
-        this.props.fetchData && this.props.fetchData();
-        socket.emit('updateLeftList', this.props.params.id);
-        return true;
-      }
     });
+    
+    if (resp.code == 1) {
+      toast.success('成功删除好友', toastOption);
+      this.props.fetchData && this.props.fetchData();
+      socket.emit('updateLeftList', this.props.params.id);
+      return true;
+    }
   }
 
   render() {

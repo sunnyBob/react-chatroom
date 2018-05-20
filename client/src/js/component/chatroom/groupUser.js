@@ -42,8 +42,6 @@ export default class extends React.Component {
 
   addGroupUser = () => {
     const groupId = this.props.groupId;
-    console.log('-----', groupId)
-    console.log('=====', this.store.friendsInfo)
     ModalManager.open({
       title: '邀请好友',
       content: <CreateGroup

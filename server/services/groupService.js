@@ -36,15 +36,15 @@ exports.getGroupInfo = async (id, userId, groupId, type, userName, limit = '10',
       manager,
     }];
   } else if (type === '8') {
-    const groupMem = await dao.query('groups.findGroupOrdinary', { userId, groupId, limit: parseInt(limit), offset: parseInt(offset) });
-    const groupMemCount = await dao.query('groups.findGroupOrdinaryCount', { userId, groupId, limit: parseInt(limit), offset: parseInt(offset) });
+    const groupMem = await dao.query('groups.findGroupOrdinary', { userId, groupId, userName: userName && `%${userName}%`, limit: parseInt(limit), offset: parseInt(offset) });
+    const groupMemCount = await dao.query('groups.findGroupOrdinaryCount', { userId, groupId, userName: userName && `%${userName}%`, limit: parseInt(limit), offset: parseInt(offset) });
     return [{
       ret: groupMem,
       count: groupMemCount[0]['count(1)'],
     }];
   } else if (type === '9') {
-    const groupManager = await dao.query('groups.findGroupManager', { groupId, limit: parseInt(limit), offset: parseInt(offset) });
-    const groupManagerCount = await dao.query('groups.findGroupManagerCount', { groupId, limit: parseInt(limit), offset: parseInt(offset) });
+    const groupManager = await dao.query('groups.findGroupManager', { groupId, userName: userName && `%${userName}%`, limit: parseInt(limit), offset: parseInt(offset) });
+    const groupManagerCount = await dao.query('groups.findGroupManagerCount', { groupId, userName: userName && `%${userName}%`, limit: parseInt(limit), offset: parseInt(offset) });
     return [{
       ret: groupManager,
       count: groupManagerCount[0]['count(1)'],

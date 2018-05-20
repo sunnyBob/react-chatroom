@@ -82,7 +82,7 @@ class AddUsrGroup extends React.Component {
           }).then(resp => {
             if (resp.code == 1) {
               toast.success('成功发送入群申请', toastOption);
-              socket.emit('updateInvitation', id);
+              socket.emit('updateGroupInvitation', id);
               this.props.onClose();
             }
           });

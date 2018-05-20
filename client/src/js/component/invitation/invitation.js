@@ -127,7 +127,7 @@ class Invitation extends React.Component {
     const { user_id, username, invite_type } = invitation;
     ModalManager.confirm({
       content: `确定拒绝${username}的${invite_type}？`,
-      onOk: this.handleDeleteInvitation.bind(null, invitation, () => {
+      onOk: async () => await this.handleDeleteInvitation(invitation, () => {
         toast.success(`您已成功拒绝${username}的${invite_type}`, toastOption);
         socket.emit('updateInvitation', user_id);
         this.fetchData();
@@ -138,19 +138,18 @@ class Invitation extends React.Component {
 
   handleDeleteInvitation = async (invitation, cb = () => {}) => {
     const { user_id, friend_id } = invitation;
-    await request({
+    const resp = await request({
       url: '/invitation',
       method: 'delete',
       data: {
         userId: user_id,
         friendId: friend_id,
       },
-    }).then(resp => {
-      if (resp.code == 1) {
-        cb();
-        return true;
-      }
     });
+    if (resp.code == 1) {
+      cb();
+      return true;
+    }
   }
 
   render() {

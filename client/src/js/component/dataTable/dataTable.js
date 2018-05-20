@@ -22,6 +22,7 @@ class DataTable extends React.Component {
   }
 
   fetchData = (params) => {
+    // params.data
     request(params).then(resp => {
       if (resp.code === '1') {
         this.props.convertParms && (resp = this.props.convertParms(resp));
@@ -58,7 +59,6 @@ class DataTable extends React.Component {
 
   render() {
     const { columns, hasCheckbox, pagination, ...props } = this.props;
-      
     return (
       <Table
         columns={columns}

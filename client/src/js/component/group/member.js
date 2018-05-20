@@ -38,7 +38,7 @@ class Member extends React.Component {
           if (resp.code === '1') {
             this.table.refresh();
             toast.success('移除成功', toastOption);
-            socket.emit('updateMyGroupList', this.user.user_id);
+            socket.emit('updatePersonGroupList', this.user.user_id);
             this.handleRedirect(this.user.user_id);
             return true;
           }
@@ -70,6 +70,7 @@ class Member extends React.Component {
       if (resp.code === '1') {
         this.table.refresh();
         toast.success('设置管理员成功', toastOption);
+        socket.emit('updatePersonGroupList', userId);
       }
     });
   }
@@ -85,7 +86,7 @@ class Member extends React.Component {
 
   render() {
     const { count } = this.props.countInfo;
-    const pageSize = 1;
+    const pageSize = 4;
     const { isCreater, isManager, createrId } = this.props;
     const columns = [
       { label: '姓名', field: 'username' },
@@ -95,8 +96,8 @@ class Member extends React.Component {
       { label: '邮箱', field: 'email' },
       { label: '操作', template: row => (
         <div>
-          {isCreater && <Icon name="user" className="tooltip" data-tooltip="设置管理员" onClick={this.setManager.bind(this, row.id)}/>}
-          <Icon name="comment-alt" prefix1="far" className="tooltip" data-tooltip="发消息" onClick={this.handleRedirect.bind(this, row.id)}/>
+          {isCreater && <Icon name="user" onClick={this.setManager.bind(this, row.id)}/>}
+          <Icon name="comment-alt" prefix1="far"  onClick={this.handleRedirect.bind(this, row.id)}/>
         </div>
       )},
     ];
@@ -105,6 +106,7 @@ class Member extends React.Component {
       data: {
         groupId: this.props.group.id,
         userId: createrId,
+        userName: this.state.userName,
         type: '8',
         limit: pageSize,
       },

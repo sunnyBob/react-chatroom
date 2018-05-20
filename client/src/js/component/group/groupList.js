@@ -4,6 +4,7 @@ import { toJS } from 'mobx';
 import GroupDetail from './groupDetail'
 import { Menu, Menus, Icon, ModalManager } from '../common';
 import request from '../../utils/request';
+import { toast } from 'react-toastify';
 
 class GroupList extends React.Component {
   constructor(props) {
@@ -54,7 +55,8 @@ class GroupList extends React.Component {
           ModalManager.close(modal);
           ModalManager.close(this.groupModal);
           if (resp.code === '1') {
-            socket.emit('updateMyGroupList', this.userId);
+            toast.success('解散成功', toastOption);
+            socket.emit('updatePersonGroupList', this.userId);
             browserHistory.push('/chat');
           } else {
             toast.error('解散失败', toastOption);
