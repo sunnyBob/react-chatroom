@@ -7,14 +7,12 @@ class Tab extends Component {
     super(props);
 
     this.state = {
-      content: '',
       index: 0,
     }
   }
-  
+
   handleClick = (data, index) => {
     this.setState({
-      content: [data],
       index,
     });
     this.props.handleClick && this.props.handleClick(data, index);
@@ -22,19 +20,22 @@ class Tab extends Component {
 
   renderTab = () => {
     const tab = [];
-    const content = [];
+    let content = [];
     React.Children.forEach(this.props.children, (tabItem, index) => {
       tab.push(React.cloneElement(
         tabItem,
         {isActive: this.state.index === index, key: index, index, handleClick: this.handleClick},
       ));
-      !this.state.content && index === 0 && (this.state.content = [tabItem.props.children]);
+      this.state.index === index && (content = [tabItem.props.children]);
     })
-    return tab;
+    return {
+      tab,
+      content,
+    };
   }
 
   render() {
-    const tab = this.renderTab();
+    const { tab, content } = this.renderTab();
     const { isCenter, isBoxed = true, size } = this.props;
     return (
       <div>
@@ -44,7 +45,7 @@ class Tab extends Component {
           </ul>
         </div>
         <div>
-          {this.state.content}
+          {content}
         </div>
       </div>
     );

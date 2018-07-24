@@ -12,6 +12,7 @@ import { Radio, RadioGroup } from './radio';
 import Table from './table/Table';
 import Select from './select/Select';
 import Tag from './tag';
+import UploadAvatar from './uploadAvatar/uploadAvatar';
 
 export {
   Tab,
@@ -33,4 +34,5 @@ export {
   RadioGroup,
   Table,
   Select,
+  UploadAvatar,
 };

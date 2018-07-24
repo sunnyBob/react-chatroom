@@ -5,26 +5,27 @@ import { browserHistory, Link } from 'react-router';
 import request from '../../utils/request';
 import UserInfo from './userInfo';
 import FriendList from './friendList';
-import GroupList from './groupList';
+import UserGroupList from './userGroupList';
+import { GroupList } from '../group';
 import { ToastContainer, toast } from 'react-toastify';
 import CreateGroup from './createGroup';
 import '../../../local';
 
 import './root.less';
-
 const lang = ['zh', 'en'];
 @inject('RootStore')
 @observer
 class Root extends React.Component {
   constructor(props) {
     super(props);
-    
+
     this.lang_index = 0;
     this.user = JSON.parse(localStorage.getItem('user'));
     this.store = new props.RootStore();
 
     this.state = {
       selectedFriends: [],
+      searchResult: null,
     };
     socket.on('updateLeftList', () => {
       this.fetchData();
@@ -35,12 +36,18 @@ class Root extends React.Component {
     });
     socket.on('updateStatus', userId => {
       this.store.friendsInfo.some(friend => {
-        if(friend.friend_id == userId || friend.user_id == userId) {
+        if (friend.friend_id == userId || friend.user_id == userId) {
           this.store.getFriends(this.user.user_id);
           return true;
         }
         return false;
       });
+    });
+    socket.on('updateGroupList', () => {
+      this.user && this.fetchGroupData();
+    });
+    socket.on('updatePersonGroupList', () => {
+      this.user && this.fetchGroupData();
     });
   }
 
@@ -87,9 +94,9 @@ class Root extends React.Component {
           id: this.user.user_id,
         }
       }).then(resp => {
-        if (resp.code == 1) {
-          socket.emit('updateStatus', this.user.user_id);
+        if (resp.code === '1') {
           location.reload();
+          socket.emit('updateStatus', this.user.user_id);
         }
       });
     });
@@ -98,11 +105,19 @@ class Root extends React.Component {
   handleAddGroup = () => {
     ModalManager.open({
       title: '创建群聊(选择群聊好友)',
-      content: <CreateGroup friendsList={this.store.friendsInfo} handleSelectedChange={this.handleSelectedChange}/>,
+      content: <CreateGroup friendsList={this.store.friendsInfo} handleSelectedChange={this.handleSelectedChange} />,
       onOk: async () => {
         const selectedFriends = this.state.selectedFriends;
         const { user_id, user_name, avatar } = this.user;
-        const ret = await request({
+        if (selectedFriends.length === 0) {
+          return;
+        }
+        if (selectedFriends.length === 1) {
+          browserHistory.push(`/chat/${selectedFriends[0].id}`);
+          return;
+        }
+        
+        const resp = await request({
           url: '/group',
           method: 'post',
           data: {
@@ -112,14 +127,17 @@ class Root extends React.Component {
             avatar,
           },
         });
-        if (ret.code === '1') {
+        if (resp.code === '1') {
           toast.success('创建成功', toastOption);
+          this.fetchGroupData();
+          const ids = [...selectedFriends].map(user => user.id);
+          socket.emit('addToRoom', ids, resp.retList.insertId);
         } else {
           toast.error('创建失败', toastOption);
         }
       },
       okText: '创建',
-    })
+    });
   }
 
   handleSelectedChange = (selectedFriends) => {
@@ -128,7 +146,37 @@ class Root extends React.Component {
     });
   }
 
+  handleSearch = async (e) => {
+    const keyCode = e.keyCode || e.which || e.charCode;
+
+    if (keyCode !== 13) {
+      return;
+    }
+
+    const name = e.target.value;
+    const resp = await request({
+      url: '/user_group',
+      data: {
+        name,
+        userId: this.user.user_id,
+      },
+    });
+
+    if (resp.code === '1') {
+      this.setState({ searchResult: resp.retList });
+    }
+  }
+
+  handleChange = (e) => {
+    if (e.target.value.trim() === '') {
+      this.setState({
+        searchResult: null,
+      });
+    }
+  }
+
   render() {
+    const searchResult = this.state.searchResult;
     const items = [{
       content: t('Change Language'),
       icon: 'language',
@@ -139,7 +187,7 @@ class Root extends React.Component {
       handleClick: this.handleAddGroup,
     }, {
       content: t('Sign Out'),
-      icon: 'sign-out',
+      icon: 'sign-out-alt',
       handleClick: this.handleSignOut,
     }];
     const child = React.Children.only(this.props.children);
@@ -147,29 +195,33 @@ class Root extends React.Component {
 
     return (
       <div className="container is-fluid mainpage">
-        <ToastContainer/>
-        <div className="columns" style={{height: '100%'}}>
+        <ToastContainer />
+        <div className="columns" style={{ height: '100%' }}>
           <div className="column is-3 menubox">
-            <UserInfo info={this.store.userInfo}/>
-            <input className="input"/>
-            <Menus>
-              <FriendList friendsList={this.store.friendsInfo}/>
-              <Menus label={t('My Groups')} isSub={true} selected={true}>
-                <GroupList groupList={this.store.joinedGroup} label={t('Joined')}/>
-                <GroupList groupList={this.store.createGroup} label={t('Created')}/>
-                <GroupList groupList={this.store.manageGroup} label={t('Managed')}/>
-              </Menus>
-            </Menus>
+            <UserInfo info={this.store.userInfo} />
+            <input className="input" onKeyDown={this.handleSearch} onChange={this.handleChange} />
+            {
+              !Array.isArray(searchResult) ? (<Menus>
+                <FriendList friendsList={this.store.friendsInfo} />
+                <Menus label={t('My Groups')} isSub={true} selected={true}>
+                  <GroupList groupList={this.store.joinedGroup} label={t('Joined')} />
+                  <GroupList groupList={this.store.createGroup} label={t('Created')} />
+                  <GroupList groupList={this.store.manageGroup} label={t('Managed')} />
+                </Menus>
+              </Menus>) : (<Menus>
+                <UserGroupList list={searchResult} />
+              </Menus>)
+            }
           </div>
           <Card className="column is-9" showHeader={false} showFooter={false}>
             <div className="right-bar">
               <Dropdown
                 align="right"
                 items={items}
-                triggerEl={<Icon name="cog"/>}
+                triggerEl={<Icon name="cog" />}
                 hasDividers={true}
               />
-              <Link to="/invitations"><Icon name="bell" className="alert-bell" data-bell={this.store.inviteCount}/></Link>
+              <Link to="/invitations"><Icon name="bell" className="alert-bell" data-bell={this.store.inviteCount} /></Link>
             </div>
             {cloneChild}
           </Card>

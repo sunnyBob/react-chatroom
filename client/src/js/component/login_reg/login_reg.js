@@ -17,7 +17,7 @@ export default class LoginReg extends React.Component {
       password: '',
       repassword: '',
       age: 0,
-      sex: null,
+      sex: 'male',
       email: null,
       phone: null,
     };
@@ -40,6 +40,14 @@ export default class LoginReg extends React.Component {
 
   handleLogin = async () => {
     const { name, passwd } = this.state;
+    if (!name) {
+      toast.error('用户名不能为空', toastOption);
+      return;
+    }
+    if (!passwd) {
+      toast.error('密码不能为空', toastOption);
+      return;
+    }
     const ret = await request({
       url: '/login',
       data: {
@@ -54,17 +62,45 @@ export default class LoginReg extends React.Component {
         user_name: userName,
         avatar,
       };
-      localStorage.setItem('user', JSON.stringify(user));
-      this.updateStatus(userId);
-      socket.emit('login', userId);
-      browserHistory.replace('/chat');
+      const pageloader = document.getElementById("pageloader");
+      if (pageloader) {
+        pageloader.classList.toggle('is-active');
+        const pageloaderTimeout = setTimeout(() => {
+          pageloader.classList.toggle('is-active');
+          clearTimeout(pageloaderTimeout);
+          localStorage.setItem('user', JSON.stringify(user));
+          this.updateStatus(userId);
+          socket.emit('login', userId);
+          browserHistory.replace('/chat');
+        }, 3000);
+      }
     }
   }
 
   handleReg = async () => {
     const { username, password, repassword, age, phone, email, sex } = this.state;
+    if (!username) {
+      toast.error('用户名不能为空', toastOption);
+      return;
+    }
+    if (!(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/).test(password)) {
+      toast.error('密码必须是8-16位数字和字母的组合', toastOption);
+      return;
+    }
     if (password !== repassword) {
       toast.error('两次输入密码不一致', toastOption);
+      return;
+    }
+    if (age && !/^((1[0-1])|[1-9])?\d$/.test(age)) {
+      toast.error('年龄格式不正确', toastOption);
+      return;
+    }
+    if (phone && !/^1[34578]\d{9}$/.test(phone)) {
+      toast.error('手机号格式不正确', toastOption);
+      return;
+    }   
+    if (email.trim() && !/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/.test(email)) {
+      toast.error('邮箱格式不正确', toastOption);
       return;
     }
     const ret = await request({
@@ -86,6 +122,12 @@ export default class LoginReg extends React.Component {
   }
 
   handleChange = (name, value) => {
+    this.setState({
+      [name]: value,
+    })
+  }
+
+  handleSexChange = (value, name) => {
     this.setState({
       [name]: value,
     })
@@ -118,9 +160,9 @@ export default class LoginReg extends React.Component {
       password: '',
       repassword: '',
       age: 0,
-      sex: null,
-      email: null,
-      phone: null,
+      sex: 'male',
+      email: '',
+      phone: '',
     })
   }
 
@@ -134,7 +176,7 @@ export default class LoginReg extends React.Component {
             isCenter={true}
             handleClick={this.handleToggle}
           >
-            <TabItem icon='sign-in' content={t('Sign In')}>
+            <TabItem icon='sign-in-alt' content={t('Sign In')}>
               <div className="content">
                 <Input
                   placeholder="username"
@@ -174,6 +216,8 @@ export default class LoginReg extends React.Component {
                   key="password"
                   required={true}
                   handleChange={this.handleChange}
+                  reg={/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/}
+                  regTip="密码为8-16位数字与字母的组合"
                 />
                 <Input
                   placeholder="password again"
@@ -182,6 +226,8 @@ export default class LoginReg extends React.Component {
                   name="repassword"
                   required={true}
                   handleChange={this.handleChange}
+                  reg={/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/}
+                  regTip="密码为8-16位数字与字母的组合"
                 />
                 <Input
                   placeholder="age"
@@ -189,35 +235,44 @@ export default class LoginReg extends React.Component {
                   type="number"
                   name="age"
                   handleChange={this.handleChange}
+                  reg={/^((1[0-1])|[1-9])?\d$/}
                 />
-                <RadioGroup
-                  label="sex"
-                  name="sex"
-                  options={[{
-                    label: 'male',
-                    value: t('Male')
-                  }, {
-                    label: 'female',
-                    value: t('Female')
-                  }]}
-                  onChange={this.handleChange}
-                />
+                <div className="field">
+                  <label className="label is-small">Sex</label>
+                  <RadioGroup
+                    name="sex"
+                    value='male'
+                    options={[{
+                      label: 'male',
+                      value: 'male',
+                    }, {
+                      label: 'female',
+                      value: 'female',
+                    }]}
+                    onChange={this.handleSexChange}
+                  />
+                </div>
                 <Input
                   placeholder="phone"
                   label="Phone"
                   name="phone"
                   handleChange={this.handleChange}
+                  reg={/^1[34578]\d{9}$/}
                 />
                 <Input
                   placeholder="email"
                   label="Email"
                   name="email"
                   handleChange={this.handleChange}
+                  reg={/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/}
                 />
                 <a className="button is-primary is-small pull-right" onClick={this.handleReg}>注册</a>
               </div>
             </TabItem>
           </Tab>
+        </div>
+        <div id="pageloader" className="pageloader is-right-to-left">
+          <span className="title">Loading...</span>
         </div>
         <div className="footer">
           © Copyright 2017. jerry chatRoom, All rights reserved.

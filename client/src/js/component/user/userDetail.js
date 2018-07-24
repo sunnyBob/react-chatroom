@@ -2,10 +2,9 @@ import React from 'react';
 import { browserHistory } from 'react-router';
 import { inject, observer } from 'mobx-react';
 import Cropper from 'cropperjs';
-import { Card, ModalManager, AttrList, Icon } from '../common';
+import { Card, ModalManager, AttrList, Icon, UploadAvatar } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
-import UploadAvatar from './uploadAvatar';
 import ModifyPasswd from './modifyPasswd';
 import { toast } from 'react-toastify';
 
@@ -76,6 +75,7 @@ class UserDetail extends React.Component {
         }).then(resp => {
           if (resp.code == 1) {
             this.props.fetchData && this.props.fetchData();
+            localStorage.setItem('user', JSON.stringify(Object.assign({} ,JSON.parse(localStorage.getItem('user')), { avatar })));
             ModalManager.close(modal);
           } else {
             toast.error('头像上传失败', toastOption);
@@ -91,36 +91,69 @@ class UserDetail extends React.Component {
     ModalManager.open({
       title: <small>密码修改</small>,
       content: <ModifyPasswd ref={(ref) => { this.passwdMpdal = ref; }}/>,
-      onOk: () => handleOk.call(this),
-    });
-    function handleOk() {
-      const { originPasswd, nowPasswd } = this.passwdMpdal.state;
-      if (originPasswd && originPasswd) {
-        const user = {
-          originPasswd,
-          name: this.store.userInfo.username,
-          id: this.props.params.id,
-          password: nowPasswd,
-        };
-        request({
-          url: '/user',
-          method: 'PUT',
-          data: user,
-        }).then(resp => {
+      onOk: async () => {
+        const { originPasswd, nowPasswd, confirmPasswd } = this.passwdMpdal.state;
+  
+        if (!originPasswd) {
+          toast.error('原始密码不能为空', toastOption);
+          return false;
+        }
+        if (!nowPasswd) {
+          toast.error('新密码不能为空', toastOption);
+          return false;
+        }
+        if (nowPasswd && !(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/).test(nowPasswd)) {
+          toast.error('密码必须是8-16位数字和字母的组合', toastOption);
+          return false;
+        }
+        if (nowPasswd === originPasswd) {
+          toast.error("新密码不能和原始密码一样", toastOption);
+          return false;
+        }
+        if (nowPasswd !== confirmPasswd) {
+          toast.error("两次输入的新密码不一致", toastOption);
+          return false;
+        }
+        if (originPasswd && nowPasswd) {
+          const user = {
+            originPasswd,
+            name: this.store.userInfo.username,
+            id: this.props.params.id,
+            password: nowPasswd,
+          };
+          const resp = await request({
+            url: '/user',
+            method: 'PUT',
+            data: user,
+          });
           if (resp.code == 1) {
             toast.success('密码修改成功', toastOption);
+            await request(({ url: '/signout' }));
+            location.reload();
+            return true;
           } else {
             toast.error("密码修改失败", toastOption);
           }
-        });
-      } else {
-        toast.success('原始/新密码不能为空', toastOption);
-      }
-    }
+        }
+      },
+    });
   }
 
   handleEdit = (user, cb) => {
     user.id = this.props.params.id;
+    const { age, phone, email } = user;
+    if (age && !/^((1[0-1])|[1-9])?\d$/.test(age)) {
+      toast.error('年龄格式不正确', toastOption);
+      return;
+    }
+    if (phone && !/^1[34578]\d{9}$/.test(phone)) {
+      toast.error('手机号格式不正确', toastOption);
+      return;
+    }   
+    if (email && !/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/.test(email)) {
+      toast.error('邮箱格式不正确', toastOption);
+      return;
+    }
     request({
       url: '/user',
       method: 'PUT',
@@ -151,21 +184,21 @@ class UserDetail extends React.Component {
   }
 
   handleOkDelFriend = async () => {
-    await request({
+    const resp = await request({
       url: '/friends',
       method: 'delete',
       data: {
         friendId: this.props.params.id,
         userId: this.userId,
       },
-    }).then(resp => {
-      if (resp.code == 1) {
-        toast.success('成功删除好友', toastOption);
-        this.props.fetchData && this.props.fetchData();
-        socket.emit('updateLeftList', this.props.params.id);
-        return true;
-      }
     });
+    
+    if (resp.code == 1) {
+      toast.success('成功删除好友', toastOption);
+      this.props.fetchData && this.props.fetchData();
+      socket.emit('updateLeftList', this.props.params.id);
+      return true;
+    }
   }
 
   render() {
@@ -179,7 +212,7 @@ class UserDetail extends React.Component {
       label: t('User Name'),
       field: 'username',
       value: userInfo.username,
-      editable,
+      // editable,
     }, {
       label: t('Sex'),
       field: 'sex',
@@ -209,19 +242,19 @@ class UserDetail extends React.Component {
       label: t('More Options'),
       value: (
         <div className="options">
-          {userInfo.id === this.userId && <span onClick={this.modPasswd}>密码修改</span>}
-          {userInfo.id === this.userId && <span onClick={this.handleUpload}>头像上传</span>}
-          {userInfo.id !== this.userId && <span onClick={this.handleDelFriend}>删除好友</span>}
-          {userInfo.id !== this.userId && <span onClick={this.handleChat}>发消息</span>}
+          {userInfo.id === this.userId && <span onClick={this.modPasswd}>{t('Modify Password')}</span>}
+          {userInfo.id === this.userId && <span onClick={this.handleUpload}>{t('Upload Avatar')}</span>}
+          {userInfo.id !== this.userId && <span onClick={this.handleDelFriend}>{t('Delete Friend')}</span>}
+          {userInfo.id !== this.userId && <span onClick={this.handleChat}>{t('Send Msg')}</span>}
         </div>
       ),
       colSpan: 3,
-    }]
+    }];
     return (
       <div>
         <header className="detail-header">
-          <p className="detail-header-title">个人主页</p>
-          <Icon name="close" onClick={this.handleClose}/>
+          <p className="detail-header-title">{t("Personal Page")}</p>
+          <Icon name="times" onClick={this.handleClose}/>
         </header>
         <div className="info-top">
           <img src={userInfo.avatar}/>

@@ -1,13 +1,18 @@
 import React from 'react';
 import { Link, browserHistory } from 'react-router';
+import { toJS } from 'mobx';
 import { inject, observer } from 'mobx-react';
+import axios from 'axios';
 import { Icon, PopoverManager, Tab, TabItem } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
 import Textarea from 'react-contenteditable';
 import { toast } from 'react-toastify';
+import GroupUser from './groupUser';
 
 import './chatRoom.less';
+
+const baseUrl = '/video.html';
 
 @inject('RootStore')
 @observer
@@ -20,16 +25,18 @@ class ChatRoom extends React.Component {
       currentChatUser: {},
       currentGroup: {},
       msgEl: [],
+      isShowGroupUser: false,
     };
 
     const user = localStorage.getItem('user');
     this.user = JSON.parse(user);
     const pathName = location.pathname.split('/')[1];
-    this.isGroup = pathName !== 'chat';
+    this.isGroup = pathName !== 'group-chat';
     this.store = new props.RootStore();
+    this.hash = '';
 
     socket.on('chatToOne', (msg, userId) => {
-      if (userId == this.props.params.id) {
+      if (userId == this.props.params.id && pathName === 'chat') {
         this.handleRecvMsg(msg);
       }
     });
@@ -37,6 +44,9 @@ class ChatRoom extends React.Component {
       if (groupId == this.props.params.id && this.user.user_id != userId) {
         this.handleRecvMsg(msg, userId, avatar);
       }
+    });
+    socket.on('updateGroupUser', (groupId) => {
+      this.getCurrentGroup(groupId);
     });
   }
 
@@ -55,7 +65,7 @@ class ChatRoom extends React.Component {
     } else {
       id && commonUtils.isGroupMember(userId, id, {
         success: () => {
-          socket.emit('joinRoom', userId, `room-${id}`);
+          this.store.getGroupUser('', id);
           this.getCurrentGroup(id);
         },
         fail: () => {
@@ -87,7 +97,7 @@ class ChatRoom extends React.Component {
       } else {
         nextId && commonUtils.isGroupMember(userId, nextId, {
           success: () => {
-            socket.emit('joinRoom', userId, `room-${nextId}`);
+            this.store.getGroupUser('', nextId);
             this.getCurrentGroup(nextId);
           },
           fail: () => {
@@ -107,7 +117,7 @@ class ChatRoom extends React.Component {
       url: '/user',
       data: {
         id,
-      }
+      },
     });
     if (Array.isArray(resp.retList) && resp.retList.length) {
       this.setState({
@@ -281,7 +291,7 @@ class ChatRoom extends React.Component {
       method: 'post',
       data,
     });
-    if (ret.code) {
+    if (ret.code === '1') {
       const { avatar, user_id } = this.user;
       const msgEl = [...this.state.msgEl];
       if (this.isGroup) {
@@ -322,7 +332,235 @@ class ChatRoom extends React.Component {
     });
   }
 
+  toggleShowGroupUser = () => {
+    this.setState({
+      isShowGroupUser: !this.state.isShowGroupUser,
+    });
+  }
+
+  sendVideoUrl = async () => {
+    const id = this.props.params.id;
+    const { user_id, user_name, avatar } = this.user;
+    const html= `<a href='${baseUrl}?hash=${this.hash}' target="_blank">视频邀请，请点击 ${baseUrl}?hash=${this.hash}</a>`;    
+    const data = {
+      from_user: user_id,
+      to_user: parseInt(id),
+      content: html,
+    };
+    const ret = await request({
+      url: '/message',
+      method: 'post',
+      data,
+    });
+    if (ret.code) {
+      const msgEl = [...this.state.msgEl];
+      socket.emit('chatToOne', html, user_id, id);
+      msgEl.push(<div className="msginfo-right"  key={Math.random()} >
+      <div dangerouslySetInnerHTML={{ __html: html }}/>
+        <Link to={`/user-info/${user_id}`}>
+          <img src={avatar} className="avatar"/>
+        </Link>
+      </div>);
+      this.setState({
+        msgEl: msgEl,
+      }, () => {
+        this.msgBox.scrollTop = this.msgBox.scrollHeight;
+      });
+    }
+  }
+
+  handleVideo = () => {
+    this.hash = Math.random();
+    this.sendVideoUrl();
+    window.open(`${baseUrl}?hash=${this.hash}`);
+  }
+
+  genIcon = (fileName) => {
+    const suffix = fileName.slice(fileName.lastIndexOf('.'));
+    const videoReg = /^(.mp4|.3gp|.rmvb|.avi|.wmv)$/;
+    const codeReg = /^(.js|.cpp|.c|.py|.java|.cs)$/;
+    const audioReg = /^(.mp3)$/;
+    const archive = /^(.zip|.rar)$/;
+    const officeMapper = {
+      '.doc': 'file-word',
+      '.docx': 'file-word',
+      '.xlsx': 'file-excel',
+      '.pptx': 'file-powerpoint',
+      '.pdf': 'file-pdf',
+    };
+    if (videoReg.test(suffix)) {
+      return 'file-video';
+    }
+    if (codeReg.test(suffix)) {
+      return 'file-code';
+    }
+    if (audioReg.test(suffix)) {
+      return 'file-audio';
+    }
+    if (archive.test(suffix)) {
+      return 'file-archive';
+    }
+    if (videoReg.test(suffix)) {
+      return 'file-film';
+    }
+    return officeMapper[suffix] || 'file';
+  }
+
+  handleFileChange = (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData(this.form);
+    const id = this.props.params.id;
+    const { user_id, user_name, avatar } = this.user;
+    let size = file.size;
+    const fileName = file.name;
+    const progressId = Date.now();
+    const msgEl = [...this.state.msgEl];
+    if (!id) {
+      toast.error('No chats selected!', toastOption);
+      return;
+    }
+    if (size < 1024) {
+      size = `${Number(size).toFixed(2)}B`;
+    } else if (size / 1024 < 1024) {
+      size = `${Number(size / 1024).toFixed(2)}KB`;
+    } else if (size / 1024 / 1024 < 1024) {
+      size = `${Number(size / 1024 / 1024).toFixed(2)}MB`;
+    } else if (size / 1024 / 1024 /1024 < 1024) {
+      size = `${Number(size / 1024 / 1024 / 1024).toFixed(2)}GB`;
+    }
+    let html = `<div class="columns file-desc">
+      <div class="column is-2">
+        <i class="far fa-${this.genIcon(fileName)} fa-3x"></i>
+      </div>
+      <div class="column">
+        <div>${fileName}</div>
+        <div id="con_${progressId}">
+          <progress id="${progressId}" max="100"></progress> 
+        </div>
+      </div>
+    </div>`;
+    msgEl.push(<div className="msginfo-right"  key={Math.random()}>
+      <div dangerouslySetInnerHTML={{ __html: html }}/>
+        <Link to={`/user-info/${user_id}`}>
+          <img src={avatar} className="avatar"/>
+        </Link>
+      </div>
+    );
+    this.setState({
+      msgEl: msgEl,
+    }, () => {
+      axios({
+        url: '/upload',
+        method: 'post',
+        data: formData,
+        onUploadProgress: (evt) => {
+          if(evt.lengthComputable){
+            document.getElementById(progressId).value = evt.loaded / evt.total * 100;
+            if (evt.loaded === evt.total) {
+              document.getElementById(`con_${progressId}`).innerHTML = `
+                <div>
+                  <span class="file-size">${size}</span>
+                  <span> | </span>
+                  <a href="/download/?name=${fileName}" download={fileName}>Download</a>
+                </div>
+              `;
+            }
+          }
+        },
+      })
+      .then(async (resp) => {
+        html = `<div class="columns file-desc">
+          <div class="column is-2">
+            <i class="far fa-${this.genIcon(fileName)} fa-3x"></i>
+          </div>
+          <div class="column">
+            <div>${fileName}</div>
+            <div id="div-${progressId}">
+              <div>
+                <span class="file-size">${size}</span>
+                <span> | </span>
+                <a href="/download/?name=${fileName}" download=${fileName}>Download</a>
+              </div> 
+            </div>
+          </div>
+        </div>`;
+        const data = {
+          from_user: user_id,
+          to_user: parseInt(id),
+          content: html,
+        };
+        const ret = await request({
+          url: '/message',
+          method: 'post',
+          data,
+        });
+        if (ret.code === '1') {
+          if (this.isGroup) {
+            socket.emit('chatToMore', html, user_id, id, avatar);
+          } else {
+            socket.emit('chatToOne', html, user_id, id);
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      this.msgBox.scrollTop = this.msgBox.scrollHeight;
+      document.getElementById('xFile').value = '';
+    });
+  }
+
+  sendImg = (e) => {
+    const id = this.props.params.id;
+    const file = e.target.files[0];
+    if (!id) {
+      toast.error('No chats selected!', toastOption);
+      return;
+    }
+    if(window.FileReader) {  
+      const reader = new FileReader();  
+      reader.onloadend = async () => {  
+        const html = `<img src="${reader.result}" class="msg-pic"/>`;
+        const { avatar, user_id } = this.user;
+        const msgEl = [...this.state.msgEl];
+        if (this.isGroup) {
+          socket.emit('chatToMore', html, user_id, id, avatar);
+        } else {
+          socket.emit('chatToOne', html, user_id, id);
+        }
+        const data = this.isGroup ? {
+          from_user: this.user.user_id,
+          content: html,
+          groupId: id,
+        } : {
+          from_user: this.user.user_id,
+          to_user: parseInt(id),
+          content: html,
+        };
+        await request({
+          url: '/message',
+          method: 'post',
+          data,
+        });
+        msgEl.push(<div className="msginfo-right"  key={Math.random()} >
+          <div dangerouslySetInnerHTML={{ __html: html.replace(/:qemoji-([0-9]+):/g, (match) => `<a class=${match.split(':')[1]}></a>`)}}/>
+          <Link to={`/user-info/${user_id}`}>
+            <img src={avatar} className="avatar"/>
+          </Link>
+        </div>);
+        this.setState({
+          msgEl: msgEl,
+        }, () => {
+          this.msgBox.scrollTop = this.msgBox.scrollHeight;
+          document.getElementById('pic').value = '';
+        });
+      };  
+      reader.readAsDataURL(file); 
+    } 
+  }
+
   render() {
+    this.isGroup && toJS(this.store.groupUser) && socket.emit('joinRoom', toJS(this.store.groupUser).map(user => user.id), this.props.params.id);
     const name = this.isGroup ? this.state.currentGroup.group_name : this.state.currentChatUser.username;
     const fontStyle = {fontWeight: '800', color: 'blue', margin: '0 5px', fontSize: '16px'};
     return (
@@ -334,7 +572,11 @@ class ChatRoom extends React.Component {
             </div>
           ) : (
             <div className="chatInfo">
-              {name && <div><span style={fontStyle}>{name}</span></div>}
+              {name && <div className="msg-topbar">
+                <span style={fontStyle}>{name}</span>
+                <Icon name={this.state.isShowGroupUser ? 'angle-up' : 'angle-down'} onClick={this.toggleShowGroupUser}/>
+                { this.state.isShowGroupUser && <GroupUser groupId={this.props.params.id}/>}
+              </div>}
             </div>
           )
         }
@@ -343,15 +585,27 @@ class ChatRoom extends React.Component {
         </div>
         <div className="wordarea">
           <div className="toolbar is-clearfix">
-            <Icon name="smile-o" size="medium" onClick={this.showEmoji}/>
-            <Icon name="folder-o" size="medium"/>
+            <Icon name="smile" prefix1='far' onClick={this.showEmoji}/>
+            <div className="sendImg">
+              <input type="file" id="pic" name="file" style={{position:'absolute',clip:'rect(0 0 0 0)'}} onChange={this.sendImg}/>
+              <label htmlFor="pic"><Icon name="images" prefix1='far'/></label>
+            </div>
+            {!this.isGroup && <Icon name="camera-retro" prefix1='fal' onClick={this.handleVideo}/>}
+            <div className="sendFile">
+              <form ref={form => { this.form = form; }}>
+                <input type="file" id="xFile" name="file" style={{position:'absolute',clip:'rect(0 0 0 0)'}} onChange={this.handleFileChange}/>
+                <label htmlFor="xFile"><Icon name="folder-open" prefix1='far'/></label>
+              </form>
+            </div>
           </div>
           <Textarea ref={ref => { this.textarea = ref; }} className="textarea is-primary" html={this.state.html} onChange={this.handleChange} onKeyDown={this.sendMsg}/>
-          <span>(按ctrl/cmd + enter组合键发送)</span>
-          <button className="pull-right button is-small" onClick={this.sendMsg}>{t('Send')}</button>
+          <div className="room-bottom">
+            <span>『按Ctrl/Cmd + Enter组合键发送』</span>
+            <button className="button is-small" onClick={this.sendMsg}>{t('Send')}</button>
+          </div>
         </div>
       </div>
-    )
+    );
   }
 }
 

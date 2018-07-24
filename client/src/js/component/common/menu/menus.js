@@ -12,7 +12,8 @@ class Menus extends React.Component {
     icon: PropTypes.string,
     selected: PropTypes.bool,
     toggled: PropTypes.bool,
-    iconPrefix: PropTypes.string,
+    iconPrefix1: PropTypes.string,
+    iconPrefix2: PropTypes.string,
     onClick: PropTypes.func,
     activeKey: PropTypes.string,
     className: PropTypes.string,
@@ -54,7 +55,8 @@ class Menus extends React.Component {
       children,
       isSub,
       icon,
-      iconPrefix,
+      iconPrefix1,
+      iconPrefix2,
       activeKey,
       selected,
       className,
@@ -79,7 +81,7 @@ class Menus extends React.Component {
             className={classNames('has-children', { 'is-open': isOpen })}
             onClick={this.handleClickOpen}
           >
-            {icon ? <Icon name={icon} prefix={iconPrefix}/> : null}
+            {icon ? <Icon name={icon} prefix1={iconPrefix1} prefix2={iconPrefix2}/> : null}
             {label}
             <span className="toggle-icon"><Icon name={arrowClass}/></span>
           </a>

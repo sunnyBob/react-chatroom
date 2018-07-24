@@ -1,16 +1,16 @@
-const { userService, msgService, inviteService, groupService } = require('../services');
+const { userService, msgService, inviteService, groupService, userOrGroupSerice } = require('../services');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwtConfig');
-const bcrypt = require('bcrypt');
-
-const saltRounds = 10;
+const bcrypt = require('bcryptjs');
+const salt = bcrypt.genSaltSync(10);
 
 exports.findUser = async (req, res) => {
   const { name, passwd } = req.query;
   const ret = await userService.findUser({name});
   const { id, password, avatar } = ret[0] || {};
-  if (bcrypt.compareSync(passwd, password)) {
+  
+  if (ret[0] && bcrypt.compareSync(passwd, password)) {
     const firstSignIn = Date.now();
     const token = jwt.sign({
       name,
@@ -21,7 +21,7 @@ exports.findUser = async (req, res) => {
     });
     res.cookie('token', token, {
       maxAge: 2592000000,//30天
-      httpOnly: true
+      // httpOnly: true
     });
     const retList = [{
       userName: name,
@@ -50,7 +50,7 @@ exports.addUser = async (req, res) => {
   if (searchRet.length && searchRet[0].id) {
     res.sendData('5000', '用户名已经被占用');
   } else {
-    const hash = bcrypt.hashSync(password, saltRounds);
+    const hash = bcrypt.hashSync(password, salt);
     const user = {
       username,
       password: hash,
@@ -77,6 +77,8 @@ exports.updateUserInfo = async (req, res) => {
     const { password: nowPassword, id } = ret[0] || {};
     if (bcrypt.compareSync(originPasswd, nowPassword)) {
       delete user.originPasswd;
+      delete user.name;
+      user.password = bcrypt.hashSync(password, salt);
       const ret = await userService.updateUserInfo(user);
       if (ret.affectedRows) {
         res.sendData(ret);
@@ -98,8 +100,8 @@ exports.updateUserInfo = async (req, res) => {
 
 //friend
 exports.showFriends = async (req, res) => {
-  const { userId } = req.query;
-  const ret = await userService.findFriend(userId);
+  const { userId, groupId } = req.query;
+  const ret = await userService.findFriend(userId, groupId);
   if (Array.isArray(ret)) {
     res.sendData(1, ret, 'success');
   } else {
@@ -152,16 +154,20 @@ exports.getMsg = async (req, res) => {
 
 //invitation
 exports.sendInvitation = async (req, res) => {
-  const { user_id, friend_id, username, invite_type } = req.body;
-  const searchRet = await inviteService.getInvitation(friend_id, user_id);
+  const { user_id, friend_id, username, invite_type, group_id, group_name } = req.body;
+  const searchRet = await inviteService.getInvitation(friend_id, user_id, invite_type, [group_id]);
+
   if (searchRet.length && searchRet[0].id) {
-    res.sendData('5000', '已发送过好友申请');
+    const msg = group_id ? '已发送过入群申请' : '已发送过好友申请';
+    res.sendData('5000', msg);
   } else {
     const invitation = {
       user_id,
       friend_id,
       username,
       invite_type,
+      group_id,
+      group_name,
     };
     const ret = await inviteService.sendInvitation(invitation);
     if (ret.affectedRows) {
@@ -173,8 +179,8 @@ exports.sendInvitation = async (req, res) => {
 };
 
 exports.getInvitation = async (req, res) => {
-  const {friend_id, invite_type } = req.query;
-  const searchRet = await inviteService.getInvitation(friend_id, invite_type);
+  const {friend_id, user_id, invite_type = '好友申请', groupIds = ''} = req.query;
+  const searchRet = await inviteService.getInvitation(friend_id, user_id, invite_type, groupIds.split(','));
   if (Array.isArray(searchRet)) {
     res.sendData('1', searchRet, '查询成功');
   } else {
@@ -205,10 +211,75 @@ exports.createGroup = async (req, res) => {
   }
 };
 
-exports.getGroupInfo = async (req, res) => {
-  const { id, userId, groupId, type } = req.query;
-  const ret = await groupService.getGroupInfo(id, userId, groupId, type);
+exports.joinGroup = async (req, res) => {
+  const { userId, groupId } = req.body;
+  const ret = await groupService.joinGroup(userId, groupId);
 
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '加入群聊成功');
+  } else {
+    res.sendData('0', ret, '加入群聊失败');
+  }
+};
+
+exports.getGroupInfo = async (req, res) => {
+  const { id, userId, groupId, type, userName, limit, offset } = req.query;
+  const ret = await groupService.getGroupInfo(id, userId, groupId, type, userName, limit, offset);
+
+  if (Array.isArray(ret)) {
+    if (type === '4') {
+      const count = ret.pop();
+      res.send({code: '1', retList: ret, total: userName ? ret.length : count['count(1)'], message: 'success'});
+    } else {
+      res.sendData('1', ret, '查询成功');
+    }
+  } else {
+    res.sendData('0', [], '查询失败');
+  }
+};
+
+exports.inviteToGroup = async (req, res) => {
+  const { users, groupId } = req.body;
+  const ret = await groupService.inviteIntoGroup(users, groupId);
+
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '加入群聊成功');
+  } else {
+    res.sendData('0', ret, '加入群聊失败');
+  }
+}
+
+exports.delGroupMem = async (req, res) => {
+  const { ids, groupId, groupName } = req.body;
+  const ret = await groupService.deleteFromGroup(ids, groupId, groupName);
+  res.sendData(ret);
+}
+
+exports.updateGroupInfo = async (req, res) => {
+  const { groupId, announce, group_name, introduce, group_avatar } = req.body;
+  const ret = await groupService.updateGroupInfo(groupId, announce, group_name, introduce, group_avatar);
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '修改成功');
+  } else {
+    res.sendData('0', ret, '修改失败');
+  }
+}
+
+exports.delGroup = async (req, res) => {
+  const { groupId } = req.body;
+  const ret = await groupService.removeGroup(groupId);
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '删除成功');
+  } else {
+    res.sendData('0', ret, '删除失败');
+  }
+}
+
+//userOrGroup
+exports.getUserOrGroup = async (req, res) => {
+  const { userId, name } = req.query;
+  const ret = await userOrGroupSerice.getUserOrGroup(userId, name);
+  
   if (Array.isArray(ret)) {
     res.sendData('1', ret, '查询成功');
   } else {
@@ -220,4 +291,27 @@ exports.getGroupInfo = async (req, res) => {
 exports.signOut = async (req, res) => {
   res.clearCookie('token');
   res.sendData('1', '登出成功');
+};
+
+
+//manager
+exports.addManager = async (req, res) => {
+  const { userId, groupId } = req.body;
+  const ret = await groupService.addManager(userId, groupId);
+
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '设置管理员成功');
+  } else {
+    res.sendData('0', ret, '设置管理员失败');
+  }
+};
+
+exports.delManager = async (req, res) => {
+  const { userId, groupId } = req.body;
+  const ret = await groupService.delManager(userId, groupId);
+  if (ret.affectedRows) {
+    res.sendData('1', ret, '取消管理员成功');
+  } else {
+    res.sendData('0', ret, '取消管理员失败');
+  }
 };

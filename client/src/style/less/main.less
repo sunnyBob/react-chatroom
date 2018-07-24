@@ -1,17 +1,26 @@
+@import '/node_modules/bulma-pageloader/dist/bulma-pageloader.min.css';
+@import '/node_modules/bulma-tooltip/dist/bulma-tooltip.min.css';
 @import './emoji.less';
 html, body {
   height: 100%;
 }
 #app {
   height: 100%;
-  margin-top: 12px;
-  background-image: url('/src/images/bg1.jpg');
+  background: url('/src/images/bg1.jpg') center no-repeat;
+  background-size: cover;
+  overflow: hidden;
 }
-
+.table-toolbar {
+  span.fa.fa-1x {
+    pointer-events: initial;
+    cursor: pointer;
+  }
+}
 .mainpage {
   height: 100%;
   width: 80% !important;
   margin: 0 auto !important;
+  padding: 0;
 }
 .topbar {
   background: #fff;
@@ -20,10 +29,13 @@ html, body {
   overflow: hidden;
 }
 .column.is-9 {
-  overflow: scroll;
+  height: 100%;
+  overflow: auto;
   & > div {
     padding: 0;
   }
+  border-radius: 0 10px 10px 0;
+  margin-top: 12px;
 }
 .user-info {
   display: flex;
@@ -56,17 +68,19 @@ html, body {
   .add-user {
     font-family: 'Serif';
     font-weight: bolder;
-    color: #95f10a;
     cursor: pointer;
   }
 }
 
 .menubox {
   height: 100%;
-  width: 200px;
-  padding: auto 0;
-  overflow: scroll;
-  background: linear-gradient(#4494d3, #D7ECF1);
+  overflow: auto;
+  // background: linear-gradient(#4494d3, #D7ECF1);
+  background: url('/src/images/bg2.jpg') no-repeat center;
+  background-size: cover;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  margin-top: 12px;
 }
 .menu-list li ul {
   padding: 0 !important;
@@ -75,12 +89,13 @@ html, body {
 .menu-list li {
   a {
     font-size: 12px;
+    font-weight: 600;
   }
   a.has-children {
     font-size: 14px;
   }
   a:hover {
-    background: #88c2ec;
+    background: rgba(181, 201, 214, 0.888);
   }
   a img {
     height: 30px;
@@ -101,11 +116,11 @@ html, body {
     display: block;
     border-radius: 50%;
     top: 18px;
-    right: 6px;
+    right: 8px;
   }
 }
 .menu-list .is-active {
-  background: #25a0f3 !important;
+  background: rgba(105, 126, 134, 0.888) !important;
 }
 .icon-close {
   padding: 30px;
@@ -188,4 +203,13 @@ html, body {
       font-size: 14px;
     }
   }
+}
+.fa-edit {
+  color: #267dce;
+}
+nav.pagination {
+ margin-top: 20px;
+}
+.data-table-container {
+  padding: 10px;
 }

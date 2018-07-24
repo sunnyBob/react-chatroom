@@ -34,4 +34,33 @@ export default class {
       }
     });
   }
+
+  static async getManageGroups(userId, groupId) {
+    const resp = await request({
+      url: '/group',
+      data: {
+        userId,
+        groupId,
+        type: '5',
+      },
+    });
+    return resp.retList || [];
+  }
+
+  static async findCreaterOrManager(groupId, options = {}) {
+    const resp = await request({
+      url: '/group',
+      data: {
+        groupId,
+        type: '7',
+      },
+    });
+  
+    const isCreaterOrManager = resp.code == 1 && resp.retList.length;
+    if (isCreaterOrManager) {
+      options.success && options.success.call(this, resp.retList);
+    } else {
+      options.fail && options.fail();
+    }
+  }
 }

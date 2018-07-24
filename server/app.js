@@ -1,18 +1,52 @@
 const express = require('express');
 const app = express();
 const PORT = '3000';
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
 const path = require('path');
 const routers = require('./routes/route');
 const sendData = require('./utils/sendHelp');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const multer  = require('multer')
+const options = {
+  key: fs.readFileSync('./cert/privatekey.pem'),
+  cert: fs.readFileSync('./cert/certificate.pem')
+};
+const https = require('https').Server(options, app);
+const io = require('socket.io')(https);
 
 const userSocket = {};
 const onlineUsers = {};
 let token = '';
+
+const createFolder = (folder) => { 
+  try{ 
+    fs.accessSync(folder);  
+  }catch(e){ 
+    fs.mkdirSync(folder); 
+  }   
+}; 
+const uploadFolder = './upload/'; 
+createFolder(uploadFolder); 
+const storage = multer.diskStorage({ 
+  destination: (req, file, cb) => { 
+    cb(null, uploadFolder);
+  }, 
+  filename: (req, file, cb) => { 
+    cb(null, file.originalname);   
+  } 
+}); 
+const upload = multer({ storage: storage }).single('file');
+app.post('/api/upload', function(req, res, next) {
+  upload(req, res, (err) => {
+    if (err) {
+      return;
+    }
+    const file = req.file;
+    res.send({ code: '1', fileName: file.originalname }); 
+  })
+}); 
 
 app.use(express.static(path.join(__dirname, '..', 'client')));
 app.use(sendData);
@@ -23,7 +57,7 @@ app.use(routers(express.Router()));
 app.get('*', (req, res, next) => {
   token = req.cookies && req.cookies.token;
 })
-http.listen(PORT, () => {
+https.listen(PORT, () => {
   console.log(`server start on port ${PORT}`);
 });
 
@@ -53,6 +87,10 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('updateGroupInvitation', id => {
+    io.to(`room-${id}`).emit('updateInvitation');
+  });
+
   socket.on('chatToOne', (msg, fromUser, toUser) => {
     if (userSocket.hasOwnProperty(toUser)) {
       userSocket[toUser].emit('chatToOne', msg, fromUser);
@@ -63,9 +101,39 @@ io.on('connection', (socket) => {
     io.to(`room-${groupId}`).emit('chatToMore', msg, userId, groupId, avatar);
   });
 
-  socket.on('joinRoom', (userId, roomName) => {
+  socket.on('addToRoom', (ids, groupId, cb) => {
+    if (ids && groupId) {
+      ids.forEach(id => {
+        if (userSocket.hasOwnProperty(id)) {
+          userSocket[id].join(`room-${groupId}`);
+        }
+      });
+
+      io.to(`room-${groupId}`).emit('updateGroupList');
+    }
+  });
+
+  socket.on('updateGroupList', groupId => {
+    io.to(`room-${groupId}`).emit('updateGroupList');
+  });
+
+  socket.on('updatePersonGroupList', userId => {
     if (userSocket.hasOwnProperty(userId)) {
-      userSocket[userId].join(roomName);
+      userSocket[userId].emit('updatePersonGroupList');
+    }
+  });
+
+  socket.on('updateGroupUser', (groupId) => {
+    io.to(`room-${groupId}`).emit('updateGroupUser', groupId);
+  });
+
+  socket.on('joinRoom', (ids, groupId, cb) => {
+    if (ids && groupId) {
+      ids.forEach(id => {
+        if (userSocket.hasOwnProperty(id)) {
+          userSocket[id].join(`room-${groupId}`);
+        }
+      });
     }
   });
 });

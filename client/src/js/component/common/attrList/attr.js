@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Icon } from '../';
 
 import './attr.less';
@@ -41,22 +42,22 @@ class Attr extends React.Component {
   renderIcon = (item) => {
     const {field} = item;
     const status = this.state[field] || 'edit';
-    const value = keyVlaue[field];
-    return status === 'edit' ? <Icon name="pencil-square-o" className="attr-opt" onClick={this.handleEdit.bind(this, field, value)}/>
+    const value = keyVlaue[field] || t('No Data');
+    return status === 'edit' ? <Icon name="edit" className="attr-opt" onClick={this.handleEdit.bind(this, field, value)}/>
     : (
       <span>
-        <Icon name="close" className="attr-opt" onClick={this.handleCancel.bind(this, field, value)}/>
+        <Icon name="times" className="attr-opt" onClick={this.handleCancel.bind(this, field, value)}/>
         <Icon name="check" className="attr-opt" onClick={this.handleOk.bind(this, field, value)}/>
       </span>
     );
   }
 
   render() {
-    const { attrList = [] } = this.props;
+    const { attrList = [], wrapClass } = this.props;
     const colSpan = 1;
 
     return (
-      <div className="info-main cols-3">
+      <div className={classNames('info-main', 'cols-3', { [wrapClass]: wrapClass })}>
         {
           attrList.map(item => {
             keyVlaue[item.field] = item.value;
@@ -64,7 +65,7 @@ class Attr extends React.Component {
               <div key={item.label} className={`info-item cols-3-${item.colSpan || colSpan}`}>
                 <label className="attr-title">{item.label}</label>
                 <span className="attr-content">
-                  <span className="attr-value" ref={ref => {this[item.field] = ref}}>{item.value}</span>
+                  <span className="attr-value" ref={ref => {this[item.field] = ref}}>{item.value || t('No Data')}</span>
                   {item.editable ? this.renderIcon(item) : null}
                 </span>
               </div>

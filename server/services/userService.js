@@ -15,8 +15,9 @@ exports.addUser = async (user) => {
   return ret;
 }
 
-exports.findFriend = async (userId) => {
-  const ret = await dao.query('user.showFriend', { userId });
+exports.findFriend = async (userId, groupId) => {
+  console.log(groupId);
+  const ret = groupId ? await dao.query('user.showFriendNotInGroup', { userId, groupId }) : await dao.query('user.showFriend', { userId });
   return ret;
 }
 

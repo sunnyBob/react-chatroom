@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import shortid from 'shortid';
 import { trim } from 'lodash';
-import { Menu, Menus, Dropdown, Icon } from '../../index';
-
+import { Menu, Menus, Dropdown, Icon } from '../';
 class Toolbar extends React.Component {
   static propTypes = {
     hasRefresh: PropTypes.bool,
@@ -186,7 +185,6 @@ class Toolbar extends React.Component {
     const { items, hasSearch, hasRefresh, hasColumnsControl, showFilter } = this.props;
     const leftItems = [];
     const rightItems = [];
-
     items.forEach(item => {
       if (Object.prototype.hasOwnProperty.call(item, 'content')) {
         item.align === 'right' ? rightItems.push(item.content) : leftItems.push(item.content);
@@ -207,7 +205,7 @@ class Toolbar extends React.Component {
           />
           {this.state.searched ? (
             <span className="icon is-small is-right" onClick={this.handleClearSearch}>
-              <Icon name="remove"/>
+              <Icon name="times"/>
             </span>
           ) : (
             <span className="icon is-small is-right" onClick={this.handleSearch}>
@@ -221,7 +219,7 @@ class Toolbar extends React.Component {
     const refreshBtn = hasRefresh ? (
       <div className="level-item">
         <a className="button is-light" onClick={this.handleRefresh}>
-          <Icon name="refresh"/>
+          <Icon name="sync"/>
         </a>
       </div>
     ) : null;

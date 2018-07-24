@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type='text/javascript' src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      margin: 0;
+      justify-content: center;
+      padding: 0 50px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    video {
+      position: fixed;
+      margin: 0 auto;
+      box-sizing: border-box;
+      border-radius: 2px;
+      padding: 0;
+      box-shadow: rgba(156, 172, 172, 0.2) 0px 2px 2px, rgba(156, 172, 172, 0.2) 0px 4px 4px, rgba(156, 172, 172, 0.2) 0px 8px 8px, rgba(156, 172, 172, 0.2) 0px 16px 16px, rgba(156, 172, 172, 0.2) 0px 32px 32px, rgba(156, 172, 172, 0.2) 0px 64px 64px;
+    }
+    #localVideo {
+      max-width: 200px;
+      right: 20px;
+      bottom: 20px;
+    }
+    #remoteVideo {
+      margin: 0 auto;
+      max-width: 800px;
+      align-self: center;
+    }
+    .copy {
+      position: fixed;
+      transform: translateX(-50%) translateY(-50%);
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.5);
+    }
+    body {
+      background: lightcyan;
+    }
+  </style>
+</head>
+<body>
+  <video id="remoteVideo" autoplay controls></video>
+  <video id="localVideo" autoplay muted controls></video>
+  <script>
+    const local = document.getElementById("localVideo");
+    const remote = document.getElementById("remoteVideo");
+    
+    function draggable(el) {
+      const height = el.offsetHeight,
+        width = el.offsetWidth;
+      let isMouseDown;
+      el.addEventListener('mousedown', function(e) {
+        isMouseDown = true;
+        document.body.classList.add('no-select');
+        initX = e.offsetX;
+        initY = e.offsetY;
+      })
+
+      el.addEventListener('mouseup', function() {
+        isMouseDown = false;
+        document.body.classList.remove('no-select');
+      })
+      document.addEventListener('mousemove', function(e) {
+        if (isMouseDown) {
+          const cx = e.clientX - initX,
+            cy = e.clientY - initY;
+          if (cx < 0) {
+            cx = 0;
+          }
+          if (cy < 0) {
+            cy = 0;
+          }
+          if (window.innerWidth - e.clientX + e.mouseX < width) {
+            cx = window.innerWidth - width;
+          }
+          if (e.clientY > window.innerHeight - height+ e.mouseY) {
+            cy = window.innerHeight - height;
+          }
+          el.style.left = cx + 'px';
+          el.style.top = cy + 'px';
+        }
+      })
+    }
+    draggable(local);
+    draggable(remote);
+  </script>
+  <script src="/src/js/video/video.js"></script>
+</body>
+</html>

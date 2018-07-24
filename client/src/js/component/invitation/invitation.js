@@ -1,6 +1,6 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
-import { Card, ModalManager, Table, Tab, TabItem } from '../common';
+import { Card, ModalManager, Table, Tab, TabItem, Icon } from '../common';
 import request from '../../utils/request';
 import commonUtils from '../../utils/commonUtils';
 import { toast } from 'react-toastify';
@@ -13,6 +13,7 @@ class Invitation extends React.Component {
 
     this.state = {
       tbData: [],
+      inviteType: '好友申请',
     };
     this.userId = JSON.parse(localStorage.getItem('user'))['user_id'];
   }
@@ -25,13 +26,17 @@ class Invitation extends React.Component {
     this.fetchData();
   }
 
-  fetchData = () => {
+  fetchData = async () => {
+    const groups = await commonUtils.getManageGroups(this.userId) || [];
+    const groupIds = groups.map(group => group.id);
+    const data = {
+      friend_id: this.userId,
+      invite_type: this.state.inviteType,
+      groupIds: groupIds.join(','),
+    };
     request({
       url: '/invitation',
-      data: {
-        friend_id: this.userId,
-        invite_type: this.state.inviteType,
-      },
+      data,
     }).then(resp => {
       if (resp.code == 1) {
         this.setState({
@@ -48,18 +53,16 @@ class Invitation extends React.Component {
   handleToggle = (e) => {
     const inviteType = e.target.innerHTML;
     this.setState({
-      inviteType, 
+      inviteType,
     }, () => { this.fetchData(); });
   }
 
   handleAccept = (invitation) => {
-    const { id, user_id, friend_id, username, invite_type } = invitation;
+    const { id, user_id, friend_id, username, invite_type, group_id } = invitation;
     if (invite_type === '好友申请') {
       commonUtils.isFriend(friend_id, user_id, {
         success: () => {
-          toast.success(`${username}已经是您的好友`, {
-
-          });
+          toast.success(`${username}已经是您的好友`, toastOption);
           this.handleDeleteInvitation(invitation, () => {
             this.fetchData();
             this.props.fetchData && this.props.fetchData();
@@ -85,36 +88,68 @@ class Invitation extends React.Component {
           });
         },
       });
+    } else {
+      commonUtils.isGroupMember(user_id, group_id, {
+        success: () => {
+          toast.success(`${username}已经在该群聊`, toastOption);
+          this.handleDeleteInvitation(invitation, () => {
+            this.fetchData();
+            this.props.fetchData && this.props.fetchData();
+          });
+        },
+        fail: () => {
+          request({
+            url: '/group/join',
+            method: 'post',
+            data: {
+              userId: user_id,
+              groupId: group_id,
+            },
+          }).then(resp => {
+            if (resp.code === '1') {
+              toast.success('加入群聊成功', toastOption);
+              this.props.fetchData && this.props.fetchData();
+              this.handleDeleteInvitation(invitation, () => {
+              this.fetchData();
+              this.props.fetchData && this.props.fetchData();
+            });
+              socket.emit('updateLeftList', user_id);
+            } else {
+              toast.error('加入群聊失败', toastOption);
+            }
+          });
+        },
+      });
     }
   }
 
   handleReject = (invitation) => {
-    const { user_id, username } = invitation;
+    const { user_id, username, invite_type } = invitation;
     ModalManager.confirm({
-      content: `确定拒绝${username}的好友申请？`,
-      onOk: this.handleDeleteInvitation.bind(null, invitation, () => {
-        toast.success(`您已成功拒绝${username}的好友申请`, toastOption);
+      content: `确定拒绝${username}的${invite_type}？`,
+      onOk: async () => await this.handleDeleteInvitation(invitation, () => {
+        toast.success(`您已成功拒绝${username}的${invite_type}`, toastOption);
         socket.emit('updateInvitation', user_id);
         this.fetchData();
+        this.props.fetchData && this.props.fetchData();
       }),
     })
   }
 
   handleDeleteInvitation = async (invitation, cb = () => {}) => {
     const { user_id, friend_id } = invitation;
-    await request({
+    const resp = await request({
       url: '/invitation',
       method: 'delete',
       data: {
         userId: user_id,
         friendId: friend_id,
       },
-    }).then(resp => {
-      if (resp.code == 1) {
-       cb();
-       return true;
-      }
     });
+    if (resp.code == 1) {
+      cb();
+      return true;
+    }
   }
 
   render() {
@@ -123,26 +158,33 @@ class Invitation extends React.Component {
       { label: '申请人姓名', field: 'username' },
       { label: '申请类型', field: 'invite_type' },
       { label: '申请时间', field: 'createTime' },
-      { label: '操作', template: row => <span className="invitation-opt">
-        <a onClick={this.handleAccept.bind(null, row)}>[接受] </a>
-        <a onClick={this.handleReject.bind(null, row)}>[拒绝]</a>
-      </span> },
+      {
+        label: '操作', template: row => <span className="invitation-opt">
+          <a onClick={this.handleAccept.bind(null, row)}>[接受] </a>
+          <a onClick={this.handleReject.bind(null, row)}>[拒绝]</a>
+        </span>
+      },
     ];
     const data = this.state.tbData;
+    const groupColumns = [...columns];
+    groupColumns.splice(3, 0, {
+      label: '群名称',
+      field: 'group_name',
+    });
+
     return (
-      <Card
-        title="申请列表"
-        enableClose={true}
-        handleClose={this.handleClose}
-        className="person-info"
-      >
+      <div>
+        <header className="detail-header">
+          <p className="detail-header-title">申请列表</p>
+          <Icon name="times" onClick={this.handleClose} />
+        </header>
         <div className="invitation-btns">
           <a onClick={this.handleToggle} className="button is-primary is-small">好友申请</a>
           <a onClick={this.handleToggle} className="button is-info is-small">入群申请</a>
         </div>
         <Table
           data={data}
-          columns={columns}
+          columns={this.state.inviteType === '好友申请' ? columns : groupColumns}
           total={data.length}
           className="is-narrow"
           pagination={{
@@ -155,7 +197,7 @@ class Invitation extends React.Component {
             layout: 'total, pager, jumper',
           }}
         />
-      </Card>
+      </div>
     );
   }
 }

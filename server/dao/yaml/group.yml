@@ -20,7 +20,7 @@ findJoinedGroup:
   - where u.group_id = g.id
   - and g.create_user_id != :userId
   - and u.user_id = :userId
-  - and u.user_id != (
+  - and u.user_id not in (
       select user_id from manager_group
     )
 
@@ -28,3 +28,106 @@ findGroupUser:
   - select user.* from groups g, user_group u, user
   - where u.group_id = g.id and user.id = u.user_id
   - and u.group_id = :groupId
+  - if:
+      test: :userId
+      sql: and user_id = :userId
+  - if:
+      test: :userName
+      sql: and username like :userName
+  - limit :limit
+  - offset :offset
+
+findGroupOrdinary:
+    - select * from (
+    - SELECT `user`.*
+    - FROM user, user_group
+    - WHERE user_group.group_id = :groupId
+    - AND user_group.user_id = `user`.id) group_user
+    - where group_user.id not in (select `user`.id from user, manager_group where manager_group.user_id = `user`.id and manager_group.group_id = :groupId)
+    - if:
+        test: :userId
+        sql: and id != :userId
+    - if:
+        test: :userName
+        sql: and username like :userName
+    - limit :limit
+    - offset :offset
+
+findGroupOrdinaryCount:
+  - select count(1) from (
+  - SELECT `user`.*
+  - FROM USER, user_group
+  - WHERE user_group.group_id = :groupId
+  - AND user_group.user_id = `user`.id) group_user
+  - where group_user.id not in (select `user`.id from user, manager_group where manager_group.user_id = `user`.id and manager_group.group_id = :groupId)
+  - if:
+      test: :userId
+      sql: and id != :userId
+  - if:
+      test: :userName
+      sql: and username like :userName
+
+findGroupManager:
+  - select user.* from user, manager_group
+  - where manager_group.user_id = `user`.id
+  - and manager_group.group_id = :groupId
+  - if:
+      test: :userName
+      sql: and username like :userName
+  - limit :limit
+  - offset :offset
+
+findGroupManagerCount:
+  - select count(1) from user, manager_group
+  - where manager_group.user_id = `user`.id
+  - and manager_group.group_id = :groupId
+  - if:
+      test: :userName
+      sql: and username like :userName
+
+findManageGroups:
+  - select groups.* from groups left join manager_group
+  - on groups.id = manager_group.group_id
+  - where (manager_group.user_id = :userId or groups.create_user_id = :userId)
+  - if:
+      test: :groupId
+      sql: and groups.group_id = :groupId
+
+findGroupUsersCount:
+  - select count(1) from groups g, user_group u, user
+  - where u.group_id = g.id and user.id = u.user_id
+  - and u.group_id = :groupId
+
+findGroupMaleCount:
+  - select count(1) from groups g, user_group u, user
+  - where u.group_id = g.id and user.id = u.user_id
+  - and u.group_id = :groupId and user.sex = 'male'
+
+findAfter90Count:
+  - select count(1) from groups g, user_group u, user
+  - where u.group_id = g.id and user.id = u.user_id
+  - and u.group_id = :groupId and user.age between 19 and 28
+
+findCreater:
+  - select user.* from groups, user
+  - where groups.create_user_id = user.id and groups.id = :groupId
+
+delMember:
+  - delete from user_group
+  - where 1 = 1
+  - if:
+      test: :user_id
+      sql: and user_id = :user_id
+  - if:
+      test: :group_id
+      sql: and group_id = :group_id
+
+delManager:
+  - delete from manager_group
+  - where 1 = 1
+  - if:
+      test: :user_id
+      sql: and user_id = :user_id
+  - if:
+      test: :group_id
+      sql: and group_id = :group_id

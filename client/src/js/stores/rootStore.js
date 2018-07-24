@@ -1,5 +1,6 @@
 import { observable, action, computed } from 'mobx';
 import request from '../utils/request';
+import commonUtils from '../utils/commonUtils';
 
 export default class RootStore {
   @observable userInfo = {};
@@ -24,10 +25,10 @@ export default class RootStore {
   }
 
   @action
-  getFriends(userId) {
+  getFriends(userId, groupId) {
     request({
       url: '/friends',
-      data: { userId },
+      data: { userId, groupId },
     }).then((resp) => {
       if (Array.isArray(resp.retList)) {
         this.friendsInfo = resp.retList;
@@ -36,10 +37,12 @@ export default class RootStore {
   }
 
   @action
-  getInvitation(friend_id) {
+  async getInvitation(friend_id) {
+    const groups = await commonUtils.getManageGroups(friend_id) || [];
+    const groupIds = groups.map(group => group.id).join(',');
     request({
       url: '/invitation',
-      data: { friend_id },
+      data: { friend_id, groupIds },
     }).then((resp) => {
       if (Array.isArray(resp.retList)) {
         this.invitation = resp.retList;
@@ -101,10 +104,10 @@ export default class RootStore {
   }
 
   @action
-  getGroupUser(id, cb = () => {}) {
+  getGroupUser(userId, groupId, cb = () => {}) {
     request({
       url: '/group',
-      data: { id, type: '4' },
+      data: { userId, groupId, type: '4' },
     }).then((resp) => {
       if (Array.isArray(resp.retList)) {
         this.groupUser = resp.retList;
