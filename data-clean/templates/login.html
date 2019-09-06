@@ -1,0 +1,25 @@
+{% extends './common/layout.html' %}
+{% block title %}管理员登录{% endblock %}
+{% block body %}
+
+  <div class="container" style="width:400px">
+    <div class="card">
+      <div class="card-content" style="margin-top: 120px; display: flex;flex-direction: column;text-align: center;align-items: center;">
+        <h1>{{ title }}</h1>
+        <form method="post" style="width: 260px;">
+          <div class="control">
+            <label class="label">account</label>
+            <input type=text name=username class="input">
+          </div>
+          <div class="control">
+            <label class="label">password</label>
+            <input type=text name=password class="input">
+          </div>
+          <p></p>
+          <p><input type=submit value=Login class="button is-primary is-small" style="margin-top: 20px">
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
