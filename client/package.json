@@ -31,7 +31,7 @@
     "url-loader": "^0.6.2"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-clean-css": "^3.9.0",
     "gulp-less": "^3.3.2",
     "gulp-notify": "^3.0.0",
